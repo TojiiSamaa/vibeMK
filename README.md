@@ -1,5 +1,27 @@
 # vibeMK 🚀
 
+## Python vs Rust: measured comparison
+
+Same machine (Windows 11), same fake CheckMK, both servers over stdio, release build for Rust.
+Script: `scripts/bench.py`. Median of 10 starts, 300 sequential `tools/call`.
+
+| | Python (0.6.4) | Rust (`rust/`) | Rust vs Python |
+|---|---|---|---|
+| Start until `initialize` answered | 1217 ms | 259 ms | 4.7x faster |
+| `tools/list` (154 tools) | 8.9 ms | 4.7 ms | 1.9x faster |
+| `tools/call`, median | 4.86 ms | 1.05 ms | 4.6x faster |
+| `tools/call`, p99 | 75 ms | 44 ms | 1.7x faster |
+| Sequential throughput | 53 calls/s | 251 calls/s | 4.7x |
+| Peak memory (process tree) | 75 MB | 54 MB | 28 % less |
+| Install footprint | 75.5 MB of dependencies (31 packages) + a Python interpreter | one 11.1 MB binary | |
+| Source lines (src) | 16,941 | 14,657 | |
+| Tests | 464 pytest cases, 6,496 lines | 537 tests, 12,131 lines | |
+| Tools offered | 154 | 154 (identical `tools.json`) | |
+
+Limits: a local fake server answers in microseconds, so these numbers show the server's own overhead, not
+what you will see against a real CheckMK, where the network and CheckMK dominate. One machine, one run.
+The Rust port is tested against the same fake CheckMK, never against a real instance. See `AUDIT.md`.
+
 **CheckMK Monitoring via LLM - Professional MCP Server**
 
 <!-- mcp-name: io.github.chexma/vibemk -->
