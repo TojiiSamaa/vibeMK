@@ -1,0 +1,31 @@
+[package]
+name = "vibemk"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "vibemk"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+jsonschema = { version = "0.30", default-features = false }
+clap = { version = "4", features = ["derive", "env"] }
+axum = "0.8"
+async-trait = "0.1"
+futures = "0.3"
+chrono = "0.4"
+thiserror = "1"
+anyhow = "1"
+tracing = "0.1"
+
+[dev-dependencies]
+wiremock = "0.6"
+tokio = { version = "1", features = ["full"] }

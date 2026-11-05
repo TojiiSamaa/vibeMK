@@ -83,7 +83,7 @@ class TestHandlersEncodeTheirPathValues:
     def test_no_raw_interpolation_in_object_paths(self):
         offenders = []
         for source in sorted(HANDLERS.glob("*.py")):
-            for number, line in enumerate(source.read_text().splitlines(), start=1):
+            for number, line in enumerate(source.read_text(encoding="utf-8").splitlines(), start=1):
                 for literal in re.findall(r'f"objects/[^"]*"', line):
                     for field in re.findall(r"\{([^}]*)\}", literal):
                         if field.startswith("path_segment(") or field in self.PRE_ENCODED:

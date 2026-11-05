@@ -182,7 +182,7 @@ def test_every_registered_tool_is_dispatched_by_its_handler(registry):
     for name in sorted(registry.tool_names()):
         handler = registry.handler_for(name)
         module = pathlib.Path(inspect.getfile(type(handler)))
-        if f'"{name}"' not in module.read_text():
+        if f'"{name}"' not in module.read_text(encoding="utf-8"):
             missing[name] = module.name
 
     assert missing == {}, f"routed to a handler that never mentions them: {missing}"

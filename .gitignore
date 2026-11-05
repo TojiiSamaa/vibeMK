@@ -105,3 +105,6 @@ CLAUDE.local.md
 recommendations.md
 pytest.errors
 /plan
+
+# Rust port build output
+/rust/target/

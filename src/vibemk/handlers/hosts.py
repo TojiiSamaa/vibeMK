@@ -5,7 +5,7 @@ Host management handlers with enhanced features for CheckMK integration
 import json
 from typing import Any, Dict, List, Optional
 
-from vibemk.api.exceptions import CheckMKError, CheckMKNotFoundError
+from vibemk.api.exceptions import CheckMKAPIError, CheckMKError, CheckMKNotFoundError
 from vibemk.api.paths import path_segment
 from vibemk.handlers.base import BaseHandler, time_ago
 from vibemk.utils.folder_validator import validate_folder_path
@@ -627,11 +627,11 @@ class HostHandler(BaseHandler):
         etag = current_config.get("headers", {}).get("ETag")
         if not etag:
             # Fallback: try legacy location or warn
-            etag = current_config["data"].get("extensions", {}).get("meta_data", {}).get("etag")
+            etag = (current_config.get("data") or {}).get("extensions", {}).get("meta_data", {}).get("etag")
             if not etag:
                 self.logger.debug("No ETag found in host config, this may cause issues with concurrent updates")
 
-        current_attributes = current_config["data"].get("extensions", {}).get("attributes", {})
+        current_attributes = (current_config.get("data") or {}).get("extensions", {}).get("attributes", {})
 
         # Build proper CheckMK API request based on update mode
         # Note: CheckMK 2.2.0p7+ does not support simultaneous use of attributes, update_attributes, and remove_attributes
@@ -730,6 +730,13 @@ class HostHandler(BaseHandler):
                         "Host update failed", f"Could not update host '{host_name}': {error_details}"
                     )
 
+        except CheckMKAPIError as e:
+            if e.status_code not in (412, 428):
+                raise
+            return self.error_response(
+                "Concurrent modification detected",
+                f"Host '{host_name}' was modified by another process. Please re-read it and retry the operation.",
+            )
         except Exception as e:
             self.logger.exception(f"Host update operation failed for {host_name}")
             return self.error_response(
@@ -946,7 +953,7 @@ class HostHandler(BaseHandler):
         if not current_config.get("success"):
             return self.error_response("Host not found", f"Host '{host_name}' not found")
 
-        current_attributes = current_config["data"].get("extensions", {}).get("attributes", {})
+        current_attributes = (current_config.get("data") or {}).get("extensions", {}).get("attributes", {})
 
         # Compare states
         comparison = self._compare_attributes(current_attributes, desired_attributes)

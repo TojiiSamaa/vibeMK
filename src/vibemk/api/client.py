@@ -48,6 +48,15 @@ _RETRYABLE_STATUS_CODES = (429, 500, 502, 503, 504)
 _IDEMPOTENT_METHODS = ("GET", "PUT", "DELETE", "HEAD", "OPTIONS")
 
 
+def _with_etag(headers: Any) -> Dict[str, str]:
+    """dict(headers) loses the case-insensitivity of the HTTPMessage: keep ETag under its canonical name."""
+    out = dict(headers) if headers else {}
+    etag = headers.get("ETag") if headers else None
+    if etag:
+        out["ETag"] = etag
+    return out
+
+
 class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
     """Refuse to follow redirects during URL detection.
 
@@ -90,6 +99,7 @@ class CheckMKClient:
     def _create_ssl_context(self) -> Optional[ssl.SSLContext]:
         """Create SSL context based on configuration"""
         if not self.config.verify_ssl:
+            logger.warning("TLS certificate verification is disabled (verify_ssl=false): credentials can be intercepted")
             ssl_context = ssl.create_default_context()
             ssl_context.check_hostname = False
             ssl_context.verify_mode = ssl.CERT_NONE
@@ -201,7 +211,12 @@ class CheckMKClient:
             if custom_headers:
                 request_headers.update(custom_headers)
 
+            # Unredirected: urllib re-sends req.headers to the target of a 3xx,
+            # which would hand the credentials to whatever host answers.
+            auth = request_headers.pop("Authorization", None)
             req = urllib.request.Request(url, headers=request_headers, method=method)
+            if auth:
+                req.add_unredirected_header("Authorization", auth)
 
             # `is not None` rather than truthiness: a handler that deliberately
             # sends {} means an empty JSON object, not "send no body at all".
@@ -239,7 +254,7 @@ class CheckMKClient:
                 redirect["location"] = e.headers.get("Location", "") if e.headers else ""
                 return redirect
             return self._handle_http_error(
-                e, endpoint, method, data, params, custom_headers, retry_count, use_api_prefix
+                e, endpoint, method, data, params, custom_headers, retry_count, use_api_prefix, follow_redirects
             )
         except (CheckMKAPIError, CheckMKConnectionError, CheckMKError):
             # Don't catch and re-wrap our own exceptions
@@ -257,7 +272,7 @@ class CheckMKClient:
             "data": data,
             "success": True,
             "raw_content": raw_content,  # Keep raw content for view API parsing
-            "headers": dict(headers) if headers else {},  # Include response headers for ETag support
+            "headers": _with_etag(headers),  # Include response headers for ETag support
         }
 
     def _handle_http_error(
@@ -270,6 +285,7 @@ class CheckMKClient:
         custom_headers: Optional[Dict[str, str]],
         retry_count: int,
         use_api_prefix: bool = True,
+        follow_redirects: bool = True,
     ) -> Dict[str, Any]:
         """Handle HTTP errors with appropriate exceptions and retries"""
 
@@ -285,7 +301,9 @@ class CheckMKClient:
         )
         if retryable:
             time.sleep(self._retry_delay(error, retry_count))
-            return self.request(endpoint, method, data, params, custom_headers, retry_count + 1, use_api_prefix)
+            return self.request(
+                endpoint, method, data, params, custom_headers, retry_count + 1, use_api_prefix, follow_redirects
+            )
 
         # Map HTTP status codes to custom exceptions
         if error.code == 401:
@@ -313,7 +331,7 @@ class CheckMKClient:
         if not raw:
             return backoff
         try:
-            return max(0.0, float(str(raw).strip()))
+            return min(30.0, max(0.0, float(str(raw).strip())))
         except ValueError:
             return backoff
 

@@ -4,7 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+- Rust port of the server (`rust/`): same tools, schemas, flags and
+  environment variables, stdio and HTTP with bearer auth; `--read-only` lists only read tools and
+  refuses the others;
+  CI in `.github/workflows/ci-rust.yml`
+
 ### Fixed
+- Audit findings, reported in the Rust port and tested there (ids in
+  `AUDIT.md`): `Authorization` is not sent on a redirect to another host (S1);
+  a non-ASCII bearer token is a 401 (S3); object paths are escaped (S4);
+  header lookup ignores case (E1); null `data`/`extensions` bodies no longer
+  crash the write report (E2, E11, N1); a retry keeps redirects off (E3);
+  `Retry-After` is capped (E4); `update_host` gives the concurrency advice on
+  412/428 (E6); the `*` ETag fallback is logged (E8); an activation is
+  reported as started (E9a); `time_ago` of a future date is 0 (E10a)
 - Whether a call failed no longer depends on how its answer is worded: a
   status shown with ❌, such as a failed background job, is reported as a
   result, not as a failed call

@@ -154,7 +154,10 @@ class ConnectionHandler(BaseHandler):
 
         # Compare the path as the server will resolve it, so ../ cannot climb
         # out of the API prefix. Percent-encoded dots are decoded first.
-        segments = urllib.parse.unquote(target.path).split("/")
+        decoded = urllib.parse.unquote(target.path)
+        if "\\" in decoded:
+            return "Backslashes in the path are not allowed"
+        segments = decoded.split("/")
         if ".." in segments:
             return "Path segments '..' are not allowed"
         base_path = base.path.rstrip("/")

@@ -36,7 +36,7 @@ def time_ago(timestamp: Any) -> Optional[str]:
     if not timestamp:
         return None
     try:
-        diff = int(time.time() - float(timestamp))
+        diff = max(0, int(time.time() - float(timestamp)))
     except (ValueError, TypeError):
         return str(timestamp)
 
@@ -126,7 +126,12 @@ class BaseHandler(ABC):
         """
         etag = (response.get("headers") or {}).get("ETag")
         if not etag:
-            etag = response.get("data", {}).get("extensions", {}).get("meta_data", {}).get("etag")
+            node: Any = response.get("data")
+            for key in ("extensions", "meta_data", "etag"):
+                node = node.get(key) if isinstance(node, dict) else None
+            etag = node
+        if not etag:
+            logger.warning("No ETag available: falling back to If-Match '*', concurrent edits will not be detected")
         return etag or "*"
 
     def _run_activation(self) -> str:
@@ -147,7 +152,7 @@ class BaseHandler(ABC):
             pending = self.client.get("domain-types/activation_run/collections/pending_changes")
             if not pending.get("success"):
                 return "⚠️ Could not read pending changes; nothing was activated."
-            if not pending.get("data", {}).get("value", []):
+            if not (pending.get("data") or {}).get("value", []):
                 return "ℹ️ No pending changes to activate."
 
             result = self.client.post(
@@ -163,7 +168,7 @@ class BaseHandler(ABC):
             return f"⚠️ Activation failed: {error}"
         if not result.get("success"):
             return "⚠️ Activation was not accepted; the changes are still pending."
-        return "✅ Changes activated."
+        return "✅ Activation started (CheckMK runs it in the background)."
 
     def success_response(self, message: str, data: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
         """Create success response"""

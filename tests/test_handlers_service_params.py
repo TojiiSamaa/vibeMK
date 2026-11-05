@@ -74,7 +74,7 @@ def test_no_shipped_module_calls_eval_or_exec():
     sources = sorted((root / "src" / "vibemk").rglob("*.py"))
     assert sources, "no shipped source found"
     for path in sources:
-        for node in ast.walk(ast.parse(path.read_text())):
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
             if isinstance(node, ast.Call) and isinstance(node.func, ast.Name) and node.func.id in ("eval", "exec"):
                 guilty.append(f"{path.relative_to(root)}:{node.lineno}: {node.func.id}()")
 

@@ -72,4 +72,4 @@ class BearerTokenMiddleware(BaseHTTPMiddleware):
         if scheme.lower() != _SCHEME:
             return False
         # Constant time, so a wrong token does not leak how much of it was right.
-        return secrets.compare_digest(presented.strip(), self._token)
+        return secrets.compare_digest(presented.strip().encode(), self._token.encode())

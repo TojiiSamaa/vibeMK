@@ -1,0 +1,57 @@
+name: CI Rust
+
+on:
+  push:
+    paths: ["rust/**", "scripts/export_tools.py", ".github/workflows/ci-rust.yml"]
+  pull_request:
+    paths: ["rust/**", "scripts/export_tools.py", ".github/workflows/ci-rust.yml"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    name: rust (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - run: rustup component add rustfmt clippy
+
+      - name: Format
+        run: cargo fmt --check
+
+      - name: Lint
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Tests
+        run: cargo test
+
+  tools-json:
+    name: tools.json is current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+
+      - run: pip install -e .
+
+      - name: Regenerate tools.json
+        run: python scripts/export_tools.py rust/tools.json
+
+      - name: No difference
+        run: git diff --exit-code rust/tools.json

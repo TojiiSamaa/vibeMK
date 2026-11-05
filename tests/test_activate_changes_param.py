@@ -81,7 +81,7 @@ class TestEveryOfferIsHonoured:
     def test_the_handlers_leave_activation_to_the_dispatcher(self):
         """One place decides. A handler with its own copy would activate twice."""
         handlers = pathlib.Path(__file__).resolve().parent.parent / "src" / "vibemk" / "handlers"
-        copies = [path.name for path in sorted(handlers.glob("*.py")) if '.get("activate_changes")' in path.read_text()]
+        copies = [path.name for path in sorted(handlers.glob("*.py")) if '.get("activate_changes")' in path.read_text(encoding="utf-8")]
         assert copies == []
 
     def test_every_tool_offering_it_reaches_a_handler_that_can_activate(self):

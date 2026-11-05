@@ -283,7 +283,7 @@ echo "Python Path: $(which python3)"
 
 uvx keeps using the version it cached first. Use `"args": ["vibemk@latest"]`
 to pick up new releases on every start (needs network access to PyPI), or pin
-one with `"args": ["vibemk==0.6.1"]`.
+one with `"args": ["vibemk==0.6.4"]`.
 
 The configurations below start vibeMK from a source checkout (Option B).
 
@@ -347,6 +347,8 @@ The configurations below start vibeMK from a source checkout (Option B).
 | `CHECKMK_VERIFY_SSL` | `true` | Enable SSL certificate verification |
 | `CHECKMK_TIMEOUT` | `30` | Request timeout in seconds |
 | `CHECKMK_MAX_RETRIES` | `3` | Maximum number of retry attempts |
+| `CHECKMK_DEBUG` | `false` | Enable debug logging |
+| `LOGFILE` | - | Path of a log file; when set, file logging and debug logging are enabled |
 | `NEVER_ACTIVATE_CHANGES` | `false` | **Safety feature**: Disable change activation |
 | `VIBEMK_READ_ONLY` | `false` | **Safety feature**: Offer only the tools that read; every write is refused (same as `--read-only`) |
 | `PYTHONIOENCODING` | - | Set to `utf-8` for Windows compatibility |

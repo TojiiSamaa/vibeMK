@@ -20,7 +20,7 @@ VERSION_COMMENT = re.compile(r"^\s+#\s*v\d+(\.\d+)*\s*$")
 
 def _uses_lines():
     for workflow in sorted(WORKFLOWS.glob("*.y*ml")):
-        for number, line in enumerate(workflow.read_text().splitlines(), start=1):
+        for number, line in enumerate(workflow.read_text(encoding="utf-8").splitlines(), start=1):
             match = USES.match(line)
             if match:
                 yield f"{workflow.name}:{number}", match.group("ref"), match.group("rest")

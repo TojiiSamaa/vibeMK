@@ -26,6 +26,8 @@ def handler(mock_checkmk_client):
 @pytest.fixture
 def restore_timezone(monkeypatch):
     yield
+    if not hasattr(time, "tzset"):
+        return
     monkeypatch.delenv("TZ", raising=False)
     time.tzset()
 
@@ -34,6 +36,7 @@ def as_utc(stamp: str) -> datetime:
     return datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
 
 
+@pytest.mark.skipif(not hasattr(time, "tzset"), reason="time.tzset is POSIX only")
 @pytest.mark.usefixtures("restore_timezone")
 def test_window_is_the_same_instant_in_every_host_timezone(handler, monkeypatch):
     windows = []
