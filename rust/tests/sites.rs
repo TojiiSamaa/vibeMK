@@ -85,14 +85,13 @@ async fn login_site_needs_all_three_arguments() {
 }
 
 #[tokio::test]
-async fn logout_site_posts_an_empty_body() {
+async fn logout_site_posts_no_body() {
     let (server, client) = common::fake_checkmk().await;
     Mock::given(method("POST"))
         .and(path(format!(
             "{}/objects/site_connection/remote1/actions/logout/invoke",
             common::API
         )))
-        .and(body_json(json!({})))
         .respond_with(ResponseTemplate::new(204))
         .expect(1)
         .mount(&server)
@@ -101,6 +100,8 @@ async fn logout_site_posts_an_empty_body() {
         .handle("vibemk_logout_site", &json!({"site_id": "remote1"}))
         .await;
     assert_eq!(text(&out), "✅ Logged out of site 'remote1'.");
+    // No body: 2.5 rejects even an empty JSON object here.
+    assert!(server.received_requests().await.unwrap()[0].body.is_empty());
 }
 
 #[tokio::test]

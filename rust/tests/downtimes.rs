@@ -693,11 +693,30 @@ async fn modify_by_id_and_by_query() {
     let first: Value = sent[0].body_json().unwrap();
     assert_eq!(
         first,
-        json!({"modify_type": "params", "downtime_id": 12, "end_time": {"modify_type": "set_end_time", "value": "2026-03-01T23:00:00Z"}, "comment": "c"})
+        json!({"modify_type": "by_id", "downtime_id": "12", "site_id": "cmk", "end_time": {"modify_type": "absolute", "value": "2026-03-01T23:00:00Z"}, "comment": "c"})
     );
     let second: Value = sent[1].body_json().unwrap();
-    assert_eq!(second["modify_type"], "by_query");
-    assert_eq!(second["query"]["op"], "and");
+    assert_eq!(
+        second,
+        json!({"modify_type": "params", "host_name": "web01", "service_descriptions": ["CPU"], "end_time": {"modify_type": "absolute", "value": "2026-03-01T23:00:00Z"}})
+    );
+    h.handle(
+        "vibemk_modify_downtime",
+        &json!({"downtime_id": 7, "site_id": "remote", "end_time": "2026-03-01T23:00:00Z"}),
+    )
+    .await;
+    let third: Value = requests(
+        &server,
+        "PUT",
+        "domain-types/downtime/actions/modify/invoke",
+    )
+    .await[2]
+        .body_json()
+        .unwrap();
+    assert_eq!(
+        (&third["downtime_id"], &third["site_id"]),
+        (&json!("7"), &json!("remote"))
+    );
     let none = h
         .handle("vibemk_modify_downtime", &json!({"end_time": "x"}))
         .await;

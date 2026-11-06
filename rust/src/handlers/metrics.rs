@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use async_trait::async_trait;
 use chrono::{Duration, Utc};
-use serde_json::{json, Map, Value};
+use serde_json::{json, Value};
 
 use crate::client::{ApiError, CheckMkClient};
 use crate::handlers::base::{py_repr, Base, Handler};
@@ -542,14 +542,15 @@ impl MetricsHandler {
                 Some("Either graph_id or metric_id is required. Both are shown in the service view once 'Show internal IDs' is enabled in its display options — a graph ID in the graph title, a metric ID in the legend."),
             ));
         }
-        let service = arg(args, "service_filter");
-        let mut filter = Map::new();
-        filter.insert("siteopt".into(), json!({"site": site}));
-        filter.insert("host".into(), json!({"host": host_filter}));
-        if let Some(s) = service {
-            filter.insert("service".into(), json!({"service": s}));
-        }
-        let mut body = json!({"time_range": Self::parse_time_range(time_range), "reduce": reduce_of(args), "filter": filter});
+        let Some(service) = arg(args, "service_filter") else {
+            return Ok(self.base.error_response(
+                "Missing parameter",
+                Some("service_filter is required (the service holding the metric)"),
+            ));
+        };
+        // 2.3 and 2.5 no longer publish metric/actions/filter: the one metric route
+        // takes an exact host and service.
+        let mut body = json!({"time_range": Self::parse_time_range(time_range), "reduce": reduce_of(args), "site": site, "host_name": host_filter, "service_description": service});
         if let Some(g) = graph_id {
             body["type"] = json!("predefined_graph");
             body["graph_id"] = json!(g);
@@ -560,16 +561,9 @@ impl MetricsHandler {
         let r = self
             .base
             .client
-            .post(
-                &format!("{METRIC_ENDPOINT}/filter/invoke"),
-                Some(&body),
-                &[],
-            )
+            .post(&format!("{METRIC_ENDPOINT}/get/invoke"), Some(&body), &[])
             .await?;
-        let target = format!(
-            "{host_filter}{}",
-            service.map_or(String::new(), |s| format!("/{s}"))
-        );
+        let target = format!("{host_filter}/{service}");
         let text = format!(
             "🔍 **Metrics Search Results**\n\nFilter: {target}\n\n{}",
             Self::format_metrics(&target, "Search", &r.data, time_range)

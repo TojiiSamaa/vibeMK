@@ -1,7 +1,7 @@
 //! Port of src/vibemk/handlers/active_checks.py (ActiveChecksHandler).
 //! Active checks are rules on active_checks:* rulesets; `value_raw` must be a Python literal, not JSON.
 
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use anyhow::{anyhow, Result};
 use async_trait::async_trait;
@@ -149,12 +149,38 @@ impl<'a> Args<'a> {
 
 pub struct ActiveChecksHandler {
     base: Base,
+    is_23: OnceLock<bool>,
 }
 
 impl ActiveChecksHandler {
     pub fn new(client: Arc<CheckMkClient>) -> Self {
         Self {
             base: Base::new(client),
+            is_23: OnceLock::new(),
+        }
+    }
+
+    /// True on 2.3, whose LDAP and SMB rulesets still store bare (warn, crit) tuples.
+    async fn plain_levels(&self) -> bool {
+        if let Some(v) = self.is_23.get() {
+            return *v;
+        }
+        let version = match self.base.client.get("version", None, &[]).await {
+            Ok(r) => r
+                .data
+                .pointer("/versions/checkmk")
+                .map_or_else(String::new, txt),
+            Err(_) => String::new(),
+        };
+        *self.is_23.get_or_init(|| version.starts_with("2.3"))
+    }
+
+    /// 2.3: the bare (warn, crit) tuple; later: SimpleLevels scaled by `scale`.
+    async fn levels(&self, warn: &Value, crit: &Value, scale: f64) -> Result<String> {
+        if self.plain_levels().await {
+            Ok(tup(&[fl(flt(warn)?), fl(flt(crit)?)]))
+        } else {
+            fixed_levels(warn, crit, scale)
         }
     }
 
@@ -664,7 +690,8 @@ impl ActiveChecksHandler {
         let mut v = vec![
             ("name", py_repr(&name)),
             ("base_dn", s(&base_dn)),
-            ("response_time", fixed_levels(&warn, &crit, 0.001)?),
+            // 2.3: milliseconds as a bare tuple; later: SimpleLevels in seconds.
+            ("response_time", self.levels(&warn, &crit, 0.001).await?),
         ];
         if let (Some(b), Some(p)) = (a.on("bind_dn"), a.on("password")) {
             v.push((
@@ -711,7 +738,7 @@ impl ActiveChecksHandler {
         let mut v = vec![
             ("share", s(&share)),
             ("host", host),
-            ("levels", fixed_levels(&warn, &crit, 1.0)?),
+            ("levels", self.levels(&warn, &crit, 1.0).await?),
         ];
         if let (Some(u), Some(p)) = (a.on("username"), a.on("password")) {
             v.push((

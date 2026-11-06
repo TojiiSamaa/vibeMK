@@ -55,36 +55,45 @@ class ConfigurationHandler(BaseHandler):
         sites = arguments.get("sites", [])
         force = arguments.get("force_foreign_changes", False)
 
-        # First, check pending changes to get current state
-        pending_result = self.client.get("domain-types/activation_run/collections/pending_changes")
-
-        if not pending_result.get("success"):
-            return self.error_response("Cannot check pending changes", "Unable to verify current configuration state")
-
-        pending_changes = pending_result["data"].get("value", [])
-        if not pending_changes:
-            return [
-                {"type": "text", "text": "ℹ️ **No Pending Changes**\n\nThere are no configuration changes to activate."}
-            ]
-
-        # Prepare activation data
         data = {
             "redirect": False,
             "sites": sites if sites else [self.client.config.site],
             "force_foreign_changes": force,
         }
 
-        # activate-changes is declared etag="input"; the ETag comes from the
-        # pending_changes response fetched above, which is etag="output".
-        # The wildcard was accepted but disabled the precondition check.
-        headers = {"If-Match": self._extract_etag(pending_result)}
+        # A 412 means the pending changes moved between the read and the POST
+        # (e.g. a host rename job activates on its own): read them again once.
+        for attempt in range(2):
+            pending_result = self.client.get("domain-types/activation_run/collections/pending_changes")
 
-        try:
-            result = self.client.post(
-                "domain-types/activation_run/actions/activate-changes/invoke", data=data, headers=headers
-            )
-        except CheckMKError as error:
-            return self.error_response("Activation failed", str(error))
+            if not pending_result.get("success"):
+                return self.error_response(
+                    "Cannot check pending changes", "Unable to verify current configuration state"
+                )
+
+            pending_changes = pending_result["data"].get("value", [])
+            if not pending_changes:
+                return [
+                    {
+                        "type": "text",
+                        "text": "ℹ️ **No Pending Changes**\n\nThere are no configuration changes to activate.",
+                    }
+                ]
+
+            # activate-changes is declared etag="input"; the ETag comes from the
+            # pending_changes response fetched above, which is etag="output".
+            # The wildcard was accepted but disabled the precondition check.
+            headers = {"If-Match": self._extract_etag(pending_result)}
+
+            try:
+                result = self.client.post(
+                    "domain-types/activation_run/actions/activate-changes/invoke", data=data, headers=headers
+                )
+                break
+            except CheckMKError as error:
+                if attempt == 0 and error.status_code == 412:
+                    continue
+                return self.error_response("Activation failed", str(error))
 
         if result.get("success"):
             activation_id = result["data"].get("id", "unknown")

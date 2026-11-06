@@ -102,6 +102,16 @@ class ActiveChecksHandler(BaseHandler):
         except Exception:
             return "~"
 
+    def _plain_levels(self) -> bool:
+        """True on 2.3, whose LDAP and SMB rulesets still store bare (warn, crit) tuples."""
+        if not hasattr(self, "_is_23"):
+            try:
+                version = self.client.get("version")["data"]["versions"]["checkmk"]
+            except Exception:
+                version = ""
+            self._is_23 = str(version).startswith("2.3")
+        return self._is_23
+
     def _post_rule(
         self, ruleset: str, value_raw: str, hostname: str, folder: str, description: str = ""
     ) -> Dict[str, Any]:
@@ -487,7 +497,8 @@ class ActiveChecksHandler(BaseHandler):
         value: Dict[str, Any] = {
             "name": name,
             "base_dn": base_dn,
-            "response_time": _fixed_levels(warn_ms, crit_ms, 0.001),
+            # 2.3: milliseconds as a bare tuple; later: SimpleLevels in seconds.
+            "response_time": (warn_ms, crit_ms) if self._plain_levels() else _fixed_levels(warn_ms, crit_ms, 0.001),
         }
         if bind_dn and password:
             value["authentication"] = {"bind_dn": bind_dn, "password": _explicit_password(password)}
@@ -527,7 +538,7 @@ class ActiveChecksHandler(BaseHandler):
             "share": share,
             # use_parent_host, or the name of the host that serves the share
             "host": ("use_parent_host", "") if smb_host == "use_parent_host" else ("define_host", smb_host),
-            "levels": _fixed_levels(warn_pct, crit_pct),
+            "levels": (warn_pct, crit_pct) if self._plain_levels() else _fixed_levels(warn_pct, crit_pct),
         }
         if username and password:
             value["auth"] = {"user": username, "password": _explicit_password(password)}
@@ -620,7 +631,9 @@ class ActiveChecksHandler(BaseHandler):
         rulesets = (
             [f"active_checks:{check_type}"]
             if check_type and check_type != "custom"
-            else ["custom_checks"] if check_type == "custom" else self._ALL_RULESETS
+            else ["custom_checks"]
+            if check_type == "custom"
+            else self._ALL_RULESETS
         )
 
         lines = ["🔍 **Active Checks**\n"]
@@ -661,7 +674,9 @@ class ActiveChecksHandler(BaseHandler):
             rulesets = (
                 [f"active_checks:{check_type}"]
                 if check_type and check_type != "custom"
-                else ["custom_checks"] if check_type == "custom" else self._ALL_RULESETS
+                else ["custom_checks"]
+                if check_type == "custom"
+                else self._ALL_RULESETS
             )
             matches = []
             for rs, res in zip(rulesets, self._map_concurrently(self._rules_of, rulesets), strict=True):

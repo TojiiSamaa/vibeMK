@@ -109,3 +109,20 @@ Aucun test rouge dans la suite lancée en A6. Restent des décisions ou preuves,
 - S4 : le double encodage `%252f` n'est pas traité (un seul unquote, comme le serveur).
 - hosts.py:733 : un `CheckMKAPIError` hors 412/428 est relancé et rattrapé par `handle()` (message d'erreur différent, non couvert par un test).
 - E10b / flaky : un échec isolé de `test_handlers_downtimes_times::test_an_iso_string_with_z_is_understood` a été vu une fois par A5c, non reproduit (464 passés ici).
+
+## Test réel : les 154 outils contre CheckMK 2.3 et 2.5 (06/11/2026)
+
+Banc : `scripts/live_sweep.py <label> <commande du serveur>`. Il appelle chacun des 154 outils sur un vrai site (Docker : 2.3.0p52 Raw et 2.5.0p18 Community), puis supprime tout ce qu'il a créé. Résultats bruts : `scripts/live_sweep_{py,rs}{23,25}.json`.
+
+| | 2.3.0p52 | 2.5.0p18 |
+|---|---|---|
+| Python | 173/174 étapes, 154/154 outils appelés | 174/174 |
+| Rust | 173/174, 154/154 | 174/174 |
+
+Le seul échec est le même en Python et en Rust : `acknowledge_service_problem` sur 2.3. CheckMK répond 422 « has no problem » tant que la PING de l'hôte de test n'a pas encore été vérifiée (`has_been_checked: 0`). Rejoué à la main une fois la PING en CRIT : accepté sur 2.3 et 2.5. Cela dépend du moment où l'appel arrive, pas de vibeMK.
+
+Bugs trouvés par ce banc et corrigés en Python puis en Rust (détail dans `CHANGELOG.md`) : `add_comment`, `delete_comment` (by_query), `create_cluster_host`, `modify_downtime`, `start_bulk_discovery` (303 sur 2.5), `get_bulk_discovery_status` (2.3), `search_metrics`, `move_host`, `move_folder`, `rename_host`, `activate_changes` (412 après un renommage), `logout_site` (2.5), `create_host_hostgroup_rule`, `create_rule` et `update_rule` (tuples), `create_aux_tag`, et les checks actifs LDAP et SMB (2.3).
+
+Cas signalé par Tom : `update_rule` sur une règle filtrée par label, et `get_ruleset`. Sur les deux versions, la valeur est bien modifiée, les `host_label_groups` sont conservés, et `get_ruleset` affiche « Labels: 1 conditions », pas « All hosts ».
+
+Écarts Python/Rust connus (non couverts par un test) : Rust reconnaît un littéral Python dans `value_raw` avec son propre analyseur. Comparé à `ast.literal_eval` sur environ 90 cas, il ne montre aucun écart, mais trois raccourcis sont commentés dans `rust/src/handlers/rules.rs`.

@@ -7,6 +7,15 @@ from typing import Any, Dict, List
 from vibemk.server.annotations import annotations_for, title_for
 from vibemk.server.schemas import output_schema_for
 
+# JSON has no tuple: valuespecs that need one take the value as a Python literal string.
+RULE_CONFIG_SCHEMA: Dict[str, Any] = {
+    "type": ["object", "string"],
+    "description": (
+        "Rule value. An object for plain values, or the Python literal CheckMK stores "
+        "(value_raw) as a string when the ruleset needs tuples, e.g. \"{'levels': (38.0, 45.0)}\""
+    ),
+}
+
 
 def get_connection_tools() -> List[Dict[str, Any]]:
     """Connection and diagnostic tools"""
@@ -872,7 +881,7 @@ def get_rule_management_tools() -> List[Dict[str, Any]]:
                 "type": "object",
                 "properties": {
                     "ruleset_name": {"type": "string", "description": "Ruleset name"},
-                    "rule_config": {"type": "object", "description": "Rule configuration"},
+                    "rule_config": RULE_CONFIG_SCHEMA,
                     "conditions": {"type": "object", "description": "Rule conditions"},
                     "comment": {"type": "string", "description": "Rule comment"},
                     "folder": {"type": "string", "description": "Target folder", "default": "/"},
@@ -899,7 +908,7 @@ def get_rule_management_tools() -> List[Dict[str, Any]]:
                 "type": "object",
                 "properties": {
                     "rule_id": {"type": "string", "description": "Rule ID"},
-                    "rule_config": {"type": "object", "description": "Rule configuration"},
+                    "rule_config": RULE_CONFIG_SCHEMA,
                     "conditions": {"type": "object", "description": "Rule conditions"},
                     "comment": {"type": "string", "description": "Rule comment"},
                     "disabled": {"type": "boolean", "description": "Disable rule"},
@@ -1639,6 +1648,10 @@ def get_downtime_tools() -> List[Dict[str, Any]]:
                     "service_description": {
                         "type": "string",
                         "description": "Service description (optional, narrows query-based modification)",
+                    },
+                    "site_id": {
+                        "type": "string",
+                        "description": "Site of the downtime given by downtime_id (defaults to configured site)",
                     },
                 },
                 "required": ["end_time"],
@@ -2545,7 +2558,7 @@ def get_aux_tag_tools() -> List[Dict[str, Any]]:
                     },
                     "help": {"type": "string", "description": "Help text"},
                 },
-                "required": ["tag_id", "title"],
+                "required": ["tag_id", "title", "topic"],
             },
         },
         {

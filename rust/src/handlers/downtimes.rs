@@ -1384,41 +1384,37 @@ impl DowntimeHandler {
             .filter(|v| !v.is_null())
             .cloned()
             .unwrap_or(Value::Null);
-        let comment = arg(args, "comment");
-        let mut data = if let Some(id) = arg(args, "downtime_id") {
-            let n = match id {
-                Value::String(s) => py_int(s).ok_or_else(|| Fail::Other(int_literal_error(s)))?,
-                Value::Number(n) => n
-                    .as_i64()
-                    .unwrap_or_else(|| n.as_f64().unwrap_or(0.0) as i64),
-                Value::Bool(b) => i64::from(*b),
-                _ => {
-                    return other(
-                        "int() argument must be a string, a bytes-like object or a real number",
-                    )
-                }
-            };
-            json!({"modify_type": "params", "downtime_id": n, "end_time": {"modify_type": "set_end_time", "value": end}})
-        } else if let Some(host) = arg(args, "host_name") {
-            let mut query = json!({"op": "=", "left": "host_name", "right": host});
-            if let Some(s) = arg(args, "service_description") {
-                query = json!({"op": "and", "expr": [query, {"op": "=", "left": "service_description", "right": s}]});
-            }
-            json!({"modify_type": "by_query", "query": query, "end_time": {"modify_type": "set_end_time", "value": end}})
-        } else {
+        let (id, host) = (arg(args, "downtime_id"), arg(args, "host_name"));
+        if id.is_none() && host.is_none() {
             return Ok(self.base.error_response(
                 "Missing parameter",
                 Some("downtime_id or host_name required"),
             ));
-        };
-        if let Some(c) = comment {
-            data["comment"] = c.clone();
         }
         if !truthy(&end) {
             return Ok(self.base.error_response(
                 "Missing parameter",
                 Some("end_time is required (ISO 8601 format)"),
             ));
+        }
+        // Same schema on 2.3 and 2.5: by_id needs the id as a string plus its site,
+        // "params" selects a host (and services); an ISO end time is "absolute".
+        let mut data = json!({"end_time": {"modify_type": "absolute", "value": end}});
+        if let Some(id) = id {
+            data["modify_type"] = json!("by_id");
+            data["downtime_id"] = json!(py_str(id));
+            data["site_id"] = arg(args, "site_id")
+                .cloned()
+                .unwrap_or_else(|| json!(self.base.client.config.site));
+        } else if let Some(host) = host {
+            data["modify_type"] = json!("params");
+            data["host_name"] = host.clone();
+            if let Some(s) = arg(args, "service_description") {
+                data["service_descriptions"] = json!([s]);
+            }
+        }
+        if let Some(c) = arg(args, "comment") {
+            data["comment"] = c.clone();
         }
         self.base
             .client

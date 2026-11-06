@@ -99,7 +99,9 @@ class CheckMKClient:
     def _create_ssl_context(self) -> Optional[ssl.SSLContext]:
         """Create SSL context based on configuration"""
         if not self.config.verify_ssl:
-            logger.warning("TLS certificate verification is disabled (verify_ssl=false): credentials can be intercepted")
+            logger.warning(
+                "TLS certificate verification is disabled (verify_ssl=false): credentials can be intercepted"
+            )
             ssl_context = ssl.create_default_context()
             ssl_context.check_hostname = False
             ssl_context.verify_mode = ssl.CERT_NONE

@@ -2092,8 +2092,11 @@
      "description": "Ruleset name"
     },
     "rule_config": {
-     "type": "object",
-     "description": "Rule configuration"
+     "type": [
+      "object",
+      "string"
+     ],
+     "description": "Rule value. An object for plain values, or the Python literal CheckMK stores (value_raw) as a string when the ruleset needs tuples, e.g. \"{'levels': (38.0, 45.0)}\""
     },
     "conditions": {
      "type": "object",
@@ -2152,8 +2155,11 @@
      "description": "Rule ID"
     },
     "rule_config": {
-     "type": "object",
-     "description": "Rule configuration"
+     "type": [
+      "object",
+      "string"
+     ],
+     "description": "Rule value. An object for plain values, or the Python literal CheckMK stores (value_raw) as a string when the ruleset needs tuples, e.g. \"{'levels': (38.0, 45.0)}\""
     },
     "conditions": {
      "type": "object",
@@ -3766,6 +3772,10 @@
     "service_description": {
      "type": "string",
      "description": "Service description (optional, narrows query-based modification)"
+    },
+    "site_id": {
+     "type": "string",
+     "description": "Site of the downtime given by downtime_id (defaults to configured site)"
     }
    },
    "required": [
@@ -5486,7 +5496,8 @@
    },
    "required": [
     "tag_id",
-    "title"
+    "title",
+    "topic"
    ],
    "additionalProperties": false
   },

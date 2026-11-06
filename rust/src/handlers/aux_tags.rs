@@ -80,19 +80,20 @@ impl AuxTagsHandler {
     }
 
     async fn create_aux_tag(&self, a: &Value) -> Result<Vec<Value>, Fail> {
-        let (tag_id, title) = (s(a, "tag_id"), s(a, "title"));
-        if tag_id.is_empty() || title.is_empty() {
-            return Ok(self
-                .base
-                .error_response("Missing parameter", Some("tag_id and title are required")));
+        let (tag_id, title, topic) = (s(a, "tag_id"), s(a, "title"), s(a, "topic"));
+        // CheckMK 2.3 and 2.5 both reject an aux tag without a topic.
+        if tag_id.is_empty() || title.is_empty() || topic.is_empty() {
+            return Ok(self.base.error_response(
+                "Missing parameter",
+                Some("tag_id, title and topic are required"),
+            ));
         }
         let mut body = Map::new();
         body.insert("aux_tag_id".into(), json!(tag_id));
         body.insert("title".into(), json!(title));
-        for k in ["topic", "help"] {
-            if !s(a, k).is_empty() {
-                body.insert(k.into(), json!(s(a, k)));
-            }
+        body.insert("topic".into(), json!(topic));
+        if !s(a, "help").is_empty() {
+            body.insert("help".into(), json!(s(a, "help")));
         }
         self.base
             .client

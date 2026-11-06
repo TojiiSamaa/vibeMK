@@ -228,9 +228,20 @@ async fn search_needs_exactly_one_of_graph_or_metric_and_posts_the_filter() {
         text(&both),
         "❌ **Conflicting parameters**\n\nGive either graph_id or metric_id, not both"
     );
+    let no_service = h
+        .handle(
+            "vibemk_search_metrics",
+            &json!({"host_filter": "web", "metric_id": "m"}),
+        )
+        .await;
+    assert_eq!(
+        text(&no_service),
+        "❌ **Missing parameter**\n\nservice_filter is required (the service holding the metric)"
+    );
+    assert!(server.received_requests().await.unwrap().is_empty());
     Mock::given(method("POST"))
-        .and(path("/cmk/check_mk/api/1.0/domain-types/metric/actions/filter/invoke"))
-        .and(body_partial_json(json!({"type": "single_metric", "metric_id": "util", "filter": {"siteopt": {"site": "cmk"}, "host": {"host": "web"}, "service": {"service": "CPU"}}})))
+        .and(path("/cmk/check_mk/api/1.0/domain-types/metric/actions/get/invoke"))
+        .and(body_partial_json(json!({"type": "single_metric", "metric_id": "util", "site": "cmk", "host_name": "web", "service_description": "CPU"})))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({"metrics": [{"title": "CPU", "data_points": [1, null]}]})))
         .expect(1)
         .mount(&server)

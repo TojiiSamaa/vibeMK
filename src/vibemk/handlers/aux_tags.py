@@ -60,12 +60,11 @@ class AuxTagsHandler(BaseHandler):
         topic = arguments.get("topic", "")
         help_text = arguments.get("help", "")
 
-        if not tag_id or not title:
-            return self.error_response("Missing parameter", "tag_id and title are required")
+        # CheckMK 2.3 and 2.5 both reject an aux tag without a topic.
+        if not tag_id or not title or not topic:
+            return self.error_response("Missing parameter", "tag_id, title and topic are required")
 
-        body: Dict[str, Any] = {"aux_tag_id": tag_id, "title": title}
-        if topic:
-            body["topic"] = topic
+        body: Dict[str, Any] = {"aux_tag_id": tag_id, "title": title, "topic": topic}
         if help_text:
             body["help"] = help_text
 

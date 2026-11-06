@@ -84,11 +84,266 @@ fn move_body(
 }
 
 /// The value as the Python literal CheckMK stores in value_raw; a one-item list is flattened.
+/// JSON has no tuple, and many valuespecs demand one: a string that already parses as a
+/// Python literal, such as "{'levels': (38.0, 45.0)}", is passed through as the literal itself.
 fn value_raw(value: &Value) -> String {
     match value {
         Value::Array(a) if a.len() == 1 => py_repr(&a[0]),
+        Value::String(s) if is_py_literal(s) => s.clone(),
         other => py_repr(other),
     }
+}
+
+/// `ast.literal_eval(s)` succeeds: strings, numbers, True/False/None, tuples, lists,
+/// dicts, sets and set(), with Python's leading-space stripping.
+/// shortcut: hashability of dict keys / set items is not checked (Python raises TypeError).
+fn is_py_literal(s: &str) -> bool {
+    let mut p = Lit {
+        // shortcut: all leading whitespace goes, where Python refuses an indented line after a blank one.
+        b: s.trim_start().as_bytes(),
+        i: 0,
+    };
+    p.expr() && {
+        p.ws(true);
+        p.i == p.b.len()
+    }
+}
+
+struct Lit<'a> {
+    b: &'a [u8],
+    i: usize,
+}
+
+impl Lit<'_> {
+    fn peek(&self) -> Option<u8> {
+        self.b.get(self.i).copied()
+    }
+    /// Skip spaces; newlines only inside brackets (or trailing, where `nl` is set too).
+    fn ws(&mut self, nl: bool) {
+        while let Some(c) = self.peek() {
+            match c {
+                b' ' | b'\t' | b'\x0c' => self.i += 1,
+                b'\n' | b'\r' if nl => self.i += 1,
+                b'\\' if self.b.get(self.i + 1) == Some(&b'\n') => self.i += 2,
+                b'#' => {
+                    while self.peek().is_some_and(|c| c != b'\n') {
+                        self.i += 1;
+                    }
+                }
+                _ => break,
+            }
+        }
+    }
+    fn eat(&mut self, c: u8, nl: bool) -> bool {
+        self.ws(nl);
+        if self.peek() == Some(c) {
+            self.i += 1;
+            true
+        } else {
+            false
+        }
+    }
+    fn word(&mut self, w: &str) -> bool {
+        let end = self.i + w.len();
+        let next_is_ident = self
+            .b
+            .get(end)
+            .is_some_and(|c| c.is_ascii_alphanumeric() || *c == b'_');
+        if self.b.get(self.i..end) == Some(w.as_bytes()) && !next_is_ident {
+            self.i = end;
+            true
+        } else {
+            false
+        }
+    }
+    /// One literal value, with `nl` telling whether newlines are allowed around it.
+    fn value(&mut self, nl: bool) -> bool {
+        self.ws(nl);
+        let Some(c) = self.peek() else { return false };
+        match c {
+            b'(' | b'[' | b'{' => self.container(c),
+            b'+' | b'-' => {
+                self.i += 1;
+                self.ws(nl);
+                self.signed(nl)
+            }
+            b'0'..=b'9' | b'.' => self.number(nl),
+            _ => {
+                if self.word("True") || self.word("False") || self.word("None") {
+                    return true;
+                }
+                if self.word("set") {
+                    return self.eat(b'(', nl) && self.eat(b')', true);
+                }
+                let mut ok = false;
+                while self.string() {
+                    ok = true; // adjacent strings concatenate
+                    self.ws(nl);
+                }
+                ok
+            }
+        }
+    }
+    fn expr(&mut self) -> bool {
+        // A bare top-level "1, 2" is a tuple too.
+        self.value(false) && {
+            let mut ok = true;
+            while ok && self.eat(b',', false) {
+                self.ws(false);
+                if self.i == self.b.len() || matches!(self.peek(), Some(b'\n' | b'\r')) {
+                    break;
+                }
+                ok = self.value(false);
+            }
+            ok
+        }
+    }
+    fn container(&mut self, open: u8) -> bool {
+        self.i += 1;
+        let close = match open {
+            b'(' => b')',
+            b'[' => b']',
+            _ => b'}',
+        };
+        if self.eat(close, true) {
+            return true; // (), [], {}
+        }
+        let mut is_dict = None;
+        loop {
+            if !self.value(true) {
+                return false;
+            }
+            if open == b'{' {
+                let colon = self.eat(b':', true);
+                if *is_dict.get_or_insert(colon) != colon || (colon && !self.value(true)) {
+                    return false;
+                }
+            }
+            if self.eat(close, true) {
+                return true;
+            }
+            if !self.eat(b',', true) {
+                return false;
+            }
+            if self.eat(close, true) {
+                return true; // trailing comma
+            }
+        }
+    }
+    /// A number, or a complex "real ± imaginary".
+    fn number(&mut self, nl: bool) -> bool {
+        let Some(imaginary) = self.num_token() else {
+            return false;
+        };
+        if !imaginary {
+            let save = self.i;
+            self.ws(nl);
+            if matches!(self.peek(), Some(b'+' | b'-')) {
+                self.i += 1;
+                self.ws(nl);
+                return self.num_token() == Some(true);
+            }
+            self.i = save;
+        }
+        true
+    }
+    /// The operand of a unary sign: a number, or one in parentheses ("-(1)").
+    fn signed(&mut self, nl: bool) -> bool {
+        if self.peek() == Some(b'(') {
+            self.i += 1;
+            self.ws(true);
+            return self.num_token().is_some() && self.eat(b')', true);
+        }
+        self.number(nl)
+    }
+    /// One int/float/imaginary token: Some(is_imaginary) when Python accepts it.
+    fn num_token(&mut self) -> Option<bool> {
+        let start = self.i;
+        while let Some(c) = self.peek() {
+            let exp_sign =
+                matches!(c, b'+' | b'-') && matches!(self.b.get(self.i - 1), Some(b'e' | b'E'));
+            if c.is_ascii_alphanumeric()
+                || c == b'_'
+                || c == b'.'
+                || (exp_sign && !self.is_hex(start))
+            {
+                self.i += 1;
+            } else {
+                break;
+            }
+        }
+        let tok = &self.b[start..self.i];
+        let hex = self.is_hex(start);
+        let digit = |c: Option<&u8>| {
+            c.is_some_and(|c| {
+                if hex {
+                    c.is_ascii_hexdigit()
+                } else {
+                    c.is_ascii_digit()
+                }
+            })
+        };
+        // An underscore sits between two digits (or right after a 0x/0o/0b prefix).
+        let underscores_ok = tok
+            .iter()
+            .enumerate()
+            .filter(|(_, c)| **c == b'_')
+            .all(|(p, _)| {
+                (digit(tok.get(p.wrapping_sub(1))) || (p == 2 && tok[0] == b'0'))
+                    && digit(tok.get(p + 1))
+            });
+        let tok = String::from_utf8_lossy(tok).replace('_', "");
+        (underscores_ok && valid_number(&tok)).then(|| tok.ends_with(['j', 'J']))
+    }
+    fn is_hex(&self, start: usize) -> bool {
+        matches!(self.b.get(start..start + 2), Some(b"0x" | b"0X"))
+    }
+    fn string(&mut self) -> bool {
+        let start = self.i;
+        let mut j = self.i;
+        while j < self.b.len() && j - start < 2 && b"rRbBuU".contains(&self.b[j]) {
+            j += 1;
+        }
+        let Some(&q) = self.b.get(j).filter(|c| **c == b'\'' || **c == b'"') else {
+            self.i = start;
+            return false;
+        };
+        let triple = self.b.get(j..j + 3) == Some(&[q, q, q]);
+        let mut k = j + if triple { 3 } else { 1 };
+        while k < self.b.len() {
+            match self.b[k] {
+                b'\\' => k += 2,
+                b'\n' if !triple => return false,
+                c if c == q && (!triple || self.b.get(k..k + 3) == Some(&[q, q, q])) => {
+                    self.i = k + if triple { 3 } else { 1 };
+                    return true;
+                }
+                _ => k += 1,
+            }
+        }
+        false
+    }
+}
+
+/// A Python int, float or imaginary token (underscores already removed).
+fn valid_number(t: &str) -> bool {
+    let imaginary = t.ends_with(['j', 'J']);
+    let t = t.strip_suffix(['j', 'J']).unwrap_or(t);
+    let lower = t.to_ascii_lowercase();
+    for (prefix, radix) in [("0x", 16), ("0o", 8), ("0b", 2)] {
+        if let Some(d) = lower.strip_prefix(prefix) {
+            return !d.is_empty() && u128::from_str_radix(d, radix).is_ok();
+        }
+    }
+    let digits = lower.chars().all(|c| c.is_ascii_digit());
+    if digits && !lower.is_empty() {
+        // Python refuses leading zeros on a non-zero int ("010").
+        return imaginary || !lower.starts_with('0') || lower.bytes().all(|c| c == b'0');
+    }
+    lower.chars().any(|c| c.is_ascii_digit())
+        && lower.parse::<f64>().is_ok()
+        && !lower.contains("inf")
+        && !lower.contains("nan")
 }
 
 /// "/" -> "~", "/hosts/linux" -> "~hosts~linux"; a path already in tilde notation passes through.
@@ -329,40 +584,62 @@ impl RulesHandler {
         };
         let rule_id_s = py_str(rule_id);
 
-        let mut data = Map::new();
-        if let Some(c) = arg(args, "rule_config") {
-            data.insert("value_raw".into(), c.clone());
-        }
-        if let Some(c) = arg(args, "conditions") {
-            data.insert("conditions".into(), c.clone());
-        }
+        let rule_config = arg(args, "rule_config");
+        let conditions = arg(args, "conditions");
         let mut props = Map::new();
         for key in ["comment", "disabled"] {
             if let Some(v) = args.get(key).filter(|v| !v.is_null()) {
                 props.insert(key.into(), v.clone());
             }
         }
-        if !props.is_empty() {
-            data.insert("properties".into(), Value::Object(props));
-        }
-        if data.is_empty() {
+        let fields = [
+            ("value_raw", rule_config.is_some()),
+            ("conditions", conditions.is_some()),
+            ("properties", !props.is_empty()),
+        ]
+        .into_iter()
+        .filter_map(|(k, set)| set.then_some(k))
+        .collect::<Vec<_>>()
+        .join(", ");
+        if fields.is_empty() {
             return Ok(self.base.error_response(
                 "No data to update",
                 Some("At least one field must be provided"),
             ));
         }
 
+        // CheckMK's PUT replaces the whole rule (value_raw as a Python literal, conditions,
+        // properties all required): start from the stored rule, change only what was asked.
         let endpoint = format!("objects/rule/{}", path_segment(&rule_id_s)?);
-        let headers = self.base.if_match_header(&endpoint).await;
-        // Python joins data.keys() in insertion order: value_raw, conditions, properties.
-        let fields = ["value_raw", "conditions", "properties"]
-            .into_iter()
-            .filter(|k| data.contains_key(*k))
-            .collect::<Vec<_>>()
-            .join(", ");
+        let current = match self.base.client.get(&endpoint, None, &[]).await {
+            Ok(c) => c,
+            Err(e) => {
+                return Ok(self.base.error_response(
+                    "Rule update failed",
+                    Some(&format!("Could not read rule '{rule_id_s}': {e}")),
+                ))
+            }
+        };
+        let stored = current
+            .data
+            .get("extensions")
+            .cloned()
+            .unwrap_or_else(|| json!({}));
+        let mut properties = stored
+            .get("properties")
+            .and_then(Value::as_object)
+            .cloned()
+            .unwrap_or_default();
+        properties.extend(props);
+        let data = json!({
+            "value_raw": rule_config.map_or_else(|| stored.get("value_raw").cloned().unwrap_or(Value::Null), |c| json!(value_raw(c))),
+            "conditions": conditions.cloned().or_else(|| stored.get("conditions").cloned()).unwrap_or_else(|| json!({})),
+            "properties": properties,
+        });
+        let headers = vec![("If-Match".to_string(), Base::extract_etag(&current))];
         self.base
             .client
-            .put(&endpoint, Some(&Value::Object(data)), &headers)
+            .put(&endpoint, Some(&data), &headers)
             .await?;
         Ok(text(format!("✅ **Rule Updated Successfully**\n\nRule ID: {rule_id_s}\nUpdated fields: {fields}\n\n{ACTIVATE_REMINDER}")))
     }
@@ -463,5 +740,106 @@ impl Handler for RulesHandler {
             self.base
                 .error_response("CheckMK API Error", Some(&e.to_string()))
         })
+    }
+}
+
+#[cfg(test)]
+mod literal_tests {
+    use super::is_py_literal;
+
+    /// Expected outcomes are what ast.literal_eval returned on CPython 3.13 for each input.
+    #[test]
+    fn agrees_with_ast_literal_eval() {
+        for (input, accepted) in [
+            ("{'levels': (38.0, 45.0)}", true),
+            ("('fixed', (0.5, 0.8))", true),
+            ("123", true),
+            ("-1.5e-3", true),
+            ("1+2j", true),
+            ("0x1F", true),
+            ("[1, 2,]", true),
+            ("{1, 2}", true),
+            ("set()", true),
+            ("{}", true),
+            ("()", true),
+            ("(1,)", true),
+            ("1, 2", true),
+            ("'a' \"b\"", true),
+            ("  'x'", true),
+            ("True", true),
+            ("None", true),
+            ("{'a': [None, False], 'b': {'c': ()}}", true),
+            ("'it\\'s'", true),
+            ("\"\"\"multi\nline\"\"\"", true),
+            ("[\n 1,\n 2\n]", true),
+            ("'x'\n", true),
+            ("", false),
+            ("hello", false),
+            ("web-servers", false),
+            ("foo bar", false),
+            ("{'a': 1", false),
+            ("{'a': 1, 2}", false),
+            ("1 2", false),
+            ("010", false),
+            ("inf", false),
+            ("nan", false),
+            ("f'x'", false),
+            ("'unterminated", false),
+            ("Truex", false),
+            ("x()", false),
+            ("1 + 2", false),
+            ("\n1", true),
+            ("1,\n2", false),
+            ("{'a' 1}", false),
+            ("[1,,2]", false),
+            ("(,)", false),
+            ("-True", false),
+            ("1e5", true),
+            ("1_000", true),
+            ("0_0", true),
+            ("00", true),
+            (".5", true),
+            ("5.", true),
+            ("1e", false),
+            ("0x", false),
+            ("-(1)", true),
+            ("- 1", true),
+            ("(1)", true),
+            ("((1,2))", true),
+            ("1,", true),
+            ("set( )", true),
+            ("'a''b'", true),
+            ("1e+5", true),
+            ("1E-5j", true),
+            ("-1-2j", true),
+            ("1+2", false),
+            ("2j+1", false),
+            ("[1, 2] ", true),
+            ("\t5", true),
+            (" \n5", true),
+            ("5 # c", true),
+            ("b'x'", true),
+            ("rb'x'", true),
+            ("u'x'", true),
+            ("{'a': 1,}", true),
+            ("{1: 2, 3}", false),
+            ("set(1)", false),
+            ("0b102", false),
+            ("0o7", true),
+            ("1__0", false),
+            ("_1", false),
+            ("1_", false),
+            ("'a\\\nb'", true),
+            ("(1\n,2)", true),
+            ("1\\\n+2j", true),
+            ("'''a'''", true),
+            ("-0x10", true),
+            ("+5", true),
+            ("~5", false),
+            ("not True", false),
+            ("[*a]", false),
+        ] {
+            assert_eq!(is_py_literal(input), accepted, "{input:?}");
+        }
     }
 }

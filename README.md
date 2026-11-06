@@ -15,12 +15,16 @@ Script: `scripts/bench.py`. Median of 10 starts, 300 sequential `tools/call`.
 | Peak memory (process tree) | 75 MB | 54 MB | 28 % less |
 | Install footprint | 75.5 MB of dependencies (31 packages) + a Python interpreter | one 11.1 MB binary | |
 | Source lines (src) | 16,941 | 14,657 | |
-| Tests | 464 pytest cases, 6,496 lines | 537 tests, 12,131 lines | |
+| Tests | 474 pytest cases, 6,601 lines | 559 tests, 12,690 lines | |
+| Live sweep, 154 tools on a real CheckMK 2.3.0p52 / 2.5.0p18 | 173/174, 174/174 steps | 173/174, 174/174 steps | same result |
 | Tools offered | 154 | 154 (identical `tools.json`) | |
 
 Limits: a local fake server answers in microseconds, so these numbers show the server's own overhead, not
 what you will see against a real CheckMK, where the network and CheckMK dominate. One machine, one run.
-The Rust port is tested against the same fake CheckMK, never against a real instance. See `AUDIT.md`.
+Both servers are also run against real CheckMK sites (2.3.0p52 Raw and 2.5.0p18 Community, Docker) by
+`scripts/live_sweep.py`, which calls every one of the 154 tools and cleans up after itself. The one step
+that can fail, `acknowledge_service_problem` on 2.3, depends on timing: CheckMK refuses the acknowledgement
+while the service has not been checked yet. Results: `scripts/live_sweep_{py,rs}{23,25}.json`. See `AUDIT.md`.
 
 **CheckMK Monitoring via LLM - Professional MCP Server**
 
@@ -124,9 +128,9 @@ it. See [INSTALL.md](https://github.com/chexma/vibeMK/blob/main/INSTALL.md) for 
 
 | CheckMK Version | Compatibility | Features |
 |-----------------|---------------|----------|
-| **2.5.x** | ✅ Full     | All features available, tested against 2.5.0p14 (Raw and Ultimate) |
+| **2.5.x** | ✅ Full     | All features available, tested against 2.5.0p14 (Raw and Ultimate), every tool run against 2.5.0p18 (Community) |
 | **2.4.x** | ✅ Full     | All features available |
-| **2.3.x** | ✅ Full     | All features available |
+| **2.3.x** | ✅ Full     | All features available, every tool run against 2.3.0p52 (Raw) |
 | **2.2.x and older** | 🔴 Unsupported | |
 
 ## Checkmk Edition Support

@@ -1283,37 +1283,26 @@ class DowntimeHandler(BaseHandler):
         host_name = arguments.get("host_name")
         service_description = arguments.get("service_description")
 
-        if downtime_id:
-            data: Dict[str, Any] = {
-                "modify_type": "params",
-                "downtime_id": int(downtime_id),
-                "end_time": {"modify_type": "set_end_time", "value": end_time},
-            }
-            if comment:
-                data["comment"] = comment
-        elif host_name:
-            # Query-based modification
-            query: Dict[str, Any] = {"op": "=", "left": "host_name", "right": host_name}
-            if service_description:
-                query = {
-                    "op": "and",
-                    "expr": [
-                        query,
-                        {"op": "=", "left": "service_description", "right": service_description},
-                    ],
-                }
-            data = {
-                "modify_type": "by_query",
-                "query": query,
-                "end_time": {"modify_type": "set_end_time", "value": end_time},
-            }
-            if comment:
-                data["comment"] = comment
-        else:
+        if not downtime_id and not host_name:
             return self.error_response("Missing parameter", "downtime_id or host_name required")
-
         if not end_time:
             return self.error_response("Missing parameter", "end_time is required (ISO 8601 format)")
+
+        # Same schema on 2.3 and 2.5: by_id needs the id as a string plus its site,
+        # "params" selects a host (and services); an ISO end time is "absolute".
+        data: Dict[str, Any] = {"end_time": {"modify_type": "absolute", "value": end_time}}
+        if downtime_id:
+            data.update(
+                modify_type="by_id",
+                downtime_id=str(downtime_id),
+                site_id=arguments.get("site_id") or self.client.config.site,
+            )
+        else:
+            data.update(modify_type="params", host_name=host_name)
+            if service_description:
+                data["service_descriptions"] = [service_description]
+        if comment:
+            data["comment"] = comment
 
         result = self.client.put("domain-types/downtime/actions/modify/invoke", data=data)
 

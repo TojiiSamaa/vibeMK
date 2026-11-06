@@ -120,6 +120,109 @@ async fn a_null_body_counts_as_no_changes_instead_of_crashing() {
     assert!(text(&r).starts_with("ℹ️ **No Pending Changes**"));
 }
 
+// ---- a 412 rereads the pending changes once (test_activate_changes_retry.py) ----
+
+/// Pending changes answered once with `first`, then always with `then` (ETag, changes).
+async fn pending_twice(server: &wiremock::MockServer, first: (&str, Value), then: (&str, Value)) {
+    Mock::given(method("GET"))
+        .and(path(PENDING))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .insert_header("ETag", first.0)
+                .set_body_json(json!({"value": first.1})),
+        )
+        .up_to_n_times(1)
+        .mount(server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path(PENDING))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .insert_header("ETag", then.0)
+                .set_body_json(json!({"value": then.1})),
+        )
+        .mount(server)
+        .await;
+}
+
+fn stale() -> ResponseTemplate {
+    ResponseTemplate::new(412).set_body_json(json!({"title": "Precondition failed"}))
+}
+
+#[tokio::test]
+async fn a_412_then_no_pending_changes_is_not_an_error() {
+    let (server, client) = common::fake_checkmk().await;
+    pending_twice(
+        &server,
+        ("\"a\"", json!([{"id": "c1"}])),
+        ("\"b\"", json!([])),
+    )
+    .await;
+    Mock::given(method("POST"))
+        .and(path(ACTIVATE))
+        .respond_with(stale())
+        .expect(1)
+        .mount(&server)
+        .await;
+    let r = ConfigurationHandler::new(client)
+        .handle("vibemk_activate_changes", &json!({}))
+        .await;
+    assert!(!is_error(&r));
+    assert!(text(&r).contains("No Pending Changes"), "{}", text(&r));
+}
+
+#[tokio::test]
+async fn a_412_is_retried_with_the_fresh_etag() {
+    let (server, client) = common::fake_checkmk().await;
+    pending_twice(
+        &server,
+        ("\"a\"", json!([{"id": "c1"}])),
+        ("\"c\"", json!([{"id": "c1"}])),
+    )
+    .await;
+    Mock::given(method("POST"))
+        .and(path(ACTIVATE))
+        .and(header("If-Match", "\"a\""))
+        .respond_with(stale())
+        .expect(1)
+        .mount(&server)
+        .await;
+    Mock::given(method("POST"))
+        .and(path(ACTIVATE))
+        .and(header("If-Match", "\"c\""))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({"id": "act-1"})))
+        .expect(1)
+        .mount(&server)
+        .await;
+    let r = ConfigurationHandler::new(client)
+        .handle("vibemk_activate_changes", &json!({}))
+        .await;
+    assert!(!is_error(&r), "{}", text(&r));
+    assert!(text(&r).contains("act-1"), "{}", text(&r));
+}
+
+#[tokio::test]
+async fn a_second_412_is_reported() {
+    let (server, client) = common::fake_checkmk().await;
+    pending_twice(
+        &server,
+        ("\"a\"", json!([{"id": "c1"}])),
+        ("\"a\"", json!([{"id": "c1"}])),
+    )
+    .await;
+    Mock::given(method("POST"))
+        .and(path(ACTIVATE))
+        .respond_with(stale())
+        .expect(2)
+        .mount(&server)
+        .await;
+    let r = ConfigurationHandler::new(client)
+        .handle("vibemk_activate_changes", &json!({}))
+        .await;
+    assert!(is_error(&r));
+    assert!(text(&r).contains("Activation failed"), "{}", text(&r));
+}
+
 #[tokio::test]
 async fn a_refused_activation_is_reported_with_the_server_detail() {
     let (server, client) = common::fake_checkmk().await;

@@ -8,7 +8,7 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use serde_json::{json, Map, Value};
 
-use crate::client::{ApiError, ApiErrorKind, CheckMkClient};
+use crate::client::{ApiError, ApiErrorKind, CheckMkClient, Method, RequestOptions};
 use crate::handlers::base::{py_repr, time_ago, Base, Handler};
 use crate::paths::{path_segment, UnsafePathError};
 
@@ -832,12 +832,14 @@ impl HostHandler {
                 Some("host_name and target_folder are required"),
             ));
         }
-        let endpoint = format!(
-            "objects/host_config/{}/actions/move/invoke",
-            path_segment(host)?
-        );
+        let endpoint = format!("objects/host_config/{}", path_segment(host)?);
+        let headers = self.base.if_match_header(&endpoint).await;
         self.client()
-            .post(&endpoint, Some(&json!({"target_folder": target})), &[])
+            .post(
+                &format!("{endpoint}/actions/move/invoke"),
+                Some(&json!({"target_folder": target})),
+                &headers,
+            )
             .await?;
         Ok(self.base.success_response("Host Moved Successfully", Some(&json!({"host": host, "folder": target, "message": "Remember to activate changes!"}))))
     }
@@ -854,9 +856,22 @@ impl HostHandler {
             "objects/host_config/{}/actions/rename/invoke",
             path_segment(host)?
         );
+        // The rename runs as a background job: 2.3 answers 302, 2.5 answers 303 to its
+        // wait-for-completion URL; that 3xx is the success, so it is not followed.
+        let opts = RequestOptions {
+            follow_redirects: false,
+            ..RequestOptions::default()
+        };
         let r = self
             .client()
-            .put(&endpoint, Some(&json!({"new_name": new_name})), &[])
+            .request(
+                Method::Put,
+                &endpoint,
+                None,
+                Some(&json!({"new_name": new_name})),
+                &[],
+                opts,
+            )
             .await?;
         let job = or(&r.data, "id", "");
         Ok(text(format!(
@@ -901,12 +916,19 @@ impl HostHandler {
         } else {
             folder
         };
-        let mut attributes = args.get("attributes").map(map_of).unwrap_or_default();
-        attributes.insert("tag_agent".into(), json!("no-agent")); // a cluster has no agent of its own
-        attributes.insert("nodes".into(), json!(nodes));
-        let body = json!({"folder": folder, "host_name": host, "attributes": attributes});
+        // A cluster has no agent of its own, unless the caller says otherwise.
+        let mut attributes = Map::new();
+        attributes.insert("tag_agent".into(), json!("no-agent"));
+        attributes.extend(args.get("attributes").map(map_of).unwrap_or_default());
+        // Clusters have their own collection, with nodes beside the attributes (not inside).
+        let body =
+            json!({"folder": folder, "host_name": host, "nodes": nodes, "attributes": attributes});
         self.client()
-            .post("domain-types/host_config/collections/all", Some(&body), &[])
+            .post(
+                "domain-types/host_config/collections/clusters",
+                Some(&body),
+                &[],
+            )
             .await?;
         Ok(text(format!(
             "✅ **Cluster Host Created Successfully**\n\n**Cluster Host:** {host}\n**Folder:** {folder}\n**Nodes:** {}\n\n📋 **Cluster Configuration:**\n• Node Count: {}\n• Agent Type: No Agent (Cluster)\n\n⚠️ **Remember to activate changes!**",

@@ -14,7 +14,7 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from vibemk.api.exceptions import CheckMKAPIError
+from vibemk.api.exceptions import CheckMKAPIError, CheckMKNotFoundError
 from vibemk.handlers.discovery import DiscoveryHandler
 from vibemk.handlers.services import ServiceHandler
 from vibemk.server.tools import get_all_tools
@@ -61,11 +61,32 @@ class TestDiscoveryEndpoints:
 
     @pytest.mark.asyncio
     async def test_bulk_discovery_uses_discovery_run(self, discovery_handler):
-        discovery_handler.client.post.return_value = {"success": True, "data": {}}
+        # 2.5 answers 303 to the background job; the id is read from Location.
+        discovery_handler.client.request = MagicMock(
+            return_value={
+                "success": True,
+                "status": 303,
+                "data": {},
+                "location": "/cmk/check_mk/api/1.0/objects/background_job/bulk_discovery-abc",
+            }
+        )
 
-        await discovery_handler.handle("vibemk_start_bulk_discovery", {"hostnames": ["a", "b"]})
+        result = await discovery_handler.handle("vibemk_start_bulk_discovery", {"hostnames": ["a", "b"]})
 
-        assert posted_paths(discovery_handler.client) == [BULK_DISCOVERY]
+        call = discovery_handler.client.request.call_args
+        assert (call.args[0], call.args[1]) == (BULK_DISCOVERY, "POST")
+        assert call.kwargs["follow_redirects"] is False
+        assert "bulk_discovery-abc" in result[0]["text"]
+
+    @pytest.mark.asyncio
+    async def test_bulk_discovery_reads_the_job_id_from_a_23_body(self, discovery_handler):
+        discovery_handler.client.request = MagicMock(
+            return_value={"success": True, "status": 200, "data": {"id": "job-23"}}
+        )
+
+        result = await discovery_handler.handle("vibemk_start_bulk_discovery", {"hostnames": ["a"]})
+
+        assert "job-23" in result[0]["text"]
 
     @pytest.mark.asyncio
     async def test_bulk_discovery_status_queries_the_background_job(self, discovery_handler):
@@ -76,6 +97,19 @@ class TestDiscoveryEndpoints:
         paths = fetched_paths(discovery_handler.client)
         assert paths, "no request was made"
         assert all(path.startswith(BACKGROUND_JOB) for path in paths), paths
+
+    @pytest.mark.asyncio
+    async def test_bulk_discovery_status_falls_back_to_discovery_run_on_23(self, discovery_handler):
+        # 2.3 has no background_job route: the client raises NotFound, not APIError.
+        discovery_handler.client.get.side_effect = [
+            CheckMKNotFoundError("Resource not found", 404, {}),
+            {"success": True, "data": {"id": "bulk_discovery", "extensions": {"state": "finished"}}},
+        ]
+
+        result = await discovery_handler.handle("vibemk_get_bulk_discovery_status", {"job_id": "bulk_discovery"})
+
+        assert fetched_paths(discovery_handler.client)[-1] == "objects/discovery_run/bulk_discovery"
+        assert "❌" not in result[0]["text"]
 
     def test_all_documented_discovery_modes_are_accepted(self):
         # cmk/gui/openapi/endpoints/service_discovery declares these seven.

@@ -332,6 +332,92 @@ async fn bulk_status_hides_lock_chatter_and_shows_exceptions() {
     );
 }
 
+/// 2.3 has no objects/background_job route: a real 404 there falls back to discovery_run,
+/// whose progress sits under extensions.logs.progress.
+#[tokio::test]
+async fn bulk_status_falls_back_to_discovery_run_on_a_404() {
+    let (server, h) = setup().await;
+    mount(
+        &server,
+        "GET",
+        "/objects/background_job/job-2",
+        ResponseTemplate::new(404).set_body_json(json!({"title": "Not Found", "status": 404})),
+    )
+    .await;
+    let body = json!({"extensions": {"state": "running", "logs": {"progress": ["Acquired lock", "Host web01 done"]}}});
+    mount(
+        &server,
+        "GET",
+        "/objects/discovery_run/job-2",
+        ResponseTemplate::new(200).set_body_json(body),
+    )
+    .await;
+    let t = text(
+        &h.handle(
+            "vibemk_get_bulk_discovery_status",
+            &json!({"job_id": "job-2"}),
+        )
+        .await,
+    );
+    assert!(t.contains("State: RUNNING"), "{t}");
+    assert!(
+        t.contains("  • Host web01 done") && !t.contains("Acquired lock"),
+        "{t}"
+    );
+}
+
+#[tokio::test]
+async fn bulk_status_does_not_fall_back_on_other_errors() {
+    let (server, h) = setup().await;
+    mount(
+        &server,
+        "GET",
+        "/objects/background_job/job-3",
+        ResponseTemplate::new(500).set_body_json(json!({"title": "boom"})),
+    )
+    .await;
+    let t = text(
+        &h.handle(
+            "vibemk_get_bulk_discovery_status",
+            &json!({"job_id": "job-3"}),
+        )
+        .await,
+    );
+    assert!(
+        t.starts_with("❌ Error getting bulk discovery status"),
+        "{t}"
+    );
+    assert!(server
+        .received_requests()
+        .await
+        .unwrap()
+        .iter()
+        .all(|r| !r.url.path().contains("discovery_run")));
+}
+
+/// 2.5 answers 303 to objects/background_job/<id>: the id is read from Location, not followed.
+#[tokio::test]
+async fn bulk_start_reads_the_job_id_from_a_303() {
+    let (server, h) = setup().await;
+    mount(
+        &server,
+        "POST",
+        BULK,
+        ResponseTemplate::new(303)
+            .insert_header("Location", format!("{API}/objects/background_job/bulk-9")),
+    )
+    .await;
+    let t = text(
+        &h.handle(
+            "vibemk_start_bulk_discovery",
+            &json!({"hostnames": ["web01"]}),
+        )
+        .await,
+    );
+    assert!(t.contains("Job ID: **bulk-9**"), "{t}");
+    assert_eq!(server.received_requests().await.unwrap().len(), 1);
+}
+
 #[tokio::test]
 async fn wait_polls_until_the_job_is_done() {
     let (server, h) = setup().await;

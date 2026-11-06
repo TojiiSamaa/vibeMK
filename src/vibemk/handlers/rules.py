@@ -2,6 +2,7 @@
 Rule management handlers for CheckMK monitoring rules
 """
 
+import ast
 from typing import Any, ClassVar, Dict, List, Optional, Tuple
 
 from vibemk.api.exceptions import CheckMKError
@@ -134,7 +135,7 @@ class RulesHandler(BaseHandler):
 
         rule_list = []
         for i, rule in enumerate(rules[:RULE_DISPLAY_LIMIT]):  # Show first 10 rules
-            rule_id = rule.get("id", f"Rule {i+1}")
+            rule_id = rule.get("id", f"Rule {i + 1}")
             extensions = rule.get("extensions", {})
             properties = extensions.get("properties", {})
             comment = properties.get("comment", "No comment")
@@ -162,7 +163,7 @@ class RulesHandler(BaseHandler):
             conditions_text = ", ".join(condition_summary) if condition_summary else "All hosts"
 
             rule_list.append(
-                f"🔧 **Rule {i+1}** (ID: {rule_id})\n"
+                f"🔧 **Rule {i + 1}** (ID: {rule_id})\n"
                 f"   Status: {status}\n"
                 f"   Value: {value_raw}\n"
                 f"   Folder: {folder}\n"
@@ -201,6 +202,16 @@ class RulesHandler(BaseHandler):
         # list of one. Kept deliberately, now quoted correctly.
         if isinstance(value, list) and len(value) == 1:
             return repr(value[0])
+
+        # JSON has no tuple, and many valuespecs demand one ("must be a tuple, but is
+        # list"): a string that already parses as a Python literal, such as
+        # "{'levels': (38.0, 45.0)}", is passed through as the literal itself.
+        if isinstance(value, str):
+            try:
+                ast.literal_eval(value)
+                return value
+            except (ValueError, SyntaxError):
+                pass
 
         return repr(value)
 
@@ -303,26 +314,43 @@ class RulesHandler(BaseHandler):
         if not rule_id:
             return self.error_response("Missing parameter", "rule_id is required")
 
-        # Build update data
-        data = {}
+        changed = []
         if rule_config:
-            data["value_raw"] = rule_config
+            changed.append("value_raw")
         if conditions:
-            data["conditions"] = conditions
-
+            changed.append("conditions")
         properties = {}
         if comment is not None:
             properties["comment"] = comment
         if disabled is not None:
             properties["disabled"] = disabled
         if properties:
-            data["properties"] = properties
+            changed.append("properties")
 
-        if not data:
+        if not changed:
             return self.error_response("No data to update", "At least one field must be provided")
 
-        headers = self._if_match_header(f"objects/rule/{path_segment(rule_id)}")
-        result = self.client.put(f"objects/rule/{path_segment(rule_id)}", data=data, headers=headers)
+        # CheckMK's PUT replaces the whole rule: value_raw, conditions and
+        # properties are all required, and value_raw must be a Python literal
+        # string. Sending only the changed field was refused with "These fields
+        # have problems: value_raw", or reset the conditions to "all hosts".
+        # So start from the stored rule and change only what was asked.
+        endpoint = f"objects/rule/{path_segment(rule_id)}"
+        try:
+            current = self.client.get(endpoint)
+        except CheckMKError as error:
+            return self.error_response("Rule update failed", f"Could not read rule '{rule_id}': {error}")
+        stored = (current.get("data") or {}).get("extensions") or {}
+        data = {
+            "value_raw": (
+                await self._validate_ruleset_value("", rule_config) if rule_config else stored.get("value_raw")
+            ),
+            "conditions": conditions if conditions else stored.get("conditions", {}),
+            "properties": {**(stored.get("properties") or {}), **properties},
+        }
+
+        headers = {"If-Match": self._extract_etag(current)}
+        result = self.client.put(endpoint, data=data, headers=headers)
 
         if result.get("success"):
             return [
@@ -331,7 +359,7 @@ class RulesHandler(BaseHandler):
                     "text": (
                         f"✅ **Rule Updated Successfully**\n\n"
                         f"Rule ID: {rule_id}\n"
-                        f"Updated fields: {', '.join(data.keys())}\n\n"
+                        f"Updated fields: {', '.join(changed)}\n\n"
                         f"⚠️ **Remember to activate changes!**"
                     ),
                 }

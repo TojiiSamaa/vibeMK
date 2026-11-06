@@ -493,13 +493,13 @@ class HostHandler(BaseHandler):
 
             # Validate individual host entry
             if not host_name:
-                validation_errors.append(f"Entry {i+1}: host_name is required")
+                validation_errors.append(f"Entry {i + 1}: host_name is required")
             elif not self._validate_host_name(host_name):
-                validation_errors.append(f"Entry {i+1}: Invalid host name '{host_name}'")
+                validation_errors.append(f"Entry {i + 1}: Invalid host name '{host_name}'")
 
             # Validate IP address if provided
             if "ipaddress" in attributes and not self._validate_ip_address(attributes["ipaddress"]):
-                validation_errors.append(f"Entry {i+1}: Invalid IP address '{attributes['ipaddress']}'")
+                validation_errors.append(f"Entry {i + 1}: Invalid IP address '{attributes['ipaddress']}'")
 
         if validation_errors:
             return self.error_response(
@@ -561,7 +561,7 @@ class HostHandler(BaseHandler):
                 else:
                     # Fallback: show requested host names
                     for i, entry in enumerate(entries[:10]):
-                        host_name = entry.get("host_name", f"Host-{i+1}")
+                        host_name = entry.get("host_name", f"Host-{i + 1}")
                         folder = entry.get("folder", "/")
                         response_text += f"• {host_name} (Folder: {folder})\n"
                     if len(entries) > 10:
@@ -776,7 +776,8 @@ class HostHandler(BaseHandler):
             return self.error_response("Missing parameters", "host_name and target_folder are required")
 
         data = {"target_folder": target_folder}
-        result = self.client.post(f"objects/host_config/{path_segment(host_name)}/actions/move/invoke", data=data)
+        endpoint = f"objects/host_config/{path_segment(host_name)}"
+        result = self.client.post(f"{endpoint}/actions/move/invoke", data=data, headers=self._if_match_header(endpoint))
 
         if result.get("success"):
             return self.success_response(
@@ -794,13 +795,17 @@ class HostHandler(BaseHandler):
         if not host_name or not new_name:
             return self.error_response("Missing parameters", "host_name and new_name are required")
 
-        result = self.client.put(
+        # The rename runs as a background job: 2.3 answers 302, 2.5 answers 303
+        # to its wait-for-completion URL. urllib cannot follow a PUT redirect.
+        result = self.client.request(
             f"objects/host_config/{path_segment(host_name)}/actions/rename/invoke",
+            "PUT",
             data={"new_name": new_name},
+            follow_redirects=False,
         )
 
         if result.get("success"):
-            job_id = result["data"].get("id", "")
+            job_id = (result.get("data") or {}).get("id", "")
             return [
                 {
                     "type": "text",
@@ -851,15 +856,13 @@ class HostHandler(BaseHandler):
         if folder == "/":
             folder = "~"
 
-        # Set cluster-specific attributes
-        cluster_attributes = attributes.copy()
-        cluster_attributes.update(
-            {"tag_agent": "no-agent", "nodes": nodes}  # Cluster hosts typically don't have agents
-        )
+        # Cluster hosts typically don't have agents
+        cluster_attributes = {"tag_agent": "no-agent", **attributes}
 
-        data = {"folder": folder, "host_name": host_name, "attributes": cluster_attributes}
+        # Clusters have their own collection, with nodes beside the attributes (not inside).
+        data = {"folder": folder, "host_name": host_name, "nodes": nodes, "attributes": cluster_attributes}
 
-        result = self.client.post("domain-types/host_config/collections/all", data=data)
+        result = self.client.post("domain-types/host_config/collections/clusters", data=data)
 
         if result.get("success"):
             return [

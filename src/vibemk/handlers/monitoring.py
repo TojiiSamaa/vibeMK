@@ -337,7 +337,8 @@ class MonitoringHandler(BaseHandler):
         if not comment_type or not host_name or not comment:
             return self.error_response("Missing parameters", "comment_type, host_name, and comment are required")
 
-        data = {"host_name": host_name, "comment": comment, "persistent": persistent}
+        # CheckMK picks the body schema from comment_type (2.3 and 2.5 both require it).
+        data = {"comment_type": comment_type, "host_name": host_name, "comment": comment, "persistent": persistent}
 
         if comment_type == "host":
             result = self.client.post("domain-types/comment/collections/host", data=data)
@@ -355,12 +356,7 @@ class MonitoringHandler(BaseHandler):
             return [
                 {
                     "type": "text",
-                    "text": (
-                        f"💬 **Comment Added**\n\n"
-                        f"Target: {target}\n"
-                        f"Comment: {comment}\n"
-                        f"Persistent: {persistent}"
-                    ),
+                    "text": (f"💬 **Comment Added**\n\nTarget: {target}\nComment: {comment}\nPersistent: {persistent}"),
                 }
             ]
         return self.error_response("Comment creation failed", f"Could not add comment to {target}")
@@ -384,9 +380,10 @@ class MonitoringHandler(BaseHandler):
         elif delete_type == "by_query":
             if not host_name:
                 return self.error_response("Missing parameter", "host_name is required for delete_type=by_query")
-            data = {"delete_type": "by_query", "host_name": host_name}
+            # CheckMK's selector by host is delete_type "params" (it has no "by_query").
+            data = {"delete_type": "params", "host_name": host_name}
             if service_description:
-                data["service_description"] = service_description
+                data["service_descriptions"] = [service_description]
         else:
             return self.error_response("Invalid delete_type", "delete_type must be 'by_id' or 'by_query'")
 

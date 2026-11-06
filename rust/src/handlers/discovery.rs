@@ -9,7 +9,7 @@ use std::time::{Duration, Instant};
 use async_trait::async_trait;
 use serde_json::{json, Map, Value};
 
-use crate::client::{CheckMkClient, Method, RequestOptions};
+use crate::client::{ApiError, ApiErrorKind, CheckMkClient, Method, RequestOptions};
 use crate::handlers::base::{py_repr, Base, Handler};
 use crate::handlers::services::{pystr, truthy};
 use crate::paths::path_segment;
@@ -97,6 +97,31 @@ impl DiscoveryHandler {
         }
     }
 
+    /// Start a bulk discovery; return the job id. 2.5 answers 303 to
+    /// objects/background_job/<id> (following it drops auth, 401), so the redirect is
+    /// not followed and the id is read from it; 2.3 answers 200 with the id in the body.
+    async fn post_bulk_start(&self, data: &Value) -> Result<String, ApiError> {
+        let opts = RequestOptions {
+            follow_redirects: false,
+            ..RequestOptions::default()
+        };
+        let r = self
+            .base
+            .client
+            .request(Method::Post, BULK_START, None, Some(data), &[], opts)
+            .await?;
+        let from_location = r
+            .header("Location")
+            .and_then(|l| l.trim_end_matches('/').rsplit('/').next())
+            .filter(|id| !id.is_empty())
+            .map(str::to_string);
+        Ok(from_location.unwrap_or_else(|| {
+            r.data
+                .get("id")
+                .map_or_else(|| "Unknown".to_string(), pystr)
+        }))
+    }
+
     async fn fallback_to_bulk_discovery(&self, host_name: &str, mode: &str) -> Vec<Value> {
         let Some(f) = mode_flags(mode) else {
             return self.base.error_text(&format!(
@@ -116,17 +141,8 @@ impl DiscoveryHandler {
             "bulk_size": 1,
             "ignore_errors": false,
         });
-        match self
-            .base
-            .client
-            .post(BULK_START, Some(&bulk_data), &[])
-            .await
-        {
-            Ok(r) => {
-                let job_id = r
-                    .data
-                    .get("id")
-                    .map_or_else(|| "Unknown".to_string(), pystr);
+        match self.post_bulk_start(&bulk_data).await {
+            Ok(job_id) => {
                 text_block(format!(
                     "✅ **Service Discovery Started** (via bulk discovery)\n\nHost: **{host_name}**\nMode: {mode} (mapped to bulk options)\nJob ID: {job_id}\n\n🔄 Discovery is running in the background.\nUse 'get_bulk_discovery_status' with Job ID {job_id} or 'get_discovery_status' to check progress.\n\n💡 Note: Used bulk discovery as fallback due to API limitations."
                 ))
@@ -170,12 +186,8 @@ impl DiscoveryHandler {
         );
 
         let data = json!({"hostnames": hostnames, "options": options, "do_full_scan": do_full_scan, "bulk_size": bulk_size, "ignore_errors": ignore_errors});
-        match self.base.client.post(BULK_START, Some(&data), &[]).await {
-            Ok(r) => {
-                let job_id = r
-                    .data
-                    .get("id")
-                    .map_or_else(|| "Unknown".to_string(), pystr);
+        match self.post_bulk_start(&data).await {
+            Ok(job_id) => {
                 text_block(format!(
                     "✅ **Bulk Discovery Started**\n\nJob ID: **{job_id}**\nHosts: {} hosts\n  • {}{}\nOptions:\n  • Full scan: {}\n  • Bulk size: {}\n  • Ignore errors: {}\n  • Monitor undecided: {monitor}\n  • Remove vanished: {remove}\n\n🔄 Bulk discovery is running in the background.\nUse 'get_bulk_discovery_status' with Job ID {job_id} to check progress.",
                     hosts.len(),
@@ -262,12 +274,24 @@ impl DiscoveryHandler {
             self.base
                 .error_text(&format!("❌ Error getting bulk discovery status: {e}"))
         };
-        // Bulk-discovery progress is a background job; objects/discovery_run/{id} is not a route.
-        let endpoint = match path_segment(&job_id) {
-            Ok(s) => format!("objects/background_job/{s}"),
+        // 2.5 serves bulk-discovery progress as a background job; 2.3 only as
+        // objects/discovery_run/{id} (its background_job route does not exist).
+        let (job_endpoint, run_endpoint) = match path_segment(&job_id) {
+            Ok(s) => (
+                format!("objects/background_job/{s}"),
+                format!("objects/discovery_run/{s}"),
+            ),
             Err(e) => return fail(&e),
         };
-        let r = match self.base.client.get(&endpoint, None, &[]).await {
+        let client = &self.base.client;
+        let r = match client.get(&job_endpoint, None, &[]).await {
+            // A 404 is ApiErrorKind::NotFound (CheckMKNotFoundError in Python).
+            Err(e) if e.kind == ApiErrorKind::NotFound => {
+                client.get(&run_endpoint, None, &[]).await
+            }
+            other => other,
+        };
+        let r = match r {
             Ok(r) => r,
             Err(e) => return fail(&e),
         };
@@ -278,13 +302,18 @@ impl DiscoveryHandler {
             .find(|v| truthy(v));
         let job_state = state_value.map_or_else(|| "unknown".to_string(), pystr);
         let log_info = &status["log_info"];
-        let lines = |k: &str| -> Vec<String> {
-            log_info[k]
-                .as_array()
+        let strings = |v: &Value| -> Vec<String> {
+            v.as_array()
                 .map(|a| a.iter().map(pystr).collect())
                 .unwrap_or_default()
         };
-        let progress: Vec<String> = lines("JobProgressUpdate")
+        let lines = |k: &str| strings(&log_info[k]);
+        let mut progress = lines("JobProgressUpdate");
+        if progress.is_empty() {
+            // 2.3's discovery_run lists progress under extensions.logs.progress.
+            progress = strings(&ext["logs"]["progress"]);
+        }
+        let progress: Vec<String> = progress
             .into_iter()
             .filter(|l| {
                 !l.starts_with("Waiting to acquire lock") && !l.starts_with("Acquired lock")

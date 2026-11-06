@@ -8,7 +8,7 @@ import time
 from typing import Any, Dict, List
 
 from vibemk.api import CheckMKClient
-from vibemk.api.exceptions import CheckMKAPIError
+from vibemk.api.exceptions import CheckMKAPIError, CheckMKNotFoundError
 from vibemk.api.paths import path_segment
 from vibemk.handlers.base import BaseHandler
 from vibemk.utils import get_logger
@@ -205,10 +205,9 @@ class DiscoveryHandler(BaseHandler):
                 "ignore_errors": False,
             }
 
-            result = self.client.post("domain-types/discovery_run/actions/bulk-discovery-start/invoke", data=bulk_data)
+            result, job_id = self._post_bulk_start(bulk_data)
 
             if result.get("success"):
-                job_id = result.get("data", {}).get("id", "Unknown")
                 return [
                     {
                         "type": "text",
@@ -230,6 +229,23 @@ class DiscoveryHandler(BaseHandler):
         except Exception as e:
             logger.exception(f"Error in fallback bulk discovery for {host_name}")
             return self.error_text(f"❌ Error in fallback discovery method: {str(e)}")
+
+    def _post_bulk_start(self, data: Dict[str, Any]):
+        """Start a bulk discovery; return (result, job_id).
+
+        2.5 answers 303 to objects/background_job/<id> and following it drops
+        auth (401), so the redirect is not followed and the id is read from it.
+        2.3 answers 200 with the id in the body.
+        """
+        result = self.client.request(
+            "domain-types/discovery_run/actions/bulk-discovery-start/invoke",
+            "POST",
+            data=data,
+            follow_redirects=False,
+        )
+        location = result.get("location") or ""
+        job_id = location.rstrip("/").rsplit("/", 1)[-1] if location else None
+        return result, job_id or (result.get("data") or {}).get("id", "Unknown")
 
     async def start_bulk_discovery(self, args: Dict[str, Any]) -> List[Dict[str, str]]:
         """Start bulk discovery for multiple hosts"""
@@ -266,10 +282,9 @@ class DiscoveryHandler(BaseHandler):
                 "ignore_errors": ignore_errors,
             }
 
-            result = self.client.post("domain-types/discovery_run/actions/bulk-discovery-start/invoke", data=data)
+            result, job_id = self._post_bulk_start(data)
 
             if result.get("success"):
-                job_id = result.get("data", {}).get("id", "Unknown")
                 return [
                     {
                         "type": "text",
@@ -376,9 +391,12 @@ class DiscoveryHandler(BaseHandler):
             if not job_id:
                 return self.error_text("❌ Error: job_id is required")
 
-            # CheckMK serves bulk-discovery progress as a background job;
-            # objects/discovery_run/{id} is not a route it publishes.
-            result = self.client.get(f"objects/background_job/{path_segment(job_id)}")
+            # 2.5 serves bulk-discovery progress as a background job; 2.3 only as
+            # objects/discovery_run/{id} (its background_job route does not exist).
+            try:
+                result = self.client.get(f"objects/background_job/{path_segment(job_id)}")
+            except CheckMKNotFoundError:
+                result = self.client.get(f"objects/discovery_run/{path_segment(job_id)}")
 
             if result.get("success"):
                 data = result.get("data", {})
@@ -389,10 +407,10 @@ class DiscoveryHandler(BaseHandler):
                 status = extensions.get("status", {})
                 job_state = str(status.get("state") or extensions.get("state") or "unknown")
                 log_info = status.get("log_info", {})
+                # 2.3's discovery_run lists progress under extensions.logs.progress.
+                progress = log_info.get("JobProgressUpdate") or (extensions.get("logs") or {}).get("progress", [])
                 progress_lines = [
-                    line
-                    for line in log_info.get("JobProgressUpdate", [])
-                    if not line.startswith(("Waiting to acquire lock", "Acquired lock"))
+                    line for line in progress if not line.startswith(("Waiting to acquire lock", "Acquired lock"))
                 ]
                 progress_text = ""
                 if progress_lines:

@@ -7,6 +7,8 @@ services -- which is not what someone asking to discover services is asking
 for.
 """
 
+from unittest.mock import MagicMock
+
 import pytest
 
 from vibemk.handlers.discovery import DiscoveryHandler
@@ -18,13 +20,13 @@ def handler(mock_checkmk_client):
 
 
 def _sent_options(handler) -> dict:
-    return handler.client.post.call_args.kwargs["data"]["options"]
+    return handler.client.request.call_args.kwargs["data"]["options"]
 
 
 class TestBulkDiscoveryDefaults:
     @pytest.mark.asyncio
     async def test_does_not_remove_vanished_services_by_default(self, handler):
-        handler.client.post.return_value = {"success": True, "data": {"id": "job-1"}}
+        handler.client.request = MagicMock(return_value={"success": True, "data": {"id": "job-1"}})
 
         await handler.start_bulk_discovery({"hostnames": ["web01"]})
 
@@ -33,7 +35,7 @@ class TestBulkDiscoveryDefaults:
     @pytest.mark.asyncio
     async def test_monitors_undecided_services_by_default(self, handler):
         """The additive option is the one that matches the request."""
-        handler.client.post.return_value = {"success": True, "data": {"id": "job-1"}}
+        handler.client.request = MagicMock(return_value={"success": True, "data": {"id": "job-1"}})
 
         await handler.start_bulk_discovery({"hostnames": ["web01"]})
 
@@ -41,7 +43,7 @@ class TestBulkDiscoveryDefaults:
 
     @pytest.mark.asyncio
     async def test_removal_can_still_be_asked_for(self, handler):
-        handler.client.post.return_value = {"success": True, "data": {"id": "job-1"}}
+        handler.client.request = MagicMock(return_value={"success": True, "data": {"id": "job-1"}})
 
         await handler.start_bulk_discovery({"hostnames": ["web01"], "options": {"remove_vanished_services": True}})
 
@@ -49,7 +51,7 @@ class TestBulkDiscoveryDefaults:
 
     @pytest.mark.asyncio
     async def test_label_updates_are_not_forced_on(self, handler):
-        handler.client.post.return_value = {"success": True, "data": {"id": "job-1"}}
+        handler.client.request = MagicMock(return_value={"success": True, "data": {"id": "job-1"}})
 
         await handler.start_bulk_discovery({"hostnames": ["web01"]})
 
@@ -67,21 +69,44 @@ class TestDiscoveryModes:
 
         It then reported success, so the caller believed a discovery had run.
         """
-        handler.client.post.return_value = {"success": True, "data": {"id": "job-1"}}
+        handler.client.request = MagicMock(return_value={"success": True, "data": {"id": "job-1"}})
 
         result = await handler._fallback_to_bulk_discovery("web01", "scorched_earth")
 
         assert "❌" in result[0]["text"]
-        assert handler.client.post.call_count == 0
+        assert handler.client.request.call_count == 0
 
     @pytest.mark.asyncio
     async def test_a_known_mode_still_works(self, handler):
-        handler.client.post.return_value = {"success": True, "data": {"id": "job-1"}}
+        handler.client.request = MagicMock(return_value={"success": True, "data": {"id": "job-1"}})
 
         await handler._fallback_to_bulk_discovery("web01", "refresh")
 
-        options = handler.client.post.call_args.kwargs["data"]["options"]
+        options = handler.client.request.call_args.kwargs["data"]["options"]
         assert options["monitor_undecided_services"] is True
+
+
+class TestBulkStartRedirect:
+    """2.5 answers 303 to objects/background_job/<id>; 2.3 answers 200 with the id."""
+
+    @pytest.mark.asyncio
+    async def test_the_job_id_is_read_from_a_303_location(self, handler):
+        handler.client.request = MagicMock(
+            return_value={"success": True, "status": 303, "location": "/cmk/check_mk/api/1.0/objects/background_job/bulk-9", "data": {}}
+        )
+
+        result = await handler.start_bulk_discovery({"hostnames": ["web01"]})
+
+        assert "Job ID: **bulk-9**" in result[0]["text"]
+        assert handler.client.request.call_args.kwargs["follow_redirects"] is False
+
+    @pytest.mark.asyncio
+    async def test_the_job_id_comes_from_the_body_on_a_200(self, handler):
+        handler.client.request = MagicMock(return_value={"success": True, "data": {"id": "job-1"}})
+
+        result = await handler.start_bulk_discovery({"hostnames": ["web01"]})
+
+        assert "Job ID: **job-1**" in result[0]["text"]
 
 
 class TestModeTableMatchesSchema:

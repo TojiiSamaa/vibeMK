@@ -352,7 +352,7 @@ class MetricsHandler(BaseHandler):
         response += f"Metrics: {len(metrics)} found\n\n"
 
         for i, metric in enumerate(metrics[: self._MAX_DISPLAYED_METRICS]):
-            title = metric.get("title", f"Metric {i+1}")
+            title = metric.get("title", f"Metric {i + 1}")
             color = metric.get("color", "#000000")
             line_type = metric.get("line_type", "line")
             data_points = metric.get("data_points", [])
@@ -409,7 +409,7 @@ class MetricsHandler(BaseHandler):
         response += f"Metrics: {len(metrics)}\n\n"
 
         for i, metric in enumerate(metrics):
-            title = metric.get("title", f"Metric {i+1}")
+            title = metric.get("title", f"Metric {i + 1}")
             color = metric.get("color", "#000000")
             line_type = metric.get("line_type", "line")
             data_points = metric.get("data_points", [])
@@ -451,7 +451,7 @@ class MetricsHandler(BaseHandler):
         response += f"Metrics: {len(metrics)}\n\n"
 
         for i, metric in enumerate(metrics):
-            title = metric.get("title", f"Metric {i+1}")
+            title = metric.get("title", f"Metric {i + 1}")
             color = metric.get("color", "#000000")
             line_type = metric.get("line_type", "line")
             data_points = metric.get("data_points", [])
@@ -484,8 +484,7 @@ class MetricsHandler(BaseHandler):
         # Check for specific parameter validation issues
         if "time_range" in detail or "start" in detail or "end" in detail:
             return (
-                f"Time range parameter error: {detail}. "
-                "Timestamps are sent as ISO-8601 UTC, e.g. 2026-09-14T12:00:00Z"
+                f"Time range parameter error: {detail}. Timestamps are sent as ISO-8601 UTC, e.g. 2026-09-14T12:00:00Z"
             )
         if "metric_id" in detail or metric_name in detail:
             return f"Invalid metric ID '{metric_name}': {detail}. Metric may not exist for this service"
@@ -580,13 +579,20 @@ class MetricsHandler(BaseHandler):
         # Parse time range
         time_data = self._parse_time_range(time_range)
 
-        # Build filter
-        filter_data = {"siteopt": {"site": site_filter}, "host": {"host": host_filter}}
+        if not service_filter:
+            return self.error_response(
+                "Missing parameter", "service_filter is required (the service holding the metric)"
+            )
 
-        if service_filter:
-            filter_data["service"] = {"service": service_filter}
-
-        data: Dict[str, Any] = {"time_range": time_data, "reduce": reduce_function, "filter": filter_data}
+        # 2.3 and 2.5 no longer publish metric/actions/filter: the one metric route
+        # takes an exact host and service.
+        data: Dict[str, Any] = {
+            "time_range": time_data,
+            "reduce": reduce_function,
+            "site": site_filter,
+            "host_name": host_filter,
+            "service_description": service_filter,
+        }
         if graph_id:
             data["type"] = "predefined_graph"
             data["graph_id"] = graph_id
@@ -594,7 +600,7 @@ class MetricsHandler(BaseHandler):
             data["type"] = "single_metric"
             data["metric_id"] = metric_id
 
-        result = self.client.post("domain-types/metric/actions/filter/invoke", data=data)
+        result = self.client.post("domain-types/metric/actions/get/invoke", data=data)
 
         if not result.get("success"):
             return self.error_response("Failed to search metrics", "Metrics search failed")

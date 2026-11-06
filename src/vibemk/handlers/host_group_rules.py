@@ -223,20 +223,26 @@ class HostGroupRulesHandler(BaseHandler):
                 )
             )
 
-        # Build rule data structure for host groups according to CMDBsyncer working implementation
-        rule_data = {
-            "ruleset": working_ruleset,
-            "folder": folder,
-            "properties": {"disabled": False, "description": "Host group assignment via vibeMK", "comment": comment},
-            "value_raw": host_groups,
-        }
-
-        # Add host conditions if provided (flat structure, not under extensions)
-        if host_conditions:
-            rule_data["conditions"] = host_conditions
+        if isinstance(host_groups, str):
+            host_groups = [host_groups]
 
         try:
-            result = self.client.post("domain-types/rule/collections/all", data=rule_data)
+            # A host_groups rule holds ONE group as a Python string literal (a list is
+            # rejected: "must be str"), so several groups mean one rule each.
+            for group in host_groups:
+                rule_data = {
+                    "ruleset": working_ruleset,
+                    "folder": folder,
+                    "properties": {
+                        "disabled": False,
+                        "description": "Host group assignment via vibeMK",
+                        "comment": comment,
+                    },
+                    "value_raw": repr(group),
+                }
+                if host_conditions:
+                    rule_data["conditions"] = host_conditions
+                result = self.client.post("domain-types/rule/collections/all", data=rule_data)
 
             if result.get("success"):
                 return [

@@ -1,0 +1,2589 @@
+{
+ "label": "rs25",
+ "listed": 154,
+ "called": 154,
+ "not_called": [],
+ "passed": 174,
+ "steps": 174,
+ "rows": [
+  {
+   "phase": "read",
+   "tool": "vibemk_debug_checkmk_connection",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 202,
+   "text": "✅ **CheckMK Connection Successful**\n\n🌐 Server: http://127.0.0.1:5081\n🏢 Site: cmk\n👤 User: cmkadmin\n🔒 SSL Verify: False\n🔗 API Base URL: http://127.0.0.1:5081/cmk/check_mk/api/1.0\n📊 Version: 2.5.0p18.community\n📦 Edition: community"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_debug_url_detection",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 0,
+   "text": "🔍 **URL Detection Debug Results**\n\n🌐 Server URL: http://127.0.0.1:5081\n🏢 Site: cmk\n🔗 Selected API URL: http://127.0.0.1:5081/cmk/check_mk/api/1.0\n\n**Test Results:**\nNo debug info available"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_test_direct_url",
+   "args": {
+    "test_url": "http://127.0.0.1:5081/cmk/check_mk/api/1.0/version"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 187,
+   "text": "✅ **Direct URL Test Successful**\n\nURL: http://127.0.0.1:5081/cmk/check_mk/api/1.0/version\nStatus: 200\nResponse: {\n  \"site\": \"cmk\",\n  \"group\": \"\",\n  \"rest_api\": {\n    \"revision\": \"0\"\n  },\n  \"versions\": {\n    \"apache\": [\n      2,\n      4,\n      52\n    ],\n    \"checkmk\": \"2.5.0p18.community\",\n    \"python\": \"3.13.14 (main, Jul 16 2026, 06:21:46) [GCC 14.2.0]\",\n    \"mod_wsgi\": [\n      5,\n      0,\n      2\n    ],\n    \"wsgi\": [\n      1,\n      0\n    ]\n  },\n  \"edition\": \"community\",\n  \"demo\": false\n}"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_test_all_endpoints",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1892,
+   "text": "🧪 **API Endpoint Test Results**\n\n✅ version - Version info (HTTP 200)\n✅ domain-types/host_config/collections/all - Host Configs (HTTP 200)\n✅ domain-types/service/collections/all - Services (HTTP 200)\n✅ domain-types/folder_config/collections/all - Folders (HTTP 200)\n✅ domain-types/downtime/collections/all - Downtimes (HTTP 200)\n❌ domain-types/acknowledge/collections/all - Acknowledgments (Error: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.)\n❌ domain-types/activation_run/collections/all - Activations (Error: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.)\n✅ domain-types/user_config/collections/all - Users (HTTP 200)\n✅ domain-types/host_group_config/collections/all - Host Groups (HTTP 200)\n✅ domain-types/service_group_config/collections/all - Service Groups (HTTP 200)"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_checkmk_version",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 183,
+   "text": "📋 **CheckMK Version Information**\n\nVersion: 2.5.0p18.community\nEdition: community\nSite: cmk\nServer: http://127.0.0.1:5081"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_checkmk_hosts",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 187,
+   "text": "📭 No hosts found"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_checkmk_services",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 192,
+   "text": "📭 No services found"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_current_problems",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 367,
+   "text": "✅ No current problems found"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_pending_changes",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 181,
+   "text": "ℹ️ **No Pending Changes**\n\nAll configuration changes have been activated.\nThe CheckMK configuration is up to date."
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_folders",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 188,
+   "text": "📁 No folders found"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_users",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 186,
+   "text": "👥 **CheckMK Users** (2 total):\n\n👤 **agent_registration** (Check_MK Agent Registration - used for agent registration)\n   📧 \n   🔑 Roles: agent_registration\n   ✅ Active\n\n👤 **cmkadmin** (cmkadmin)\n   📧 No email\n   🔑 Roles: admin\n   ✅ Active"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_contact_groups",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 182,
+   "text": "👥 **Contact Groups** (1 total):\n\n👥 **all** - all"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_list_user_roles",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 194,
+   "text": "👥 **User Roles**\n\n**🏗️ Built-in Roles** (cannot be deleted):\n👤 **user** - Normal monitoring user\n   📊 395 permissions\n   💡 Normal user - can only see own hosts/services, limited changes\n\n👑 **admin** - Administrator\n   📊 475 permissions\n   💡 Full CheckMK administrator with all permissions\n\n👁️ **guest** - Guest user\n   📊 309 permissions\n   💡 Read-only access - can see everything but change nothing\n\n🎭 **agent_registration** - Agent registration user\n   📊 3 permissions\n   💡 Custom user role\n\n🎭 **no_permissions** - Empty template for least privilege roles\n   📊 0 permissions\n   💡 Custom user role\n\n**💡 Available Operations:**\n• `vibemk_show_user_role` - View detailed role information\n• `vibemk_create_user_role` - Clone an existing role\n• `vibemk_update_user_role` - Modify custom role permissions\n• `vibemk_delete_user_role` - Delete custom roles\n"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_show_user_role",
+   "args": {
+    "role_id": "user"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 186,
+   "text": "👥 **User Role Details: user**\n\n🏗️ **Built-in Role** (cannot be deleted)\n\n**Role Information:**\n• **ID**: `user`\n• **Alias**: Normal monitoring user\n• **Type**: Built-in\n• **Permissions**: 395 total\n\n**Description:**\nNormal user - can only see own hosts/services, limited changes\n\n**Key Permissions** (showing first 10):\n✅ `general.edit_pagetype_topic`\n✅ `general.publish_pagetype_topic`\n✅ `general.publish_to_groups_pagetype_topic`\n✅ `general.see_user_pagetype_topic`\n✅ `action.aggregation_freeze`\n✅ `wato.parentscan`\n✅ `nagvis.Map_view`\n✅ `nagvis.Map_edit`\n✅ `nagvis.Map_delete`\n✅ `sidesnap.nagvis_maps`\n... and 385 more permissions\n\n**Available Operations:**\n• `vibemk_create_user_role` - Clone this role to create a new one\n"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_host_groups",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 185,
+   "text": "🏠 **No Host Groups Found**\n\nNo host groups are configured."
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_service_groups",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 179,
+   "text": "🔧 **No Service Groups Found**\n\nNo service groups are configured."
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_comments",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 378,
+   "text": "💬 No comments found"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_downtimes",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 226,
+   "text": "ℹ️ No scheduled downtimes"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_rulesets",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 249,
+   "text": "📋 **Available Rulesets** (22 total):\n\n📋 **active_checks:cmk_inv**\n   Title: Do HW/SW inventory\n   Help: All hosts configured via this rule set will do a hardware and software inventory. For each configure...\n\n📋 **checkgroup_parameters:memory_linux**\n   Title: Memory and swap usage on Linux\n   Help: None...\n\n📋 **ping_levels**\n   Title: Ping and host check parameters\n   Help: This rule sets the parameters for the host checks (via check_icmp) and also for ping checks on ping-...\n\n📋 **inventory_df_rules**\n   Title: File system discovery\n   Help: None...\n\n📋 **checkgroup_parameters:interfaces**\n   Title: Network interfaces and switch ports\n   Help: None...\n\n📋 **inventory_processes_rules**\n   Title: Process discovery\n   Help: This rule set defines criteria for automatically creating checks for running processes based upon wh...\n\n📋 **active_checks:smtp**\n   Title: Check SMTP service access\n   Help: This check uses check_smtp from the standard Nagios plug-ins in order to try the response of an SMTP...\n\n📋 **active_checks:disk_smb**\n   Title: Check SMB share access\n   Help: This rule set helps you to configure the active check plug-in check_disk_smb that checks the access ...\n\n📋 **active_checks:ldap**\n   Title: Check LDAP service access\n   Help: This check uses check_ldap from the standard Nagios plug-ins in order to try the response of an LDAP...\n\n📋 **host_contactgroups**\n   Title: Assignment of hosts to contact groups\n   Help: None...\n\n📋 **extra_service_conf:check_interval**\n   Title:"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_ruleset",
+   "args": {
+    "ruleset_name": "checkgroup_parameters:temperature"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 299,
+   "text": "📋 **Ruleset: checkgroup_parameters:temperature**\n\nRules (0 total):\n\nNo rules configured in this ruleset"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_host_tags",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 192,
+   "text": "🏷️ **Host Tag Groups** (6 total):\n\n🏷️ **criticality** - criticality\n   Tags: Productive system, Business critical, Test system, ... (+1 more)\n   Total: 4 tags\n\n🏷️ **networking** - networking\n   Tags: Local network (low latency), WAN (high latency), DMZ (low latency, secure access)\n   Total: 3 tags\n\n🏷️ **agent** - agent\n   Tags: API integrations if configured, else Checkmk agent, Configured API integrations and Checkmk agent, Configured API integrations, no Checkmk agent, ... (+1 more)\n   Total: 4 tags\n\n🏷️ **piggyback** - piggyback\n   Tags: Use piggyback data from other hosts if present, Always use and expect piggyback data, Never use piggyback data\n   Total: 3 tags\n\n🏷️ **snmp_ds** - snmp_ds\n   Tags: No SNMP, SNMPv2 or v3, SNMPv1\n   Total: 3 tags\n\n🏷️ **address_family** - address_family\n   Tags: IPv4 only, IPv6 only, IPv4/IPv6 dual-stack, ... (+1 more)\n   Total: 4 tags"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_timeperiods",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 191,
+   "text": "⏰ **Time Periods** (1 total):\n\n⏰ **24X7** - Always\n   7 active ranges"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_passwords",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 220,
+   "text": "🔐 **No Passwords Found**\n\nNo stored passwords are configured."
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_notification_rules",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 192,
+   "text": "📢 **Notification Rules** (1)\n\n• **(no description)** — id `81ba9784-f608-41b5-8332-cbba5e148985`, enabled, via `create_notification_with_the_following_parameters`"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_debug_api_endpoints",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1152,
+   "text": "🔍 **CheckMK API Endpoints Debug**\n\n💥 **domain-types**\n   Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n\n💥 **domain-types/host**\n   Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n\n✅ **domain-types/host/collections/all**\n   Keys: ['links', 'id', 'domainType', 'value', 'extensions']\n   Sample: []...\n\n💥 **domain-types/service**\n   Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n\n✅ **domain-types/service/collections/all**\n   Keys: ['links', 'id', 'domainType', 'value', 'extensions']\n   Sample: []...\n\n💥 **objects**\n   Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_debug_permissions",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1177,
+   "text": "🔐 **Permissions Debug**\n\n🧪 **API Version**\n   ✅ Access granted\n\n🧪 **Domain Types**\n   💥 Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n\n🧪 **User Info**\n   💥 Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n\n🔒 **Host Monitoring Permissions**\n   ✅ Access granted - 0 items\n\n🔒 **Service Monitoring Permissions**\n   ✅ Access granted - 0 items\n\n🔒 **Host Config Permissions**\n   ✅ Access granted - 0 items"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_find_host_grouping_rulesets",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 964,
+   "text": "🔍 **Host Grouping and Contact Assignment Rulesets**\n\nSearch for 'contact' failed: HTTP 400: Bad Request — These fields have problems: search\nSearch for 'group' failed: HTTP 400: Bad Request — These fields have problems: search\nSearch for 'host' failed: HTTP 400: Bad Request — These fields have problems: search\nSearch for 'notification' failed: HTTP 400: Bad Request — These fields have problems: search\nSearch for 'assignment' failed: HTTP 400: Bad Request — These fields have problems: search\n\n📊 **Summary:** Found 0 relevant rulesets"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_example_rule_structures",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1,
+   "text": "📚 **Example Rule Structures for Host Grouping**\n\n\n🔧 **1. Host Contact Group Assignment (Swagger Format)**\n```json\n{\n  \"extensions\": {\n    \"ruleset\": \"host_contactgroups\",\n    \"folder\": \"/\",\n    \"properties\": {\n      \"comment\": \"Critical hosts to admin teams\"\n    },\n    \"value_raw\": [\"admins\", \"network-team\"],\n    \"conditions\": {\n      \"host_tags\": [\n        {\n          \"key\": \"criticality\",\n          \"operator\": \"is\",\n          \"value\": \"critical\"\n        }\n      ]\n    }\n  }\n}\n```\n\n🏠 **2. Host Group Assignment (Swagger Format)**\n```json\n{\n  \"extensions\": {\n    \"ruleset\": \"host_groups\",\n    \"folder\": \"/\",\n    \"properties\": {\n      \"comment\": \"Database servers to appropriate groups\"\n    },\n    \"value_raw\": [\"database-servers\", \"production\"],\n    \"conditions\": {\n      \"host_name\": {\n        \"match_on\": [\"db.*\"],\n        \"operator\": \"match_regex\"\n      }\n    }\n  }\n}\n```\n\n🔍 **3. Advanced Host Conditions (Swagger Format)**\n```json\n{\n  \"extensions\": {\n    \"ruleset\": \"host_contactgroups\",\n    \"folder\": \"/\",\n    \"value_raw\": [\"web-admins\"],\n    \"conditions\": {\n      \"host_name\": {\n        \"match_on\": [\"web[0-9]+\"],\n        \"operator\": \"match_regex\"\n      },\n      \"host_tags\": [\n        {\n          \"key\": \"environment\",\n          \"operator\": \"is\",\n          \"value\": \"production\"\n        },\n        {\n          \"key\": \"location\",\n          \"operator\": \"is\",\n          \"value\": \"datacenter-1\"\n        }\n      ],\n      \"host_label_groups\": [\n        {\n          \"label_group\": [\n            {"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_list_downtimes",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 200,
+   "text": "📋 **No Downtimes Found**\n\nNo active downtimes"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_active_downtimes",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 209,
+   "text": "🟢 **No Active Downtimes**\n\nNo downtimes are currently active"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_list_service_groups",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 201,
+   "text": "ℹ️ **No Service Groups Found**\n\nUse 'create_service_group' to create one."
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_search_rulesets",
+   "args": {
+    "fulltext": "temperature"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 274,
+   "text": "🔍 **No Rulesets Found**\n\nNo rulesets match text 'temperature'.\n\n💡 **Tips:**\n• Try broader search terms\n• Check if deprecated rulesets should be included\n• Verify folder path is correct"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_show_ruleset",
+   "args": {
+    "ruleset_name": "checkgroup_parameters:temperature"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 203,
+   "text": "📋 **Ruleset Details: checkgroup_parameters:temperature**\n\n**Title:** No title\n**Type:** Unknown\n**Match Type:** Unknown\n**Number of Rules:** 0\n\n**Description:**\nNo help available\n\n**Available Operations:**\n• Use `vibemk_get_ruleset` to see actual rules in this ruleset\n• Use `vibemk_create_rule` to add new rules to this ruleset\n• Use `vibemk_search_rulesets` to find related rulesets\n"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_list_rulesets",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 236,
+   "text": "📋 **Available Rulesets**\n\n**Showing 22 rulesets**\n\n**ACTIVE:**\n  ✅ `active_checks:cmk_inv` - Do HW/SW inventory\n  ✅ `active_checks:smtp` - Check SMTP service access\n  ✅ `active_checks:disk_smb` - Check SMB share access\n  ✅ `active_checks:ldap` - Check LDAP service access\n  ✅ `active_checks:mkevents` - Check event state in Event Console\n  ... and 3 more active rulesets\n\n**CHECKGROUP:**\n  ✅ `checkgroup_parameters:memory_linux` - Memory and swap usage on Linux\n  ✅ `checkgroup_parameters:interfaces` - Network interfaces and switch ports\n\n**EXTRA:**\n  ✅ `extra_service_conf:check_interval` - Normal check interval for service checks\n  ✅ `extra_host_conf:notification_options` - Notified events for hosts\n\n**HOST:**\n  ✅ `host_contactgroups` - Assignment of hosts to contact groups\n  ✅ `host_check_commands` - Host check command\n\n**INVENTORY:**\n  ✅ `inventory_df_rules` - File system discovery\n  ✅ `inventory_processes_rules` - Process discovery\n\n\n💡 **Usage:**\n• `vibemk_show_ruleset` - Get detailed information about a specific ruleset\n• `vibemk_search_rulesets` - Search rulesets with filters\n• `vibemk_get_ruleset` - View rules within a ruleset\n"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_list_acknowledgements",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 191,
+   "text": "✅ **Acknowledgements List**\n\nNo active acknowledgements found."
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_list_active_checks",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 669,
+   "text": "🔍 **Active Checks**\n\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: d580a4c5-e7a8-417a-89c4-e295135ba37d\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: 4fac27e0-6aa0-4a76-ac55-b2b9c10dae11\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: 26d6a92a-db48-4165-ab3e-d490fbaa26a5\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: a1208377-3bf4-4d68-a775-fe3636d665c2\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:icmp** — vmk-h1\n  ID: 243ec0ed-55bf-4120-89dc-025bf1638cdd\n  Value: `{'description': 'PING', 'packets': 5, 'timeout': 20}`\n• [🟢 active] **active_checks:icmp** — vmk-h1\n  ID: 1ab69b41-8529-4a60-9d6a-71272d7b7b2a\n  Value: `{'description': 'PING', 'packets': 5, 'timeout': 20}`\n• [🟢 active] **active_checks:icmp** — vmk-h1\n  ID: 36e4191e-1200-4097-8d19-0d831cdc404a\n  Value: `{'description': 'PING', 'packets': 5, 'timeout': 20}`\n• [🟢 active] **active_checks:icmp** — vmk-h1\n  ID: 27c13121-0af0-42ad-9c9f-85b29237a444\n  Value: `{'description': 'PING', 'packets': 5, 'timeout': 20}`\n• [🟢 active] **active_checks:dns** — vmk-h1\n  ID: 0c48d7eb-6785-45b1-8f6d-b7fa7b4d7c56\n  Value: `{'hostname': 'vmk-h1', 'server': None, 'response_time': (0"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_events",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 188,
+   "text": "📭 No Event Console events found."
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_aux_tags",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 184,
+   "text": "🏷️ **Aux Tags (6)**\n\n• **ip-v4** — IPv4 [Address]\n• **ip-v6** — IPv6 [Address]\n• **snmp** — Monitor via SNMP [Monitoring agents]\n• **tcp** — Monitor via Checkmk agent or special agent [Monitoring agents]\n• **checkmk-agent** — Monitor via Checkmk agent [Monitoring agents]\n• **ping** — Only ping this device [Monitoring agents]"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_audit_log",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 220,
+   "text": "📋 **Audit Log — 2026-11-06 (385 entries)**\n\n• `01:41:27` **cmkadmin** — new-folder [vmktest: Folder]\n  Created new folder Main / vibeMK test\n• `01:41:28` **cmkadmin** — create-host [vmk-h1: Host]\n  Created new host vmk-h1.\n• `01:41:28` **cmkadmin** — edit-hostgroups\n  Create new host group vmkhg\n• `01:41:28` **cmkadmin** — edit-contactgroups\n  Create new contact group vmkcg\n• `01:41:29` **cmkadmin** — edit-servicegroups\n  Create new service group vmksg\n• `01:41:29` **cmkadmin** — edit-servicegroups\n  Create new service group vmksg2\n• `01:41:29` **cmkadmin** — edit-servicegroups\n  Create new service group vmksg3\n• `01:41:30` **cmkadmin** — edit-user [vmkuser: User]\n  Created new user: vmkuser\n• `01:41:30` **cmkadmin** — edit-users\n  Created new user: vmkuser\n• `01:41:31` **cmkadmin** — edit-timeperiods\n  Created new time period vmktp\n• `01:41:32` **cmkadmin** — add-password\n  Added the password vmkpw\n• `01:41:33` **cmkadmin** — new-notification-rule\n  Created new notification rule\n• `01:41:34` **cmkadmin** — snapshot-created\n  Created snapshot wato-snapshot-2026-11-06-00-41-34.tar\n• `01:41:34` **cmkadmin** — activate-changes\n  Starting activation (Sites: cmk)\n• `01:41:34` **cmkadmin** — activate-changes\n  Started activation of site cmk\n• `01:43:16` **cmkadmin** — edit-host [vmk-h1: Host]\n  Modified host vmk-h1.\n• `01:43:18` **cmkadmin** — create-host [vmk-h2b: Host]\n  Created new host vmk-h2b.\n• `01:43:18` **cmkadmin** — edit-host [vmk-h2b: Host]\n  Modified host vmk-h2b.\n• `01"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_get_sites",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 183,
+   "text": "🌐 **Monitoring Sites (1)**\n\n• **cmk** — Local site cmk [🔴 not connected]\n  Replication: disabled"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_list_process_rules",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 207,
+   "text": "🔍 **Process monitoring rules (inventory_processes_rules)**\n\n• 🟢 **Process %u apache** (match: `~.*/omd/sites/[^/]+/etc/apache/apache.conf$`) → all hosts\n  ID: `7eda3d76-62ff-4ff6-b84b-a26ce202c577`\n  (no thresholds)\n• 🟢 **Process %u automation helpers** (match: `~(?:.*cmk-automation-helper.*|gunicorn:.*automation-helper)`) → all hosts\n  ID: `94190e27-2836-488a-b6b4-f23f694a455e`\n  (no thresholds)\n• 🟢 **Process %u ui-job-scheduler** (match: `~.*cmk-ui-job-scheduler.*`) → all hosts\n  ID: `8b5616fb-a457-404e-a136-24065da7f170`\n  (no thresholds)\n• 🟢 **Process %u checker helpers** (match: `~python3 /omd/sites/[^/]+/bin/cmk .*--checker`) → all hosts\n  ID: `feaa2248-08b8-47a3-bc3c-a5502d2b9f3a`\n  (no thresholds)\n• 🟢 **Process %u clickhouse server** (match: `~clickhouse server`) → all hosts\n  ID: `fb28480f-175f-4e41-b0a9-a7a5afdf5fac`\n  (no thresholds)\n• 🟢 **Process %u cmc** (match: `~/omd/sites/[^/]+/bin/cmc`) → all hosts\n  ID: `9440a0b2-5eb2-4f52-ac4b-17c6ddecd1f2`\n  (no thresholds)\n• 🟢 **Process %u dcd** (match: `~dcd`) → all hosts\n  ID: `f56e8b7a-98f0-4597-a030-1f1f6dc2347d`\n  (no thresholds)\n• 🟢 **Process %u event console** (match: `~python3 /omd/sites/[^/]+/bin/mkeventd(.*)?$`) → all hosts\n  ID: `2105c8a7-5672-4242-98f6-fd6ce8b8f3a7`\n  (no thresholds)\n• 🟢 **Process %u fetcher helpers** (match: `~python3 /omd/sites/[^/]+/bin/fetcher`) → all hosts\n  ID: `0846dd4c-cc62-4adf-9400-7f20a651f996`\n  (no thresholds)\n• 🟢 **Process %u jaeger** (match: `~/omd/sites/[^/]+/bin/jaeger`) → all"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_checkmk_rules_guide",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1,
+   "text": "# Checkmk Rule Management Guide\n\n## Rule order (CRITICAL)\n\nCheckmk evaluates rules by these principles:\n1. **The first matching rule wins** — rules are searched top to bottom, and the first one that matches is applied.\n2. **A subfolder rule ALWAYS beats a root folder rule** — a rule in `/muenchen/mue-0/` is evaluated before one in `/` (root), whatever position it holds.\n3. **Within one folder**: position #0 (top) beats position #5.\n\n### What follows from that\n- ALWAYS create a new rule for a host in that host's own folder, not in root `~`.\n- Before creating a rule, call `vibemk_get_ruleset` and check whether one already exists for this host.\n- If one exists, prefer **updating** it (vibemk_update_rule) over adding another — otherwise two rules compete.\n- After creating a rule, check the order and move it up with vibemk_move_rule if needed.\n\n## value_raw — a Python literal, not JSON\n\nCheckmk rule values are Python dicts containing tuples. JSON has no tuples, so always pass `value_raw` as a Python string:\n\n```python\n# CORRECT (value_raw as a string):\n\"{'levels': ('perc_used', (80.0, 90.0))}\"\n\"{'levels_swap': ('perc_used', (30.0, 50.0)), 'levels_virtual': ('perc_used', (90.0, 95.0))}\"\n\n# WRONG (JSON / rule_config -> API 400):\n{\"levels\": [\"perc_used\", [80.0, 90.0]]}  # lists instead of tuples -> error\n```\n\n## memory_linux parameter keys\n\nFor `checkgroup_parameters:memory_linux`:\n- `levels_virtual` — total virtual memory (what Checkmk displays as \"Total virtual memory\")\n- `levels_r"
+  },
+  {
+   "phase": "read",
+   "tool": "vibemk_baking_status",
+   "args": {},
+   "expected": "err",
+   "got": "err",
+   "ok": true,
+   "ms": 187,
+   "text": "❌ **Agent bakery not available**\n\nThis CheckMK edition has no agent bakery -- it is part of the commercial editions only. On Raw/Community, install the vanilla agent from Setup > Agents > Linux / Windows."
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_folder",
+   "args": {
+    "folder": "vmktest",
+    "parent": "/",
+    "title": "vibeMK test"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 210,
+   "text": "✅ **Folder Created Successfully**\n\n📁 **Folder:** vmktest\n📝 **Title:** vibeMK test\n📂 **Parent:** /\n🔗 **Full Path:** /vmktest\n⚙️ **API Path:** ~vmktest\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_host",
+   "args": {
+    "host_name": "vmk-h1",
+    "folder": "/",
+    "attributes": {
+     "ipaddress": "192.0.2.10",
+     "tag_agent": "no-agent",
+     "tag_snmp_ds": "no-snmp"
+    }
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 425,
+   "text": "✅ **Host Created Successfully**\n\n**Host:** vmk-h1\n**Folder:** / (~)\n**Attributes Set:** 3\n\n📋 **Host Details:**\n• IP Address: 192.0.2.10\n\n⚠️ **Remember to activate changes!**\n\n💡 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review\n2️⃣ Use 'activate_changes' to apply configuration\n\n🤖 **Smart Routing Applied:** Single host detected → Individual Creation API\n📡 **API Endpoint:** POST domain-types/host_config/collections/all"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_host_group",
+   "args": {
+    "name": "vmkhg",
+    "alias": "vmk host group"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 200,
+   "text": "✅ **Host Group Created Successfully**\n\nName: vmkhg\nAlias: vmk host group\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_contact_group",
+   "args": {
+    "name": "vmkcg",
+    "alias": "vmk contact group"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 194,
+   "text": "✅ **Contact Group Created Successfully**\n\nName: vmkcg\nAlias: vmk contact group\nMembers: 0 users\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_service_group",
+   "args": {
+    "name": "vmksg",
+    "alias": "vmk service group"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 375,
+   "text": "✅ **Service Group Created Successfully**\n\n**Name:** vmksg\n**Alias:** vmk service group\n\n⚠️ **Remember to activate changes!**\n\n💡 **Next Steps:**\n1️⃣ Use 'list_service_groups' to view all groups\n2️⃣ Use 'activate_changes' to apply configuration"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_bulk_create_service_groups",
+   "args": {
+    "entries": [
+     {
+      "name": "vmksg2",
+      "alias": "two"
+     },
+     {
+      "name": "vmksg3",
+      "alias": "three"
+     }
+    ]
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 204,
+   "text": "✅ **Bulk Service Groups Created Successfully**\n\n**Created:** 2 service groups\n\n📋 **Created Groups:**\n• vmksg2 (two)\n• vmksg3 (three)\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_user",
+   "args": {
+    "username": "vmkuser",
+    "fullname": "vmk user",
+    "password": "Vmk-passw0rd!x"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 395,
+   "text": "✅ **User Created Successfully**\n\nUsername: vmkuser\nFull Name: vmk user\nEmail: Not set\nRoles: user\nContact Groups: all\nLogin: Enabled\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_user_role",
+   "args": {
+    "base_role_id": "user",
+    "new_role_id": "vmkrole"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 202,
+   "text": "✅ **User Role Created Successfully**\n\n**New Role Details:**\n• **Role ID**: `vmkrole`\n• **Cloned from**: `user`\n• **Alias**: Not specified\n\n**Inherited Permissions:**\nThe new role inherits all permissions from the 'user' role.\n\n💡 **Next Steps:**\n• Use `vibemk_show_user_role` to view detailed permissions\n• Use `vibemk_update_user_role` to customize permissions\n• Assign this role to users in user management"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_host_tag",
+   "args": {
+    "tag_id": "vmktag",
+    "title": "vmk tag",
+    "tags": [
+     {
+      "id": "vmka",
+      "title": "A"
+     },
+     {
+      "id": "vmkb",
+      "title": "B"
+     }
+    ]
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 206,
+   "text": "✅ **Host Tag Group Created Successfully**\n\nTag ID: vmktag\nTitle: vmk tag\nTopic: None\nTags: 2 configured\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_aux_tag",
+   "args": {
+    "tag_id": "vmkaux",
+    "title": "vmk aux",
+    "topic": "vmk"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 211,
+   "text": "✅ Auxiliary tag 'vmkaux' (vmk aux) created."
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_timeperiod",
+   "args": {
+    "name": "vmktp",
+    "alias": "vmk tp",
+    "active_time_ranges": [
+     {
+      "day": "monday",
+      "time_ranges": [
+       {
+        "start": "08:00",
+        "end": "17:00"
+       }
+      ]
+     }
+    ]
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 204,
+   "text": "✅ **Time Period Created Successfully**\n\nName: **vmktp**\nAlias: vmk tp\nActive time ranges:\n  • Monday: 08:00-17:00\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_password",
+   "args": {
+    "ident": "vmkpw",
+    "title": "vmk pw",
+    "password": "s3cret"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1056,
+   "text": "✅ **Password Created Successfully**\n\nIdentifier: vmkpw\nTitle: vmk pw\nOwner: admin\nShared with: 0 users/groups\nComment: None\n\n🔒 **Security Note:** The password is now securely stored in CheckMK\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_rule",
+   "args": {
+    "ruleset_name": "checkgroup_parameters:temperature",
+    "rule_config": "{'levels': (38.0, 45.0)}",
+    "comment": "vmk rule",
+    "conditions": {
+     "host_label_groups": [
+      {
+       "operator": "and",
+       "label_group": [
+        {
+         "operator": "and",
+         "label": "cmk/site:cmk"
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 233,
+   "text": "✅ **Rule Created Successfully**\n\nRuleset: checkgroup_parameters:temperature\nRule ID: 3d09dd73-06ce-4f66-b586-c1fb1ec4f46d\nFolder: /\nComment: vmk rule\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_create_notification_rule",
+   "args": {
+    "rule_config": {
+     "rule_properties": {
+      "description": "vmk notif",
+      "comment": "vmk",
+      "documentation_url": "",
+      "do_not_apply_this_rule": {
+       "state": "disabled"
+      },
+      "allow_users_to_deactivate": {
+       "state": "enabled"
+      }
+     },
+     "notification_method": {
+      "notify_plugin": {
+       "option": "create_notification_with_the_following_parameters",
+       "plugin_params": {
+        "plugin_name": "mail",
+        "from_details": {
+         "state": "disabled"
+        },
+        "reply_to": {
+         "state": "disabled"
+        },
+        "subject_for_host_notifications": {
+         "state": "disabled"
+        },
+        "subject_for_service_notifications": {
+         "state": "disabled"
+        },
+        "sort_order_for_bulk_notifications": {
+         "state": "disabled"
+        },
+        "send_separate_notification_to_every_recipient": {
+         "state": "disabled"
+        },
+        "info_to_be_displayed_in_the_email_body": {
+         "state": "disabled"
+        },
+        "insert_html_section_between_body_and_table": {
+         "state": "disabled"
+        },
+        "url_prefix_for_links_to_checkmk": {
+         "state": "disabled"
+        },
+        "enable_sync_smtp": {
+         "state": "disabled"
+        },
+        "display_graphs_among_each_other": {
+         "state": "disabled"
+        },
+        "graphs_per_notification": {
+         "state": "disabled"
+        },
+        "bulk_notifications_with_graphs": {
+         "state": "disabled"
+        }
+       }
+      },
+      "notification_bulking": {
+       "state": "disabled"
+      }
+     },
+     "contact_selection": {
+      "all_contacts_of_the_notified_object": {
+       "state": "enabled"
+      },
+      "all_users": {
+       "state": "disabled"
+      },
+      "all_users_with_an_email_address": {
+       "state": "disabled"
+      },
+      "the_following_users": {
+       "state": "disabled"
+      },
+      "members_of_contact_groups": {
+       "state": "disabled"
+      },
+      "explicit_email_addresses": {
+       "state": "disabled"
+      },
+      "restrict_by_custom_macros": {
+       "state": "disabled"
+      },
+      "restrict_by_contact_groups": {
+       "state": "disabled"
+      }
+     },
+     "conditions": {
+      "match_sites": {
+       "state": "disabled"
+      },
+      "match_folder": {
+       "state": "disabled"
+      },
+      "match_host_tags": {
+       "state": "disabled"
+      },
+      "match_host_labels": {
+       "state": "disabled"
+      },
+      "match_host_groups": {
+       "state": "disabled"
+      },
+      "match_hosts": {
+       "state": "disabled"
+      },
+      "match_exclude_hosts": {
+       "state": "disabled"
+      },
+      "match_service_labels": {
+       "state": "disabled"
+      },
+      "match_service_groups": {
+       "state": "disabled"
+      },
+      "match_exclude_service_groups": {
+       "state": "disabled"
+      },
+      "match_service_groups_regex": {
+       "state": "disabled"
+      },
+      "match_exclude_service_groups_regex": {
+       "state": "disabled"
+      },
+      "match_services": {
+       "state": "disabled"
+      },
+      "match_exclude_services": {
+       "state": "disabled"
+      },
+      "match_check_types": {
+       "state": "disabled"
+      },
+      "match_plugin_output": {
+       "state": "disabled"
+      },
+      "match_contact_groups": {
+       "state": "disabled"
+      },
+      "match_service_levels": {
+       "state": "disabled"
+      },
+      "match_only_during_time_period": {
+       "state": "disabled"
+      },
+      "match_host_event_type": {
+       "state": "enabled",
+       "value": {
+        "start_or_end_of_flapping_state": false,
+        "start_or_end_of_scheduled_downtime": false,
+        "acknowledgement_of_problem": false,
+        "alert_handler_execution_successful": false,
+        "alert_handler_execution_failed": false,
+        "up_down": false,
+        "up_unreachable": false,
+        "down_up": false,
+        "down_unreachable": false,
+        "unreachable_down": false,
+        "unreachable_up": false,
+        "any_up": true,
+        "any_down": true,
+        "any_unreachable": false
+       }
+      },
+      "match_service_event_type": {
+       "state": "enabled",
+       "value": {
+        "start_or_end_of_flapping_state": false,
+        "start_or_end_of_scheduled_downtime": false,
+        "acknowledgement_of_problem": false,
+        "alert_handler_execution_successful": false,
+        "alert_handler_execution_failed": false,
+        "ok_warn": false,
+        "ok_ok": false,
+        "ok_crit": false,
+        "ok_unknown": false,
+        "warn_ok": false,
+        "warn_crit": false,
+        "warn_unknown": false,
+        "crit_ok": false,
+        "crit_warn": false,
+        "crit_unknown": false,
+        "unknown_ok": false,
+        "unknown_warn": false,
+        "unknown_crit": false,
+        "any_ok": true,
+        "any_warn": true,
+        "any_crit": true,
+        "any_unknown": false
+       }
+      },
+      "restrict_to_notification_numbers": {
+       "state": "disabled"
+      },
+      "throttle_periodic_notifications": {
+       "state": "disabled"
+      },
+      "match_notification_comment": {
+       "state": "disabled"
+      },
+      "event_console_alerts": {
+       "state": "disabled"
+      }
+     }
+    }
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 451,
+   "text": "✅ **Notification rule created**\n\n**rule_id**: 4eea1797-34b2-4c90-a06b-4bd0e91c83ac\n**next step**: activate changes to apply it"
+  },
+  {
+   "phase": "setup",
+   "tool": "vibemk_activate_changes",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 499,
+   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: 6ebf2c25-b3cc-4b9c-8183-c7ecb50c16d3\nSites: cmk\nForce foreign changes: False\nChanges to activate: 11\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_host_status",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 243,
+   "text": "✅ **Host Status: vmk-h1**\n\n**Status:** 🔴 **DOWN**\n**State Code:** 1 (Hard State: 1)\n**Has Been Checked:** Yes\n**Last Check:** 36s ago\n**Last State Change:** 1m ago\n\n**Plugin Output:** CRITICAL - 192.0.2.10: rta nan, lost 100%\n\n✅ **Live monitoring data from CheckMK REST API**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_host_details",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 222,
+   "text": "🔍 **Host Details: vmk-h1**\n\nFolder: /\nIP Address: 192.0.2.10\nAlias: Not set\nAgent Type: no-agent\nSite: Not set"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_host_config",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 226,
+   "text": "ℹ️ **Host Configuration: vmk-h1**\n\n**links**: 4\n**domainType**: host_config\n**id**: vmk-h1\n**title**: vmk-h1\n**members**: object\n**extensions**: object"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_host_effective_attributes",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 227,
+   "text": "📋 **Effective Host Attributes**\n\n**Host:** vmk-h1\n**Folder:** /\n\n🎯 **Effective Attributes:**\n• **tag_agent:** no-agent _Host_\n• **tag_snmp_ds:** no-snmp _Host_\n• **ipaddress:** 192.0.2.10 _Host_\n• **meta_data:** {'created_at': '2026-11-06T01:22:09.675821+00:00', 'updated_at': '2026-11-06T01:22:11.676537+00:00', 'created_by': 'cmkadmin'} _Host_\n"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_validate_host_config",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 437,
+   "text": "🔍 **Host Configuration Validation**\n\n**Host:** vmk-h1\n**Operation:** create\n**Status:** ❌ Invalid\n\n🚨 **Errors:**\n• Host already exists\n\n"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_compare_host_states",
+   "args": {
+    "host_name": "vmk-h1",
+    "desired_attributes": {
+     "ipaddress": "192.0.2.10"
+    }
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 207,
+   "text": "🔄 **Host State Comparison**\n\n**Host:** vmk-h1\n**Changes Required:** Yes\n\n📋 **Detected Changes:**\n**Removed:**\n• tag_agent: no-agent\n• tag_snmp_ds: no-snmp\n• meta_data: {'created_at': '2026-11-06T01:22:09.675821+00:00', 'updated_at': '2026-11-06T01:22:11.676537+00:00', 'created_by': 'cmkadmin'}\n"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_host",
+   "args": {
+    "host_name": "vmk-h1",
+    "attributes": {
+     "alias": "vmk alias"
+    }
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 431,
+   "text": "✅ **Host Updated Successfully**\n\n**Host:** vmk-h1\n**Update Mode:** update\n**Operation:** Merging with existing host attributes\n\n📋 **Changes Applied:**\n**Added:**\n• alias: vmk alias\n\n\n⚠️ **Remember to activate changes!**\n💡 Use 'vibemk_activate_changes' to apply the configuration"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_service_status",
+   "args": {
+    "host_name": "vmk-h1",
+    "service_description": "PING"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 209,
+   "text": "🔴 **Service Status: vmk-h1/PING**\n\n**Status:** CRITICAL\n**State Code:** 2\n**Output:** CRITICAL - 192.0.2.10: rta nan, lost 100%\n**Since:** 2026-11-06 01:22 UTC"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_host_metrics",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 189,
+   "text": "📊 **Available Metrics**\n\nTarget: vmk-h1\nMetrics (4 total):\n\n📈 rta\n📈 rtmax\n📈 rtmin\n📈 pl\n\n💡 **Usage:** pass one of these as metric_name to get its values"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_service_metrics",
+   "args": {
+    "host_name": "vmk-h1",
+    "service_description": "PING"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 190,
+   "text": "📊 **Available Metrics**\n\nTarget: vmk-h1/PING\nMetrics (4 total):\n\n📈 rta\n📈 rtmax\n📈 rtmin\n📈 pl\n\n💡 **Usage:** pass one of these as metric_name to get its values"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_list_available_metrics",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 192,
+   "text": "📊 **Available Metrics**\n\nTarget: vmk-h1\nMetrics (4 total):\n\n📈 rta\n📈 rtmax\n📈 rtmin\n📈 pl\n\n💡 **Usage:** pass one of these as metric_name to get its values"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_search_metrics",
+   "args": {
+    "host_filter": "vmk-h1",
+    "service_filter": "PING",
+    "metric_id": "rta"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 209,
+   "text": "🔍 **Metrics Search Results**\n\nFilter: vmk-h1/PING\n\n📊 **Search Metrics: vmk-h1/PING**\n\nTime Range: 1h\nMetrics: 1 found\n\n📈 **Round trip average**\n   Latest: No data\n   Data points: 60\n   Line type: area\n   Color: #ff8400\n\n\n💡 **Use specific metric_name for detailed data**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_custom_graph",
+   "args": {
+    "custom_graph_id": "nope"
+   },
+   "expected": "err",
+   "got": "err",
+   "ok": true,
+   "ms": 208,
+   "text": "❌ **Failed to retrieve custom graph**\n\nCould not get custom graph 'nope': HTTP 404: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_bulk_create_hosts",
+   "args": {
+    "entries": [
+     {
+      "host_name": "vmk-h2b",
+      "folder": "/",
+      "attributes": {
+       "ipaddress": "192.0.2.11",
+       "tag_agent": "no-agent",
+       "tag_snmp_ds": "no-snmp"
+      }
+     }
+    ]
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 243,
+   "text": "✅ **Bulk Host Creation Successful**\n\n**Hosts Created:** 1/1\n\n📋 **Created Hosts:**\n• vmk-h2b (Folder: /)\n⚠️ **Remember to activate changes!**\n\n💡 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review all changes\n2️⃣ Use 'activate_changes' to apply configuration\n"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_bulk_update_hosts",
+   "args": {
+    "entries": [
+     {
+      "host_name": "vmk-h2b",
+      "attributes": {
+       "alias": "bulk"
+      }
+     }
+    ]
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 223,
+   "text": "✅ **Bulk Update Successful**\n\n**updated**: 1\n**message**: Remember to activate changes!"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_clone_host",
+   "args": {
+    "source_hostname": "vmk-h1",
+    "target_hostname": "vmk-h2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 431,
+   "text": "✅ Host 'vmk-h2' created as a clone of 'vmk-h1'.\nFolder: /\nAttributes: {\n  \"tag_agent\": \"no-agent\",\n  \"tag_snmp_ds\": \"no-snmp\",\n  \"ipaddress\": \"192.0.2.10\",\n  \"alias\": \"vmk alias\"\n}"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_move_host",
+   "args": {
+    "host_name": "vmk-h2",
+    "target_folder": "/vmktest"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 441,
+   "text": "✅ **Host Moved Successfully**\n\n**host**: vmk-h2\n**folder**: /vmktest\n**message**: Remember to activate changes!"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_folder_hosts",
+   "args": {
+    "folder": "/vmktest"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 212,
+   "text": "📁 **Hosts in Folder '/vmktest'** (1 total):\n\n⚙️ **API Path:** ~vmktest\n\n🖥️ vmk-h2"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_folder",
+   "args": {
+    "folder": "/vmktest",
+    "title": "vibeMK test 2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 421,
+   "text": "✅ **Folder Updated Successfully**\n\n📁 **Folder:** /vmktest\n⚙️ **API Path:** ~vmktest\n📝 **New Title:** vibeMK test 2\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_cluster_host",
+   "args": {
+    "host_name": "vmk-cl",
+    "nodes": [
+     "vmk-h1",
+     "vmk-h2"
+    ]
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 250,
+   "text": "✅ **Cluster Host Created Successfully**\n\n**Cluster Host:** vmk-cl\n**Folder:** ~\n**Nodes:** vmk-h1, vmk-h2\n\n📋 **Cluster Configuration:**\n• Node Count: 2\n• Agent Type: No Agent (Cluster)\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_ruleset",
+   "args": {
+    "ruleset_name": "checkgroup_parameters:temperature"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 214,
+   "text": "📋 **Ruleset: checkgroup_parameters:temperature**\n\nRules (1 total):\n\n🔧 **Rule 1** (ID: 3d09dd73-06ce-4f66-b586-c1fb1ec4f46d)\n   Status: ✅ Active\n   Value: {'levels': (38.0, 45.0)}\n   Folder: /\n   Conditions: Labels: 1 conditions\n   Comment: vmk rule"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_rule",
+   "args": {
+    "rule_id": "3d09dd73-06ce-4f66-b586-c1fb1ec4f46d",
+    "rule_config": "{'levels': (40.0, 45.0)}"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1289,
+   "text": "✅ **Rule Updated Successfully**\n\nRule ID: 3d09dd73-06ce-4f66-b586-c1fb1ec4f46d\nUpdated fields: value_raw\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_move_rule",
+   "args": {
+    "rule_id": "3d09dd73-06ce-4f66-b586-c1fb1ec4f46d",
+    "position": "top_of_folder"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 722,
+   "text": "✅ **Rule Moved Successfully**\n\nRule ID: 3d09dd73-06ce-4f66-b586-c1fb1ec4f46d\nNew Position: top_of_folder\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_host_contactgroup_rule",
+   "args": {
+    "contact_groups": [
+     "vmkcg"
+    ],
+    "comment": "vmk"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 259,
+   "text": "✅ **Host Contact Group Rule Created Successfully**\n\nRuleset: host_contactgroups\nRule ID: c31e4026-45d6-4ff7-97a9-32d27bdb5eb7\nContact Groups: ['vmkcg']\nFolder: /\nComment: vmk\n\n📝 **Conditions:** None (applies to all hosts)\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_host_hostgroup_rule",
+   "args": {
+    "host_groups": [
+     "vmkhg"
+    ],
+    "comment": "vmk"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 437,
+   "text": "✅ **Host Group Assignment Rule Created**\n\nRuleset: host_groups\nHost Groups: vmkhg\nFolder: /\nComment: vmk\n\n📝 **Conditions:** None (applies to all hosts)\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_host_group",
+   "args": {
+    "name": "vmkhg",
+    "alias": "vmk hg 2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 598,
+   "text": "✅ **Host Group Updated Successfully**\n\nName: vmkhg\nUpdated fields: alias\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_contact_group",
+   "args": {
+    "name": "vmkcg",
+    "alias": "vmk cg 2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 610,
+   "text": "✅ **Contact Group Updated Successfully**\n\nName: vmkcg\nUpdated fields: alias\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_service_group",
+   "args": {
+    "name": "vmksg"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 200,
+   "text": "📋 **Service Group Details**\n\n**Name:** vmksg\n**Alias:** vmk service group\n**Type:** Service Group Configuration\n\n🔗 **Available Operations:**\n• Update\n• Delete\n\n💡 Use 'update_service_group' or 'delete_service_group' to modify this group"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_service_group",
+   "args": {
+    "name": "vmksg",
+    "alias": "vmk sg 2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 415,
+   "text": "✅ **Service Group Updated Successfully**\n\n**Name:** vmksg\n**New Alias:** vmk sg 2\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_bulk_update_service_groups",
+   "args": {
+    "entries": [
+     {
+      "name": "vmksg2",
+      "attributes": {
+       "alias": "two b"
+      }
+     }
+    ]
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 220,
+   "text": "✅ **Bulk Service Groups Updated Successfully**\n\n**Updated:** 1 service groups\n\n📋 **Updated Groups:**\n• vmksg2 → two b\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_user",
+   "args": {
+    "username": "vmkuser",
+    "fullname": "vmk user 2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 628,
+   "text": "✅ **User Updated Successfully**\n\nUsername: vmkuser\nUpdated fields: fullname\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_add_user_to_group",
+   "args": {
+    "username": "vmkuser",
+    "group_name": "vmkcg"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 635,
+   "text": "✅ **User Added to Contact Group**\n\nUsername: vmkuser\nAdded to group: vmkcg\nTotal groups: all, vmkcg\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_remove_user_from_group",
+   "args": {
+    "username": "vmkuser",
+    "group_name": "vmkcg"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 682,
+   "text": "✅ **User Removed from Contact Group**\n\nUsername: vmkuser\nRemoved from group: vmkcg\nRemaining groups: all\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_user_role",
+   "args": {
+    "role_id": "vmkrole",
+    "alias": "vmk role 2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 208,
+   "text": "✅ **User Role Updated Successfully**\n\n**Updated Role**: `vmkrole`\n\n**Changes Applied:**\n• **Alias**: vmk role 2\n\n\n💡 **Use `vibemk_show_user_role` to view the updated role details**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_host_tag",
+   "args": {
+    "tag_id": "vmktag",
+    "title": "vmk tag 2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 638,
+   "text": "✅ **Host Tag Group Updated Successfully**\n\nTag ID: vmktag\nUpdated fields: title\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_aux_tag",
+   "args": {
+    "tag_id": "vmkaux",
+    "title": "vmk aux 2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 239,
+   "text": "✅ Auxiliary tag 'vmkaux' updated."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_timeperiod",
+   "args": {
+    "name": "vmktp",
+    "alias": "vmk tp 2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 600,
+   "text": "✅ **Time Period Updated Successfully**\n\nName: vmktp\nUpdated fields: alias\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_password",
+   "args": {
+    "ident": "vmkpw",
+    "password": "s3cret2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1936,
+   "text": "✅ **Password Updated Successfully**\n\nIdentifier: vmkpw\nUpdated fields: password\n\n🔒 **Security Note:** Changes are securely stored in CheckMK\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_notification_rule",
+   "args": {
+    "rule_id": "4eea1797-34b2-4c90-a06b-4bd0e91c83ac"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 445,
+   "text": "📢 **Notification Rule `4eea1797-34b2-4c90-a06b-4bd0e91c83ac`**\n\nDescription: (no description)\n\nFull rule_config — reuse this structure when creating or updating a rule:\n\n```json\n{\n  \"rule_properties\": {\n    \"description\": \"vmk notif\",\n    \"comment\": \"vmk\",\n    \"documentation_url\": \"\",\n    \"do_not_apply_this_rule\": {\n      \"state\": \"disabled\"\n    },\n    \"allow_users_to_deactivate\": {\n      \"state\": \"enabled\"\n    }\n  },\n  \"notification_method\": {\n    \"notify_plugin\": {\n      \"option\": \"create_notification_with_the_following_parameters\",\n      \"plugin_params\": {\n        \"plugin_name\": \"mail\",\n        \"from_details\": {\n          \"state\": \"disabled\"\n        },\n        \"reply_to\": {\n          \"state\": \"disabled\"\n        },\n        \"subject_for_host_notifications\": {\n          \"state\": \"disabled\"\n        },\n        \"subject_for_service_notifications\": {\n          \"state\": \"disabled\"\n        },\n        \"sort_order_for_bulk_notifications\": {\n          \"state\": \"disabled\"\n        },\n        \"send_separate_notification_to_every_recipient\": {\n          \"state\": \"disabled\"\n        },\n        \"info_to_be_displayed_in_the_email_body\": {\n          \"state\": \"disabled\"\n        },\n        \"insert_html_section_between_body_and_table\": {\n          \"state\": \"disabled\"\n        },\n        \"url_prefix_for_links_to_checkmk\": {\n          \"state\": \"disabled\"\n        },\n        \"enable_sync_smtp\": {\n          \"state\": \"disabled\"\n        },\n        \"display_graphs_among_each_other\": {\n          \"state\": \""
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_update_notification_rule",
+   "args": {
+    "rule_id": "4eea1797-34b2-4c90-a06b-4bd0e91c83ac",
+    "rule_config": {
+     "rule_properties": {
+      "description": "vmk notif 2",
+      "comment": "vmk",
+      "documentation_url": "",
+      "do_not_apply_this_rule": {
+       "state": "disabled"
+      },
+      "allow_users_to_deactivate": {
+       "state": "enabled"
+      }
+     },
+     "notification_method": {
+      "notify_plugin": {
+       "option": "create_notification_with_the_following_parameters",
+       "plugin_params": {
+        "plugin_name": "mail",
+        "from_details": {
+         "state": "disabled"
+        },
+        "reply_to": {
+         "state": "disabled"
+        },
+        "subject_for_host_notifications": {
+         "state": "disabled"
+        },
+        "subject_for_service_notifications": {
+         "state": "disabled"
+        },
+        "sort_order_for_bulk_notifications": {
+         "state": "disabled"
+        },
+        "send_separate_notification_to_every_recipient": {
+         "state": "disabled"
+        },
+        "info_to_be_displayed_in_the_email_body": {
+         "state": "disabled"
+        },
+        "insert_html_section_between_body_and_table": {
+         "state": "disabled"
+        },
+        "url_prefix_for_links_to_checkmk": {
+         "state": "disabled"
+        },
+        "enable_sync_smtp": {
+         "state": "disabled"
+        },
+        "display_graphs_among_each_other": {
+         "state": "disabled"
+        },
+        "graphs_per_notification": {
+         "state": "disabled"
+        },
+        "bulk_notifications_with_graphs": {
+         "state": "disabled"
+        }
+       }
+      },
+      "notification_bulking": {
+       "state": "disabled"
+      }
+     },
+     "contact_selection": {
+      "all_contacts_of_the_notified_object": {
+       "state": "enabled"
+      },
+      "all_users": {
+       "state": "disabled"
+      },
+      "all_users_with_an_email_address": {
+       "state": "disabled"
+      },
+      "the_following_users": {
+       "state": "disabled"
+      },
+      "members_of_contact_groups": {
+       "state": "disabled"
+      },
+      "explicit_email_addresses": {
+       "state": "disabled"
+      },
+      "restrict_by_custom_macros": {
+       "state": "disabled"
+      },
+      "restrict_by_contact_groups": {
+       "state": "disabled"
+      }
+     },
+     "conditions": {
+      "match_sites": {
+       "state": "disabled"
+      },
+      "match_folder": {
+       "state": "disabled"
+      },
+      "match_host_tags": {
+       "state": "disabled"
+      },
+      "match_host_labels": {
+       "state": "disabled"
+      },
+      "match_host_groups": {
+       "state": "disabled"
+      },
+      "match_hosts": {
+       "state": "disabled"
+      },
+      "match_exclude_hosts": {
+       "state": "disabled"
+      },
+      "match_service_labels": {
+       "state": "disabled"
+      },
+      "match_service_groups": {
+       "state": "disabled"
+      },
+      "match_exclude_service_groups": {
+       "state": "disabled"
+      },
+      "match_service_groups_regex": {
+       "state": "disabled"
+      },
+      "match_exclude_service_groups_regex": {
+       "state": "disabled"
+      },
+      "match_services": {
+       "state": "disabled"
+      },
+      "match_exclude_services": {
+       "state": "disabled"
+      },
+      "match_check_types": {
+       "state": "disabled"
+      },
+      "match_plugin_output": {
+       "state": "disabled"
+      },
+      "match_contact_groups": {
+       "state": "disabled"
+      },
+      "match_service_levels": {
+       "state": "disabled"
+      },
+      "match_only_during_time_period": {
+       "state": "disabled"
+      },
+      "match_host_event_type": {
+       "state": "enabled",
+       "value": {
+        "start_or_end_of_flapping_state": false,
+        "start_or_end_of_scheduled_downtime": false,
+        "acknowledgement_of_problem": false,
+        "alert_handler_execution_successful": false,
+        "alert_handler_execution_failed": false,
+        "up_down": false,
+        "up_unreachable": false,
+        "down_up": false,
+        "down_unreachable": false,
+        "unreachable_down": false,
+        "unreachable_up": false,
+        "any_up": true,
+        "any_down": true,
+        "any_unreachable": false
+       }
+      },
+      "match_service_event_type": {
+       "state": "enabled",
+       "value": {
+        "start_or_end_of_flapping_state": false,
+        "start_or_end_of_scheduled_downtime": false,
+        "acknowledgement_of_problem": false,
+        "alert_handler_execution_successful": false,
+        "alert_handler_execution_failed": false,
+        "ok_warn": false,
+        "ok_ok": false,
+        "ok_crit": false,
+        "ok_unknown": false,
+        "warn_ok": false,
+        "warn_crit": false,
+        "warn_unknown": false,
+        "crit_ok": false,
+        "crit_warn": false,
+        "crit_unknown": false,
+        "unknown_ok": false,
+        "unknown_warn": false,
+        "unknown_crit": false,
+        "any_ok": true,
+        "any_warn": true,
+        "any_crit": true,
+        "any_unknown": false
+       }
+      },
+      "restrict_to_notification_numbers": {
+       "state": "disabled"
+      },
+      "throttle_periodic_notifications": {
+       "state": "disabled"
+      },
+      "match_notification_comment": {
+       "state": "disabled"
+      },
+      "event_console_alerts": {
+       "state": "disabled"
+      }
+     }
+    }
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 637,
+   "text": "✅ **Notification rule '4eea1797-34b2-4c90-a06b-4bd0e91c83ac' updated**\n\n**next step**: activate changes to apply it"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_http_check",
+   "args": {
+    "hostname": "vmk-h1",
+    "uri": "/"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 451,
+   "text": "✅ HTTP check 'HTTP' created for 'vmk-h1'.\nURI: /, SSL: False, Port: standard\nRule-ID: 522e75f8-0e12-433d-8ad8-369b2906b14d"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_tcp_check",
+   "args": {
+    "hostname": "vmk-h1",
+    "port": 22
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 475,
+   "text": "✅ TCP check on port 22 created for 'vmk-h1'.\nService: TCP Port 22, SSL: False\nRule-ID: 00936386-f2f0-4f9b-848f-6986340b5e9c"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_icmp_check",
+   "args": {
+    "hostname": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 481,
+   "text": "✅ ICMP/PING check 'PING' created for 'vmk-h1'.\nPackets: 5, timeout: 20s\nRule-ID: e94285f5-f9b0-458c-996d-ba34ed720393"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_custom_check",
+   "args": {
+    "hostname": "vmk-h1",
+    "service_description": "vmk custom",
+    "command_line": "echo ok"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 492,
+   "text": "✅ Custom check 'vmk custom' created for 'vmk-h1'.\nCommand: echo ok\nRule ID: 18abfcef-e198-457d-8ba8-0fe8c1f66bfc"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_dns_check",
+   "args": {
+    "hostname": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 466,
+   "text": "✅ DNS check created for 'vmk-h1'.\nLookup: vmk-h1, DNS server: system default\nRule-ID: d40c015c-eb09-4219-a689-a52d7486bff0"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_smtp_check",
+   "args": {
+    "hostname": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 439,
+   "text": "✅ SMTP check 'SMTP' created for 'vmk-h1'.\nPort: default, STARTTLS: False\nRule-ID: fa29beb3-ff1e-4f94-b359-505238abea3b"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_ftp_check",
+   "args": {
+    "hostname": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 432,
+   "text": "✅ FTP check on port 21 created for 'vmk-h1'.\nRule-ID: 8bd7bc2d-a0a4-4a85-bf51-a4fae75635ea"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_ldap_check",
+   "args": {
+    "hostname": "vmk-h1",
+    "base_dn": "dc=example,dc=org"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 675,
+   "text": "✅ LDAP check 'LDAP' created for 'vmk-h1'.\nBase DN: dc=example,dc=org\nRule-ID: 8fb82061-517c-4f77-b536-687a79ed9b11"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_smb_check",
+   "args": {
+    "hostname": "vmk-h1",
+    "share": "data"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 486,
+   "text": "✅ SMB check on share 'data' created for 'vmk-h1'.\nWarn: 85.0%, Crit: 95.0%\nRule-ID: a96c405f-7969-47fd-b6db-3fa0fdb26502"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_mkevents_check",
+   "args": {
+    "hostname": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 450,
+   "text": "✅ Event Console check created for 'vmk-h1'.\nRule-ID: a43bb1a7-3353-4ca6-8fa4-5a1a37075d71"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_create_inventory_check",
+   "args": {
+    "hostname": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 509,
+   "text": "✅ HW/SW inventory check created for 'vmk-h1'.\nRule-ID: 0ca2a0b2-35fd-4538-a6b9-0de06eb0ef4a"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_list_active_checks",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 783,
+   "text": "🔍 **Active Checks**\n\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: d580a4c5-e7a8-417a-89c4-e295135ba37d\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: 4fac27e0-6aa0-4a76-ac55-b2b9c10dae11\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: 26d6a92a-db48-4165-ab3e-d490fbaa26a5\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: a1208377-3bf4-4d68-a775-fe3636d665c2\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: 522e75f8-0e12-433d-8ad8-369b2906b14d\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:tcp** — vmk-h1\n  ID: 00936386-f2f0-4f9b-848f-6986340b5e9c\n  Value: `{'port': 22}`\n• [🟢 active] **active_checks:icmp** — vmk-h1\n  ID: 243ec0ed-55bf-4120-89dc-025bf1638cdd\n  Value: `{'description': 'PING', 'packets': 5, 'timeout': 20}`\n• [🟢 active] **active_checks:icmp** — vmk-h1\n  ID: 1ab69b41-8529-4a60-9d6a-71272d7b7b2a\n  Value: `{'description': 'PING', 'packets': 5, 'timeout': 20}`\n• [🟢 active] **active_checks:icmp** — vmk-h1\n  ID: 36e4191e-1200-4097-8d19-0d831cdc404a\n  Value: `{'description': 'PING', 'packets': 5, 'timeout': 20}`\n• [🟢 active] **ac"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_delete_active_check",
+   "args": {
+    "hostname": "vmk-h1",
+    "check_type": "tcp"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 481,
+   "text": "✅ Active check rule '00936386-f2f0-4f9b-848f-6986340b5e9c' deleted."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_set_process_thresholds",
+   "args": {
+    "hostname": "vmk-h1",
+    "process_name": "sshd",
+    "warn_max": 5,
+    "crit_max": 10
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1430,
+   "text": "✅ Process thresholds for 'Process sshd' on 'vmk-h1' created.\nMinimum: warn<1, crit<1\nMaximum: warn>=5, crit>=10\nRule-ID: 84e333c6-5e79-4afc-9597-3e95d634c480\n✅ Activation started (CheckMK runs it in the background).\n⚠️  Service discovery failed: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_set_interface_params",
+   "args": {
+    "hostname": "vmk-h1",
+    "interface_name": "eth0",
+    "expected_speed_mbit": 1000
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 551,
+   "text": "✅ Interface parameters set for 'Interface eth0' on 'vmk-h1'.\nExpected speed: 1000 Mbit/s (1,000,000,000 bits/s)\nRule-ID: b85cd831-9b72-4b11-96c2-e1661d7958cc\nℹ️  Activate changes for the rule to take effect."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_set_memory_thresholds",
+   "args": {
+    "hostname": "vmk-h1",
+    "ram_warn_percent": 80,
+    "ram_crit_percent": 90
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 517,
+   "text": "✅ Memory thresholds set for 'vmk-h1'.\nRAM: warn>=80%, crit>=90%\nRule-ID: c34892e1-7c05-4c69-b47e-8224299dc3b9\nℹ️  The rule is at the top, so it takes precedence over older rules."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_list_process_rules",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 266,
+   "text": "🔍 **Process monitoring rules (inventory_processes_rules)**\n\n• 🟢 **Process %u apache** (match: `~.*/omd/sites/[^/]+/etc/apache/apache.conf$`) → all hosts\n  ID: `7eda3d76-62ff-4ff6-b84b-a26ce202c577`\n  (no thresholds)\n• 🟢 **Process %u automation helpers** (match: `~(?:.*cmk-automation-helper.*|gunicorn:.*automation-helper)`) → all hosts\n  ID: `94190e27-2836-488a-b6b4-f23f694a455e`\n  (no thresholds)\n• 🟢 **Process %u ui-job-scheduler** (match: `~.*cmk-ui-job-scheduler.*`) → all hosts\n  ID: `8b5616fb-a457-404e-a136-24065da7f170`\n  (no thresholds)\n• 🟢 **Process %u checker helpers** (match: `~python3 /omd/sites/[^/]+/bin/cmk .*--checker`) → all hosts\n  ID: `feaa2248-08b8-47a3-bc3c-a5502d2b9f3a`\n  (no thresholds)\n• 🟢 **Process %u clickhouse server** (match: `~clickhouse server`) → all hosts\n  ID: `fb28480f-175f-4e41-b0a9-a7a5afdf5fac`\n  (no thresholds)\n• 🟢 **Process %u cmc** (match: `~/omd/sites/[^/]+/bin/cmc`) → all hosts\n  ID: `9440a0b2-5eb2-4f52-ac4b-17c6ddecd1f2`\n  (no thresholds)\n• 🟢 **Process %u dcd** (match: `~dcd`) → all hosts\n  ID: `f56e8b7a-98f0-4597-a030-1f1f6dc2347d`\n  (no thresholds)\n• 🟢 **Process %u event console** (match: `~python3 /omd/sites/[^/]+/bin/mkeventd(.*)?$`) → all hosts\n  ID: `2105c8a7-5672-4242-98f6-fd6ce8b8f3a7`\n  (no thresholds)\n• 🟢 **Process %u fetcher helpers** (match: `~python3 /omd/sites/[^/]+/bin/fetcher`) → all hosts\n  ID: `0846dd4c-cc62-4adf-9400-7f20a651f996`\n  (no thresholds)\n• 🟢 **Process %u jaeger** (match: `~/omd/sites/[^/]+/bin/jaeger`) → all"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_delete_service_param_rule",
+   "args": {
+    "rule_id": "7eda3d76-62ff-4ff6-b84b-a26ce202c577"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 493,
+   "text": "✅ Rule `7eda3d76-62ff-4ff6-b84b-a26ce202c577` deleted."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_activate_changes",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 503,
+   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: 9cba9af9-ca1e-4242-bc10-6025a7c2c4e2\nSites: cmk\nForce foreign changes: False\nChanges to activate: 35\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_start_service_discovery",
+   "args": {
+    "host_name": "vmk-h1",
+    "mode": "refresh"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 238,
+   "text": "✅ **Service Discovery Started**\n\nHost: **vmk-h1**\nMode: refresh\n\n🔄 Discovery is running in the background.\nUse 'wait_for_discovery' or 'get_discovery_status' to check progress."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_wait_for_discovery",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 2457,
+   "text": "✅ **Discovery Completed**\n\nHost: **vmk-h1**\n\n🔄 Service discovery has finished.\nUse 'get_discovery_status' to see the results."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_discovery_status",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 218,
+   "text": "📊 **Service Discovery Status**\n\nHost: **vmk-h1**\n\n📋 **Service Summary:**\n  • New services: 0\n  • Unchanged services: 0\n  • Vanished services: 0\n  • Total services: 0\n\n"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_discovery_background_job",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 227,
+   "text": "✅ **Discovery Background Job**\n\nHost: **vmk-h1**\nState: FINISHED\nStarted: Unknown\nFinished: Not finished\nDuration: Unknown\n\n💡 Use 'get_discovery_status' to see discovery results."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_start_bulk_discovery",
+   "args": {
+    "hostnames": [
+     "vmk-h1"
+    ]
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 250,
+   "text": "✅ **Bulk Discovery Started**\n\nJob ID: **bulk_discovery-09e04b7d-c95b-4313-b0ed-a4d420ac2996**\nHosts: 1 hosts\n  • vmk-h1\nOptions:\n  • Full scan: True\n  • Bulk size: 10\n  • Ignore errors: True\n  • Monitor undecided: True\n  • Remove vanished: False\n\n🔄 Bulk discovery is running in the background.\nUse 'get_bulk_discovery_status' with Job ID bulk_discovery-09e04b7d-c95b-4313-b0ed-a4d420ac2996 to check progress."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_bulk_discovery_status",
+   "args": {
+    "job_id": "bulk_discovery-09e04b7d-c95b-4313-b0ed-a4d420ac2996"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 232,
+   "text": "✅ **Bulk Discovery Job Status**\n\nJob ID: **bulk_discovery-09e04b7d-c95b-4313-b0ed-a4d420ac2996**\nState: FINISHED\n\n📊 **Progress:**\n  • Bulk discovery started...\n  • [1/1] vmk-h1: discovery successful\n  • Bulk discovery finished.\n  • Hosts: 1 total (1 succeeded, 0 skipped, 0 failed)\n  • Host labels: 0 total (0 added, 0 changed, 0 removed, 0 kept)\n  • Services: 0 total (0 added, 0 changed, 0 removed, 0 kept)\n\n💡 Use 'get_discovery_status' on individual hosts for detailed results."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_add_comment",
+   "args": {
+    "comment_type": "host",
+    "host_name": "vmk-h1",
+    "comment": "vmk comment"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 216,
+   "text": "💬 **Comment Added**\n\nTarget: host 'vmk-h1'\nComment: vmk comment\nPersistent: True"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_add_comment",
+   "args": {
+    "comment_type": "service",
+    "host_name": "vmk-h1",
+    "service_description": "PING",
+    "comment": "vmk svc"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 236,
+   "text": "💬 **Comment Added**\n\nTarget: service 'vmk-h1/PING'\nComment: vmk svc\nPersistent: True"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_comments",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 451,
+   "text": "💬 **Comments** (2 total):\n\n💬 HOST:50 - vmk-h1 - vmk comment (by cmkadmin)\n💬 SERVICE:51 - vmk-h1/PING - vmk svc (by cmkadmin)"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_delete_comment",
+   "args": {
+    "comment_id": 50
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 541,
+   "text": "💬 **Comment Deleted**\n\nTarget: comment #50"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_schedule_downtime",
+   "args": {
+    "downtime_type": "host",
+    "host_name": "vmk-h1",
+    "start_time": "2026-11-06T01:25:26Z",
+    "end_time": "2026-11-06T03:24:26Z",
+    "comment": "vmk dt"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 5904,
+   "text": "✅ **Host Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Start:** 2026-11-07T00:25:00Z\n**End:** 2026-11-07T01:25:00Z\n**Duration:** 60 minutes\n**Comment:** vmk dt\n**Verification:** ✅ Confirmed\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_schedule_host_downtime",
+   "args": {
+    "host_name": "vmk-h1",
+    "duration": 30,
+    "comment": "vmk dt2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 597,
+   "text": "✅ **Host Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Start:** 2026-11-06T01:24:32Z\n**End:** 2026-11-06T01:54:32Z\n**Duration:** 30 minutes\n**Comment:** vmk dt2\n**Verification:** ✅ Confirmed\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_schedule_service_downtime",
+   "args": {
+    "host_name": "vmk-h1",
+    "service_descriptions": [
+     "PING"
+    ],
+    "duration": 30,
+    "comment": "vmk dt3"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 21442,
+   "text": "✅ **Service Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Services:** PING\n**Start:** 2026-11-06T01:24:33Z\n**End:** 2026-11-06T01:54:33Z\n**Duration:** 30 minutes\n**Comment:** vmk dt3\n**Verification:** ⚠️ Pending (may take a moment)\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_check_host_downtime_status",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 382,
+   "text": "🔍 **Downtime Status for Host: vmk-h1**\n\n🏠 **Host Object Downtime:** ✅ **YES** - Host is covered by 1 active host-level downtime(s)\n🔧 **Service Downtimes:** ✅ **YES** - 1 service(s) on this host have active downtimes\n\n🎯 **CRITICAL DISTINCTION:** This host HAS host-level downtimes.\n   ✅ Host alerts (host DOWN, UNREACHABLE) are SUPPRESSED\n   ✅ All service alerts on this host are also SUPPRESSED\n   📊 Alert Status: HOST and SERVICE alerts both suppressed\n\n📋 **Active Host Downtimes:**\n   • Downtime #14: vmk dt2\n\n📋 **Active Service Downtimes:**\n   • Service 'PING' (#15): vmk dt3\n\n💡 **Usage:** This tool helps distinguish between host-level and service-level downtimes\n   for proper alerting analysis and downtime troubleshooting."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_modify_downtime",
+   "args": {
+    "downtime_id": 13,
+    "end_time": "2026-11-06T05:24:55Z"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 381,
+   "text": "⏰ **Downtime Modified**\n\nTarget: downtime #13\nNew end: 2026-11-06T05:24:55Z"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_delete_downtime",
+   "args": {
+    "downtime_id": 13
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 405,
+   "text": "✅ **Downtime Deleted**\n\n**Downtime ID:** 13\n**Status:** Removed from monitoring schedule\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view remaining active downtimes"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_acknowledge_problem",
+   "args": {
+    "acknowledge_type": "host",
+    "host_name": "vmk-h1",
+    "comment": "vmk ack"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 200,
+   "text": "✅ **Problem Acknowledged**\n\nTarget: host 'vmk-h1'\nComment: vmk ack"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_acknowledge_service_problem",
+   "args": {
+    "host_name": "vmk-h1",
+    "service_description": "PING",
+    "comment": "vmk ack svc"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 954,
+   "text": "✅ **Service Acknowledgement Created**\n\nHost: **vmk-h1**\nService: **PING**\nComment: vmk ack svc\nSticky: False\nPersistent: False\nNotify: False\nExpire on: Never\n\nCheckMK Version: 2.4+\n\nThe service problem has been acknowledged and will not generate further alerts."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_list_acknowledgements",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 199,
+   "text": "✅ **Current Acknowledgements**\n\n**1. Acknowledgement #56**\nType: Host\nHost: **vmk-h1**\nComment: vmk ack;\nAuthor: cmkadmin\nEntry time: 2026-11-06T01:24:56+00:00\nPersistent: False\n\n**2. Acknowledgement #57**\nType: Service\nHost: **vmk-h1**\nType: Service acknowledgement\nComment: vmk ack svc;\nAuthor: cmkadmin\nEntry time: 2026-11-06T01:24:57+00:00\nPersistent: False\n"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_remove_acknowledgement",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 421,
+   "text": "✅ Successfully removed 1 acknowledgements for vmk-h1"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_acknowledge_host_problem",
+   "args": {
+    "host_name": "vmk-h1",
+    "comment": "vmk ack 2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 217,
+   "text": "✅ **Host Acknowledgement Created**\n\nHost: **vmk-h1**\nComment: vmk ack 2\nSticky: False\nPersistent: False\nNotify: False\nExpire on: Never\n\nCheckMK Version: 2.4+\n\nThe host problem has been acknowledged and will not generate further alerts."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_acknowledge_event",
+   "args": {
+    "event_id": 999999
+   },
+   "expected": "err",
+   "got": "err",
+   "ok": true,
+   "ms": 209,
+   "text": "❌ **CheckMK API Error**\n\nResource not found: Not Found — Could not find event with id 999999."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_change_event_state",
+   "args": {
+    "event_id": 999999,
+    "new_state": "ok"
+   },
+   "expected": "err",
+   "got": "err",
+   "ok": true,
+   "ms": 198,
+   "text": "❌ **CheckMK API Error**\n\nResource not found: Not Found — Could not find event with id 999999."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_delete_events",
+   "args": {
+    "event_ids": [
+     999999
+    ]
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 187,
+   "text": "✅ 1 event(s) deleted."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_login_site",
+   "args": {
+    "site_id": "cmk",
+    "username": "cmkadmin",
+    "password": "x"
+   },
+   "expected": "err",
+   "got": "err",
+   "ok": true,
+   "ms": 196,
+   "text": "❌ **CheckMK API Error**\n\nHTTP 400: Bad Request — Invalid URL 'login.py': No scheme supplied. Perhaps you meant https://login.py?"
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_logout_site",
+   "args": {
+    "site_id": "cmk"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 185,
+   "text": "✅ Logged out of site 'cmk'."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_bake_agents",
+   "args": {},
+   "expected": "err",
+   "got": "err",
+   "ok": true,
+   "ms": 203,
+   "text": "❌ **Agent bakery not available**\n\nThis CheckMK edition has no agent bakery -- it is part of the commercial editions only. On Raw/Community, install the vanilla agent from Setup > Agents > Linux / Windows."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_download_agent_by_host",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1,
+   "text": "📦 **Agent Download URL**\n\nHost: vmk-h1\nOS type: linux_deb\nURL: http://127.0.0.1:5081/cmk/check_mk/api/1.0/domain-types/agent/actions/download_by_host/invoke?os_type=linux_deb&host_name=vmk-h1&agent_type=host_name\n\nUse curl with your bearer token to download:\n  curl -H 'Authorization: Bearer USER PASS' 'http://127.0.0.1:5081/cmk/check_mk/api/1.0/domain-types/agent/actions/download_by_host/invoke?os_type=linux_deb&host_name=vmk-h1&agent_type=host_name' -o agent.linux_deb\n\nℹ️ Commercial editions only; bake first with vibemk_bake_agents if the host's agent changed."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_activate_changes",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 524,
+   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: 46d6e68e-ed72-4d3b-81ac-640f1a2754c2\nSites: cmk\nForce foreign changes: False\nChanges to activate: 4\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_rename_host",
+   "args": {
+    "host_name": "vmk-h2b",
+    "new_name": "vmk-h2c"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 235,
+   "text": "✅ **Host Rename Started**\n\nOld name: vmk-h2b\nNew name: vmk-h2c\n\n⚠️ Remember to activate changes after the job completes."
+  },
+  {
+   "phase": "ops",
+   "tool": "vibemk_get_audit_log",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 211,
+   "text": "📋 **Audit Log — 2026-11-06 (451 entries)**\n\n• `01:41:27` **cmkadmin** — new-folder [vmktest: Folder]\n  Created new folder Main / vibeMK test\n• `01:41:28` **cmkadmin** — create-host [vmk-h1: Host]\n  Created new host vmk-h1.\n• `01:41:28` **cmkadmin** — edit-hostgroups\n  Create new host group vmkhg\n• `01:41:28` **cmkadmin** — edit-contactgroups\n  Create new contact group vmkcg\n• `01:41:29` **cmkadmin** — edit-servicegroups\n  Create new service group vmksg\n• `01:41:29` **cmkadmin** — edit-servicegroups\n  Create new service group vmksg2\n• `01:41:29` **cmkadmin** — edit-servicegroups\n  Create new service group vmksg3\n• `01:41:30` **cmkadmin** — edit-user [vmkuser: User]\n  Created new user: vmkuser\n• `01:41:30` **cmkadmin** — edit-users\n  Created new user: vmkuser\n• `01:41:31` **cmkadmin** — edit-timeperiods\n  Created new time period vmktp\n• `01:41:32` **cmkadmin** — add-password\n  Added the password vmkpw\n• `01:41:33` **cmkadmin** — new-notification-rule\n  Created new notification rule\n• `01:41:34` **cmkadmin** — snapshot-created\n  Created snapshot wato-snapshot-2026-11-06-00-41-34.tar\n• `01:41:34` **cmkadmin** — activate-changes\n  Starting activation (Sites: cmk)\n• `01:41:34` **cmkadmin** — activate-changes\n  Started activation of site cmk\n• `01:43:16` **cmkadmin** — edit-host [vmk-h1: Host]\n  Modified host vmk-h1.\n• `01:43:18` **cmkadmin** — create-host [vmk-h2b: Host]\n  Created new host vmk-h2b.\n• `01:43:18` **cmkadmin** — edit-host [vmk-h2b: Host]\n  Modified host vmk-h2b.\n• `01"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_activate_changes",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1832,
+   "text": "ℹ️ **No Pending Changes**\n\nThere are no configuration changes to activate."
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_rule",
+   "args": {
+    "rule_id": "3d09dd73-06ce-4f66-b586-c1fb1ec4f46d"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 443,
+   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: 3d09dd73-06ce-4f66-b586-c1fb1ec4f46d\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_notification_rule",
+   "args": {
+    "rule_id": "4eea1797-34b2-4c90-a06b-4bd0e91c83ac"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 393,
+   "text": "✅ **Notification rule '4eea1797-34b2-4c90-a06b-4bd0e91c83ac' deleted**\n\n**next step**: activate changes to apply it"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_rule",
+   "args": {
+    "rule_id": "c31e4026-45d6-4ff7-97a9-32d27bdb5eb7"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 444,
+   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: c31e4026-45d6-4ff7-97a9-32d27bdb5eb7\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_rule",
+   "args": {
+    "rule_id": "7dc1727f-0a96-4aff-a0f8-f4fca6c25fe7"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 451,
+   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: 7dc1727f-0a96-4aff-a0f8-f4fca6c25fe7\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_host",
+   "args": {
+    "host_name": "vmk-cl"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 245,
+   "text": "✅ **Host Deleted Successfully**\n\nHost: vmk-cl\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The host is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_host",
+   "args": {
+    "host_name": "vmk-h2"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 250,
+   "text": "✅ **Host Deleted Successfully**\n\nHost: vmk-h2\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The host is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_host",
+   "args": {
+    "host_name": "vmk-h2c"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 239,
+   "text": "✅ **Host Deleted Successfully**\n\nHost: vmk-h2c\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The host is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_host",
+   "args": {
+    "host_name": "vmk-h1"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 231,
+   "text": "✅ **Host Deleted Successfully**\n\nHost: vmk-h1\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The host is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_folder",
+   "args": {
+    "folder": "/vmktest"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 202,
+   "text": "✅ **Folder Deleted Successfully**\n\n📁 **Folder:** /vmktest\n⚙️ **API Path:** ~vmktest\n🗑️ **Delete Mode:** abort_on_nonempty\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The folder is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_service_group",
+   "args": {
+    "name": "vmksg"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 400,
+   "text": "✅ **Service Group Deleted Successfully**\n\n**Deleted:** vmksg\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_bulk_delete_service_groups",
+   "args": {
+    "entries": [
+     "vmksg2",
+     "vmksg3"
+    ]
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 235,
+   "text": "✅ **Bulk Service Groups Deleted Successfully**\n\n**Deleted:** 2 service groups\n\n📋 **Deleted Groups:**\n• vmksg2\n• vmksg3\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_user",
+   "args": {
+    "username": "vmkuser"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 449,
+   "text": "✅ **User Deleted Successfully**\n\nUsername: vmkuser\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The user is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_user_role",
+   "args": {
+    "role_id": "vmkrole"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 203,
+   "text": "✅ **User Role Deleted Successfully**\n\n**Deleted Role**: `vmkrole`\n\n⚠️ **Important Notes:**\n• Users with this role will need to be reassigned to other roles\n• Built-in roles (admin, user, guest) cannot be deleted\n• This action cannot be undone\n\n💡 **Use `vibemk_list_user_roles` to view remaining roles**"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_contact_group",
+   "args": {
+    "name": "vmkcg"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 404,
+   "text": "✅ **Contact Group Deleted Successfully**\n\nName: vmkcg\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The contact group is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_host_group",
+   "args": {
+    "name": "vmkhg"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 403,
+   "text": "✅ **Host Group Deleted Successfully**\n\nName: vmkhg\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The host group is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_host_tag",
+   "args": {
+    "tag_id": "vmktag"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 383,
+   "text": "✅ **Host Tag Group Deleted Successfully**\n\nTag ID: vmktag\nRepair mode: Disabled\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The tag group is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_aux_tag",
+   "args": {
+    "tag_id": "vmkaux"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 196,
+   "text": "✅ Auxiliary tag 'vmkaux' deleted."
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_timeperiod",
+   "args": {
+    "name": "vmktp"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 720,
+   "text": "✅ **Time Period Deleted Successfully**\n\nName: vmktp\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The time period is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_password",
+   "args": {
+    "ident": "vmkpw"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 1718,
+   "text": "✅ **Password Deleted Successfully**\n\nIdentifier: vmkpw\n\n🔒 **Security Note:** The password has been securely removed\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The password is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_create_folder",
+   "args": {
+    "folder": "vmkmove",
+    "parent": "/",
+    "title": "move me"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 253,
+   "text": "✅ **Folder Created Successfully**\n\n📁 **Folder:** vmkmove\n📝 **Title:** move me\n📂 **Parent:** /\n🔗 **Full Path:** /vmkmove\n⚙️ **API Path:** ~vmkmove\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_create_folder",
+   "args": {
+    "folder": "vmkdest",
+    "parent": "/",
+    "title": "dest"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 237,
+   "text": "✅ **Folder Created Successfully**\n\n📁 **Folder:** vmkdest\n📝 **Title:** dest\n📂 **Parent:** /\n🔗 **Full Path:** /vmkdest\n⚙️ **API Path:** ~vmkdest\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_move_folder",
+   "args": {
+    "folder": "/vmkmove",
+    "destination": "/vmkdest"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 417,
+   "text": "✅ **Folder Moved Successfully**\n\n📁 **Source:** /vmkmove\n📂 **Destination:** /vmkdest\n⚙️ **API Paths:**\n   • From: ~vmkmove\n   • To: ~vmkdest\n\n⚠️ **Remember to activate changes!**"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_folder",
+   "args": {
+    "folder": "/vmkdest/vmkmove"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 213,
+   "text": "✅ **Folder Deleted Successfully**\n\n📁 **Folder:** /vmkdest/vmkmove\n⚙️ **API Path:** ~vmkdest~vmkmove\n🗑️ **Delete Mode:** abort_on_nonempty\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The folder is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_delete_folder",
+   "args": {
+    "folder": "/vmkdest"
+   },
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 211,
+   "text": "✅ **Folder Deleted Successfully**\n\n📁 **Folder:** /vmkdest\n⚙️ **API Path:** ~vmkdest\n🗑️ **Delete Mode:** abort_on_nonempty\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The folder is only marked for deletion until you activate changes!"
+  },
+  {
+   "phase": "cleanup",
+   "tool": "vibemk_activate_changes",
+   "args": {},
+   "expected": "ok",
+   "got": "ok",
+   "ok": true,
+   "ms": 458,
+   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: 2e0982dc-c72c-49b8-941d-8b93ee14c32f\nSites: cmk\nForce foreign changes: False\nChanges to activate: 21\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
+  }
+ ]
+}

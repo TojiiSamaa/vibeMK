@@ -466,6 +466,7 @@ impl MonitoringHandler {
         };
         let persistent = flag(args, "persistent", true);
         let mut data = Map::new();
+        data.insert("comment_type".into(), kind.clone());
         data.insert("host_name".into(), host.clone());
         data.insert("comment".into(), comment.clone());
         data.insert("persistent".into(), persistent.clone());
@@ -546,9 +547,9 @@ impl MonitoringHandler {
                         Some("host_name is required for delete_type=by_query"),
                     ));
                 };
-                let mut d = json!({"delete_type": "by_query", "host_name": host});
+                let mut d = json!({"delete_type": "params", "host_name": host});
                 if let Some(s) = service {
-                    d["service_description"] = s.clone();
+                    d["service_descriptions"] = json!([s]);
                 }
                 d
             }

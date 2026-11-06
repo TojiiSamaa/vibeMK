@@ -242,9 +242,8 @@ class FolderHandler(BaseHandler):
         destination_checkmk = dest_validation["checkmk_path"]
 
         data = {"destination": destination_checkmk}
-        result = self.client.post(
-            f"objects/folder_config/{path_segment(encoded_folder)}/actions/move/invoke", data=data
-        )
+        endpoint = f"objects/folder_config/{path_segment(encoded_folder)}"
+        result = self.client.post(f"{endpoint}/actions/move/invoke", data=data, headers=self._if_match_header(endpoint))
 
         if result.get("success"):
             return [

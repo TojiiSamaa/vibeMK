@@ -81,7 +81,8 @@ class SitesHandler(BaseHandler):
         if not site_id:
             return self.error_response("Missing parameter", "site_id is required")
 
-        result = self.client.post(f"objects/site_connection/{path_segment(site_id)}/actions/logout/invoke", {})
+        # No body: 2.5 rejects even an empty JSON object here.
+        result = self.client.post(f"objects/site_connection/{path_segment(site_id)}/actions/logout/invoke")
         if result.get("success"):
             return [{"type": "text", "text": f"✅ Logged out of site '{site_id}'."}]
         return self.error_response("Logout failed", str(result.get("data", {})))

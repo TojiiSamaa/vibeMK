@@ -331,16 +331,14 @@ impl FolderHandler {
         if !dst.valid {
             return self.invalid("Invalid destination folder path", &dst);
         }
-        let endpoint = format!(
-            "objects/folder_config/{}/actions/move/invoke",
-            path_segment(&src.checkmk_path)?
-        );
+        let endpoint = format!("objects/folder_config/{}", path_segment(&src.checkmk_path)?);
+        let headers = self.base.if_match_header(&endpoint).await;
         self.base
             .client
             .post(
-                &endpoint,
+                &format!("{endpoint}/actions/move/invoke"),
                 Some(&json!({"destination": dst.checkmk_path})),
-                &[],
+                &headers,
             )
             .await?;
         Ok(text(format!(

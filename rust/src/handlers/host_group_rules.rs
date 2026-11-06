@@ -260,28 +260,43 @@ impl HostGroupRulesHandler {
                 tried.join("\n")
             )));
         };
-        let mut rule = json!({
-            "ruleset": ruleset,
-            "folder": folder,
-            "properties": {"disabled": false, "description": "Host group assignment via vibeMK", "comment": comment},
-            "value_raw": host_groups,
-        });
-        if truthy(&host_conditions) {
-            rule["conditions"] = host_conditions.clone();
-        }
         let fail = |e: String| {
             Ok(self.base.error_response(
                 "Rule creation failed",
                 Some(&format!("Could not create host group rule: {e}")),
             ))
         };
-        if let Err(e) = self
-            .base
-            .client
-            .post("domain-types/rule/collections/all", Some(&rule), &[])
-            .await
-        {
-            return fail(e.to_string());
+        let host_groups = match host_groups {
+            Value::String(_) => json!([host_groups]),
+            Value::Object(o) => json!(o.keys().collect::<Vec<_>>()),
+            other => other,
+        };
+        let Some(each) = host_groups.as_array() else {
+            return fail(format!(
+                "'{}' object is not iterable",
+                py_type_name(&host_groups)
+            ));
+        };
+        // A host_groups rule holds ONE group as a Python string literal (a list is
+        // rejected: "must be str"), so several groups mean one rule each.
+        for group in each {
+            let mut rule = json!({
+                "ruleset": ruleset,
+                "folder": folder,
+                "properties": {"disabled": false, "description": "Host group assignment via vibeMK", "comment": comment},
+                "value_raw": py_repr(group),
+            });
+            if truthy(&host_conditions) {
+                rule["conditions"] = host_conditions.clone();
+            }
+            if let Err(e) = self
+                .base
+                .client
+                .post("domain-types/rule/collections/all", Some(&rule), &[])
+                .await
+            {
+                return fail(e.to_string());
+            }
         }
         let groups = match py_join(", ", &host_groups) {
             Ok(g) => g,

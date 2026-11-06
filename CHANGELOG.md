@@ -23,6 +23,28 @@ All notable changes to this project will be documented in this file.
   status shown with ❌, such as a failed background job, is reported as a
   result, not as a failed call
 - The host group rule and debug tools show line breaks instead of a literal `\n`
+- Found by running every tool against real CheckMK 2.3.0p52 and 2.5.0p18
+  (`scripts/live_sweep.py`), fixed in Python and Rust:
+  - `add_comment` sends the required `comment_type`; `delete_comment` by query
+    uses `delete_type: params` and `service_descriptions`
+  - `create_cluster_host` posts to `host_config/collections/clusters`
+  - `modify_downtime` sends the body CheckMK expects (by id or by host/service,
+    `end_time` as `{modify_type: absolute, value}`)
+  - `start_bulk_discovery` reads the job id from the 303 on 2.5 (following it
+    lost the credentials, 401); `get_bulk_discovery_status` falls back to
+    `discovery_run` on 2.3
+  - `search_metrics` uses `metric/actions/get/invoke`, the only metric route
+    left; `service_filter` is now required
+  - `move_host` and `move_folder` send `If-Match` (428 before)
+  - `rename_host` treats the 302/303 that starts the job as success
+  - `activate_changes` rereads the pending changes once after a 412 (a rename
+    job activates on its own)
+  - `logout_site` sends no body (2.5 rejects one)
+  - `create_host_hostgroup_rule` creates one rule per group
+  - `create_rule`/`update_rule` keep a `rule_config` that already is a Python
+    literal, so tuples survive
+  - `create_aux_tag` requires and sends `topic`
+  - LDAP and SMB active checks send plain `(warn, crit)` levels on 2.3
 
 ## [0.6.4] - 2026-10-03
 

@@ -169,19 +169,22 @@ async fn hostgroup_rule_finds_the_first_working_ruleset_then_posts() {
         .expect(1)
         .mount(&server)
         .await;
-    let expected = json!({
-        "ruleset": "hostgroups",
-        "folder": "/x",
-        "properties": {"disabled": false, "description": "Host group assignment via vibeMK", "comment": "Host group assignment"},
-        "value_raw": ["g1", "g2"],
-    });
-    Mock::given(method("POST"))
-        .and(path(RULES))
-        .and(body_json(expected))
-        .respond_with(ResponseTemplate::new(200).set_body_json(json!({})))
-        .expect(1)
-        .mount(&server)
-        .await;
+    // A host_groups rule holds ONE group as a Python string literal: one rule per group.
+    for group in ["'g1'", "'g2'"] {
+        let expected = json!({
+            "ruleset": "hostgroups",
+            "folder": "/x",
+            "properties": {"disabled": false, "description": "Host group assignment via vibeMK", "comment": "Host group assignment"},
+            "value_raw": group,
+        });
+        Mock::given(method("POST"))
+            .and(path(RULES))
+            .and(body_json(expected))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json!({})))
+            .expect(1)
+            .mount(&server)
+            .await;
+    }
     let out = HostGroupRulesHandler::new(client)
         .handle(
             "vibemk_create_host_hostgroup_rule",
@@ -231,7 +234,7 @@ async fn hostgroup_rule_sends_conditions_and_reports_missing_ruleset_and_input()
         "ruleset": "host_groups",
         "folder": "/",
         "properties": {"disabled": false, "description": "Host group assignment via vibeMK", "comment": "k"},
-        "value_raw": ["g"],
+        "value_raw": "'g'",
         "conditions": cond,
     });
     Mock::given(method("POST"))

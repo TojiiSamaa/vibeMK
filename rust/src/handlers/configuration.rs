@@ -58,36 +58,44 @@ impl ConfigurationHandler {
             .cloned()
             .unwrap_or(Value::Bool(false));
 
-        let pending = self.base.client.get(PENDING, None, &[]).await?;
-        let count = pending_list(&pending.data).len();
-        if count == 0 {
-            return Ok(vec![
-                json!({"type": "text", "text": "ℹ️ **No Pending Changes**\n\nThere are no configuration changes to activate."}),
-            ]);
-        }
         let used_sites = if sites.is_empty() {
             vec![config.site.clone()]
         } else {
             sites
         };
         let body = json!({"redirect": false, "sites": used_sites, "force_foreign_changes": force});
-        // activate-changes is etag="input": the ETag comes from the pending_changes answer above.
-        let headers = vec![("If-Match".to_string(), Base::extract_etag(&pending))];
-        let result = match self
-            .base
-            .client
-            .post(
-                "domain-types/activation_run/actions/activate-changes/invoke",
-                Some(&body),
-                &headers,
-            )
-            .await
-        {
-            Ok(r) => r,
-            Err(e) => {
-                return Ok(self
-                    .base
-                    .error_response("Activation failed", Some(&e.to_string())))
+        // A 412 means the pending changes moved between the read and the POST
+        // (e.g. a host rename job activates on its own): read them again once.
+        let mut attempt = 0;
+        let (result, count) = loop {
+            let pending = self.base.client.get(PENDING, None, &[]).await?;
+            let count = pending_list(&pending.data).len();
+            if count == 0 {
+                return Ok(vec![
+                    json!({"type": "text", "text": "ℹ️ **No Pending Changes**
+
+There are no configuration changes to activate."}),
+                ]);
+            }
+            // activate-changes is etag="input": the ETag comes from the pending_changes answer above.
+            let headers = vec![("If-Match".to_string(), Base::extract_etag(&pending))];
+            match self
+                .base
+                .client
+                .post(
+                    "domain-types/activation_run/actions/activate-changes/invoke",
+                    Some(&body),
+                    &headers,
+                )
+                .await
+            {
+                Ok(r) => break (r, count),
+                Err(e) if attempt == 0 && e.status_code == Some(412) => attempt += 1,
+                Err(e) => {
+                    return Ok(self
+                        .base
+                        .error_response("Activation failed", Some(&e.to_string())))
+                }
             }
         };
         let id = result

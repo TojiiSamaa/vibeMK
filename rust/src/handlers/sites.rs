@@ -139,7 +139,7 @@ impl SitesHandler {
         );
         self.base
             .client
-            .post(&endpoint, Some(&json!({})), &[])
+            .post(&endpoint, None, &[]) // no body: 2.5 rejects even an empty JSON object here
             .await?;
         Ok(text(format!("✅ Logged out of site '{site_id}'.")))
     }
