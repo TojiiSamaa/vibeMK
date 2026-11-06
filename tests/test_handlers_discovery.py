@@ -92,7 +92,12 @@ class TestBulkStartRedirect:
     @pytest.mark.asyncio
     async def test_the_job_id_is_read_from_a_303_location(self, handler):
         handler.client.request = MagicMock(
-            return_value={"success": True, "status": 303, "location": "/cmk/check_mk/api/1.0/objects/background_job/bulk-9", "data": {}}
+            return_value={
+                "success": True,
+                "status": 303,
+                "location": "/cmk/check_mk/api/1.0/objects/background_job/bulk-9",
+                "data": {},
+            }
         )
 
         result = await handler.start_bulk_discovery({"hostnames": ["web01"]})

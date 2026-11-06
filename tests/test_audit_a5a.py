@@ -22,7 +22,7 @@ def test_s3_non_ascii_bearer_is_401_not_500():
     assert r.status_code == 401
 
 
-@pytest.mark.parametrize("path", ["x\..\..\y", "x%5c..%5c..%5cy", "x%5C"])
+@pytest.mark.parametrize("path", [r"x\..\..\y", "x%5c..%5c..%5cy", "x%5C"])
 def test_s4_backslash_in_path_is_refused(mock_checkmk_client, path):
     handler = ConnectionHandler(mock_checkmk_client)
     assert handler._refuse_foreign_url(f"{handler.client.api_base_url}/{path}") is not None

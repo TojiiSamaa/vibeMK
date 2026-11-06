@@ -4,11 +4,12 @@ The Rust port embeds this file, so tool schemas stay identical to the Python
 reference. Re-run after any change to src/vibemk/server/tools.py:
     python scripts/export_tools.py rust/tools.json
 """
+
 import json
 import sys
 
-from vibemk.server.tools import get_all_tools
 from vibemk.server.annotations import annotations_for  # noqa: F401  (ensures import side effects)
+from vibemk.server.tools import get_all_tools
 
 out = sys.argv[1] if len(sys.argv) > 1 else "rust/tools.json"
 tools = get_all_tools()

@@ -631,9 +631,7 @@ class ActiveChecksHandler(BaseHandler):
         rulesets = (
             [f"active_checks:{check_type}"]
             if check_type and check_type != "custom"
-            else ["custom_checks"]
-            if check_type == "custom"
-            else self._ALL_RULESETS
+            else ["custom_checks"] if check_type == "custom" else self._ALL_RULESETS
         )
 
         lines = ["🔍 **Active Checks**\n"]
@@ -674,9 +672,7 @@ class ActiveChecksHandler(BaseHandler):
             rulesets = (
                 [f"active_checks:{check_type}"]
                 if check_type and check_type != "custom"
-                else ["custom_checks"]
-                if check_type == "custom"
-                else self._ALL_RULESETS
+                else ["custom_checks"] if check_type == "custom" else self._ALL_RULESETS
             )
             matches = []
             for rs, res in zip(rulesets, self._map_concurrently(self._rules_of, rulesets), strict=True):

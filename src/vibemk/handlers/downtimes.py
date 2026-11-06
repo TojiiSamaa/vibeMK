@@ -2,7 +2,7 @@
 Downtime management handlers for CheckMK maintenance scheduling
 """
 
-import datetime
+import datetime as dt
 from typing import Any, Dict, List, Optional
 
 from vibemk.api.exceptions import CheckMKError
@@ -13,7 +13,7 @@ def unix_time(timestamp: Any) -> float:
     """A downtime's ISO 8601 time (or a number) as a Unix timestamp; 0.0 when unreadable."""
     try:
         if isinstance(timestamp, str):
-            return datetime.datetime.fromisoformat(timestamp.replace("Z", "+00:00")).timestamp()
+            return dt.datetime.fromisoformat(timestamp.replace("Z", "+00:00")).timestamp()
         if isinstance(timestamp, (int, float)) and not isinstance(timestamp, bool):
             return float(timestamp)
     except (ValueError, TypeError):
@@ -310,7 +310,7 @@ class DowntimeHandler(BaseHandler):
 
             # Filter downtimes if requested
             filtered_downtimes = []
-            now = datetime.datetime.now().timestamp()
+            now = dt.datetime.now().timestamp()
             for downtime in downtimes:
                 extensions = downtime.get("extensions", {})
 
@@ -401,7 +401,7 @@ class DowntimeHandler(BaseHandler):
 
             # Filter for active downtimes only
             active_downtimes = []
-            now = datetime.datetime.now().timestamp()
+            now = dt.datetime.now().timestamp()
 
             for downtime in all_downtimes:
                 extensions = downtime.get("extensions", {})
@@ -511,7 +511,7 @@ class DowntimeHandler(BaseHandler):
         }
 
     @staticmethod
-    def _as_aware(value: "datetime.datetime") -> "datetime.datetime":
+    def _as_aware(value: "dt.datetime") -> "dt.datetime":
         """Attach the local offset to a naive datetime, leave aware ones alone.
 
         Every wall-clock time a user gives is on their own clock, so local is
@@ -521,7 +521,7 @@ class DowntimeHandler(BaseHandler):
             return value.astimezone()
         return value
 
-    def _parse_natural_time(self, time_str: str) -> Optional["datetime.datetime"]:
+    def _parse_natural_time(self, time_str: str) -> Optional["dt.datetime"]:
         """
         Parse natural language time expressions into datetime objects.
 
@@ -688,12 +688,12 @@ class DowntimeHandler(BaseHandler):
         try:
             # If it's already a string, try to parse as ISO format
             if isinstance(timestamp, str):
-                dt = datetime.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-                return dt.strftime("%Y-%m-%d %H:%M")
+                moment = dt.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                return moment.strftime("%Y-%m-%d %H:%M")
             # If it's a number, treat as Unix timestamp
             elif isinstance(timestamp, (int, float)):
-                dt = datetime.datetime.fromtimestamp(timestamp)
-                return dt.strftime("%Y-%m-%d %H:%M")
+                moment = dt.datetime.fromtimestamp(timestamp)
+                return moment.strftime("%Y-%m-%d %H:%M")
             else:
                 return "Unknown"
         except (ValueError, TypeError):
@@ -707,11 +707,11 @@ class DowntimeHandler(BaseHandler):
         """Extract time-only format (HH:MM) from various timestamp formats"""
         try:
             if isinstance(timestamp, str):
-                dt = datetime.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-                return dt.strftime("%H:%M")
+                moment = dt.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                return moment.strftime("%H:%M")
             elif isinstance(timestamp, (int, float)):
-                dt = datetime.datetime.fromtimestamp(timestamp)
-                return dt.strftime("%H:%M")
+                moment = dt.datetime.fromtimestamp(timestamp)
+                return moment.strftime("%H:%M")
             else:
                 # Fallback: try to extract from formatted string
                 timestamp_str = self._format_timestamp(timestamp)
@@ -860,13 +860,13 @@ class DowntimeHandler(BaseHandler):
 
             # Calculate remaining time
             end_time = extensions.get("end_time", 0)
-            now = datetime.datetime.now().timestamp()
+            now = dt.datetime.now().timestamp()
 
             # Handle different timestamp formats from CheckMK API
             if isinstance(end_time, str):
                 try:
                     # Try parsing ISO format timestamp
-                    end_time_dt = datetime.datetime.fromisoformat(end_time.replace("Z", "+00:00"))
+                    end_time_dt = dt.datetime.fromisoformat(end_time.replace("Z", "+00:00"))
                     end_time = end_time_dt.timestamp()
                 except (ValueError, AttributeError):
                     # Fallback: assume it's already a Unix timestamp string
@@ -949,7 +949,7 @@ class DowntimeHandler(BaseHandler):
             host_downtimes = host_result["data"].get("value", [])
             service_downtimes = service_result["data"].get("value", [])
 
-            now = datetime.datetime.now().timestamp()
+            now = dt.datetime.now().timestamp()
             active_host_downtimes = []
             active_service_downtimes = []
 
@@ -1005,7 +1005,7 @@ class DowntimeHandler(BaseHandler):
             # Handle different timestamp formats from CheckMK API
             if isinstance(start_time, str):
                 try:
-                    start_time_dt = datetime.datetime.fromisoformat(start_time.replace("Z", "+00:00"))
+                    start_time_dt = dt.datetime.fromisoformat(start_time.replace("Z", "+00:00"))
                     start_time = start_time_dt.timestamp()
                 except (ValueError, AttributeError):
                     try:
@@ -1015,7 +1015,7 @@ class DowntimeHandler(BaseHandler):
 
             if isinstance(end_time, str):
                 try:
-                    end_time_dt = datetime.datetime.fromisoformat(end_time.replace("Z", "+00:00"))
+                    end_time_dt = dt.datetime.fromisoformat(end_time.replace("Z", "+00:00"))
                     end_time = end_time_dt.timestamp()
                 except (ValueError, AttributeError):
                     try:
@@ -1136,7 +1136,7 @@ class DowntimeHandler(BaseHandler):
                 return False
 
             host_downtimes = host_result["data"].get("value", [])
-            current_time = datetime.datetime.now().timestamp()
+            current_time = dt.datetime.now().timestamp()
 
             # Check if any host downtime is currently active
             return any(self._is_downtime_active(downtime, current_time) for downtime in host_downtimes)

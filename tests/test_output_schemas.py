@@ -7,7 +7,7 @@ schema has to carry structured content that validates against it: the SDK
 refuses the result otherwise, which breaks the tool for every client.
 """
 
-import datetime
+import datetime as dt
 from typing import Any, Dict, List
 
 import jsonschema
@@ -30,8 +30,8 @@ def assert_valid(tool: str, content: List[Dict[str, Any]]) -> Dict[str, Any]:
     return data
 
 
-def _iso(offset: datetime.timedelta) -> str:
-    return (datetime.datetime.now(datetime.timezone.utc) + offset).isoformat(timespec="seconds")
+def _iso(offset: dt.timedelta) -> str:
+    return (dt.datetime.now(dt.timezone.utc) + offset).isoformat(timespec="seconds")
 
 
 class TestServiceStatus:
@@ -164,7 +164,7 @@ class TestCurrentProblems:
 
 def _downtimes() -> Dict[str, Any]:
     """One host downtime running now and one service downtime starting tomorrow, as 2.5 lists them."""
-    hour, day = datetime.timedelta(hours=1), datetime.timedelta(days=1)
+    hour, day = dt.timedelta(hours=1), dt.timedelta(days=1)
     return {
         "success": True,
         "data": {

@@ -2,7 +2,7 @@
 Audit log handler — read CheckMK configuration change history.
 """
 
-import datetime
+import datetime as dt
 from typing import Any, Dict, List
 
 from vibemk.api.exceptions import CheckMKError
@@ -28,7 +28,7 @@ class AuditLogHandler(BaseHandler):
         return result
 
     async def _get_audit_log(self, arguments: Dict[str, Any]) -> List[Dict[str, Any]]:
-        date = arguments.get("date") or datetime.date.today().isoformat()
+        date = arguments.get("date") or dt.date.today().isoformat()
         object_type = arguments.get("object_type")
         object_id = arguments.get("object_id")
         user_id = arguments.get("user_id")
@@ -57,7 +57,7 @@ class AuditLogHandler(BaseHandler):
         for entry in entries[:limit]:
             ext = entry.get("extensions", {})
             time_ts = ext.get("time", 0)
-            time_str = datetime.datetime.fromtimestamp(time_ts).strftime("%H:%M:%S") if time_ts else "?"
+            time_str = dt.datetime.fromtimestamp(time_ts).strftime("%H:%M:%S") if time_ts else "?"
             user = ext.get("user_id", "?")
             action = ext.get("action", "?")
             obj_type = ext.get("object_type", "")

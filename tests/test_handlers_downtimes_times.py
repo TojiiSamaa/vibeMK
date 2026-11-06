@@ -13,7 +13,7 @@ timezone handling, which was wrong: natural-language times were read as
 local and then labelled UTC.
 """
 
-import datetime
+import datetime as dt
 import time
 from unittest.mock import MagicMock
 
@@ -91,7 +91,7 @@ class TestReadingTimestampsBackFromCheckmk:
         assert handler._format_timestamp("2026-03-01T22:00:00Z") == "2026-03-01 22:00"
 
     def test_a_unix_number_is_understood(self, handler):
-        stamp = datetime.datetime(2026, 3, 1, 22, 0).timestamp()
+        stamp = dt.datetime(2026, 3, 1, 22, 0).timestamp()
 
         assert handler._format_timestamp(stamp) == "2026-03-01 22:00"
 
@@ -101,7 +101,7 @@ class TestReadingTimestampsBackFromCheckmk:
 
     def test_unix_conversion_round_trips_an_iso_string(self, handler):
         text = "2026-03-01T22:00:00+00:00"
-        expected = datetime.datetime.fromisoformat(text).timestamp()
+        expected = dt.datetime.fromisoformat(text).timestamp()
 
         assert handler._timestamp_to_unix(text) == expected
 
@@ -134,7 +134,7 @@ class TestDecidingWhetherADowntimeIsRunning:
     def test_iso_strings_are_compared_the_same_as_numbers(self, handler):
         start = "2026-03-01T22:00:00+00:00"
         end = "2026-03-01T23:00:00+00:00"
-        inside = datetime.datetime.fromisoformat("2026-03-01T22:30:00+00:00").timestamp()
+        inside = dt.datetime.fromisoformat("2026-03-01T22:30:00+00:00").timestamp()
 
         assert handler._is_downtime_active(self._downtime(start, end), inside) is True
 
@@ -158,8 +158,8 @@ class TestTheScheduleIsExpressedInUTC:
     """
 
     @staticmethod
-    def _as_utc(stamp: str) -> datetime.datetime:
-        return datetime.datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc)
+    def _as_utc(stamp: str) -> dt.datetime:
+        return dt.datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=dt.timezone.utc)
 
     def test_a_parsed_wall_clock_time_carries_an_offset(self, handler):
         """The assertion that holds in every timezone, UTC included.
@@ -179,24 +179,22 @@ class TestTheScheduleIsExpressedInUTC:
 
         # 22:00 tomorrow on the operator's wall clock, expressed in UTC.
         local = (
-            (datetime.datetime.now() + datetime.timedelta(days=1))
-            .replace(hour=22, minute=0, second=0, microsecond=0)
-            .astimezone()
+            (dt.datetime.now() + dt.timedelta(days=1)).replace(hour=22, minute=0, second=0, microsecond=0).astimezone()
         )
-        expected = local.astimezone(datetime.timezone.utc)
+        expected = local.astimezone(dt.timezone.utc)
 
         assert self._as_utc(times["start_time"]) == expected
 
     def test_now_means_now(self, handler):
         times = handler._parse_downtime_times("now", None, 60)
 
-        drift = abs((self._as_utc(times["start_time"]) - datetime.datetime.now(datetime.timezone.utc)).total_seconds())
+        drift = abs((self._as_utc(times["start_time"]) - dt.datetime.now(dt.timezone.utc)).total_seconds())
         assert drift < 5, f"start drifted {drift}s from the actual moment"
 
     def test_a_relative_start_is_measured_from_now(self, handler):
         times = handler._parse_downtime_times("+2h", None, 60)
 
-        expected = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=2)
+        expected = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=2)
         drift = abs((self._as_utc(times["start_time"]) - expected).total_seconds())
         assert drift < 5
 
@@ -204,13 +202,13 @@ class TestTheScheduleIsExpressedInUTC:
         times = handler._parse_downtime_times("now", None, 90)
 
         span = self._as_utc(times["end_time"]) - self._as_utc(times["start_time"])
-        assert span == datetime.timedelta(minutes=90)
+        assert span == dt.timedelta(minutes=90)
 
     def test_a_relative_end_is_measured_from_the_start(self, handler):
         times = handler._parse_downtime_times("now", "+45m", 120)
 
         span = self._as_utc(times["end_time"]) - self._as_utc(times["start_time"])
-        assert span == datetime.timedelta(minutes=45)
+        assert span == dt.timedelta(minutes=45)
 
     def test_an_end_before_the_start_is_pushed_past_it(self, handler):
         """CheckMK would reject the window, and the operator would lose the
@@ -223,4 +221,4 @@ class TestTheScheduleIsExpressedInUTC:
         times = handler._parse_downtime_times("now", None, 60)
 
         for value in times.values():
-            datetime.datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+            dt.datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")

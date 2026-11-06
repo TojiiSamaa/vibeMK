@@ -55,7 +55,7 @@ def _client(mock_config, url):
     return c
 
 
-def test_S1_authorization_not_sent_to_another_host(mock_config):
+def test_s1_authorization_not_sent_to_another_host(mock_config):
     target = _Server({"/stolen": [(200, {})]})
     origin = _Server({"/x": [(302, {"Location": f"{target.url}/stolen"})]})
     try:
@@ -67,7 +67,7 @@ def test_S1_authorization_not_sent_to_another_host(mock_config):
     assert target.seen == [] or target.seen[0][1] is None
 
 
-def test_E3_replay_after_5xx_keeps_follow_redirects_false(mock_config):
+def test_e3_replay_after_5xx_keeps_follow_redirects_false(mock_config):
     srv = _Server({"/d": [(503, {}), (302, {"Location": "/e"})], "/e": [(200, {})]})
     try:
         with patch("time.sleep"):
@@ -77,18 +77,18 @@ def test_E3_replay_after_5xx_keeps_follow_redirects_false(mock_config):
     assert result["status"] == 302
 
 
-def test_E4_retry_after_is_capped():
+def test_e4_retry_after_is_capped():
     err = urllib.error.HTTPError("u", 429, "x", {"Retry-After": "3600"}, None)
     assert CheckMKClient._retry_delay(err, 0) <= 30.0
 
 
-def test_E1_etag_header_found_whatever_its_case():
+def test_e1_etag_header_found_whatever_its_case():
     msg = Message()
     msg["etag"] = "abc"
     assert CheckMKClient._result(200, {}, "", msg)["headers"].get("ETag") == "abc"
 
 
-def test_S5_warns_when_tls_verification_is_off(mock_config, caplog):
+def test_s5_warns_when_tls_verification_is_off(mock_config, caplog):
     mock_config.verify_ssl = False
     with caplog.at_level(logging.WARNING):
         CheckMKClient(mock_config, skip_url_detection=True)
@@ -110,31 +110,31 @@ def _handler(**responses):
 
 
 @pytest.mark.parametrize("data", [None, [], {"extensions": None}, {"extensions": {"meta_data": None}}])
-def test_E2_extract_etag_survives_odd_bodies(data):
+def test_e2_extract_etag_survives_odd_bodies(data):
     assert BaseHandler._extract_etag({"headers": {}, "data": data}) == "*"
 
 
-def test_E11_activation_survives_null_pending_data():
+def test_e11_activation_survives_null_pending_data():
     h, _ = _handler(get={"success": True, "data": None, "headers": {}})
     assert isinstance(h._run_activation(), str)
 
 
-def test_E8_wildcard_fallback_is_logged(caplog):
+def test_e8_wildcard_fallback_is_logged(caplog):
     with caplog.at_level(logging.WARNING):
         BaseHandler._extract_etag({"headers": {}, "data": {}})
     assert any("*" in r.message or "etag" in r.message.lower() for r in caplog.records)
 
 
-def test_E9a_activation_only_says_started():
+def test_e9a_activation_only_says_started():
     h, _ = _handler(get={"success": True, "data": {"value": [1]}, "headers": {"ETag": "e"}})
     assert "started" in h._run_activation().lower()
 
 
-def test_E10a_time_ago_future_never_negative():
+def test_e10a_time_ago_future_never_negative():
     assert not time_ago(time.time() + 18000).startswith("-")
 
 
-def test_N1_update_host_with_null_data_does_not_raise():
+def test_n1_update_host_with_null_data_does_not_raise():
     client = MagicMock()
     client.get.return_value = {"success": True, "data": None, "headers": {}}
     client.put.return_value = {"success": True, "data": {}}
@@ -142,7 +142,7 @@ def test_N1_update_host_with_null_data_does_not_raise():
     assert isinstance(out, list)
 
 
-def test_E6_update_host_412_gives_the_concurrency_advice():
+def test_e6_update_host_412_gives_the_concurrency_advice():
     client = MagicMock()
     client.get.return_value = {"success": True, "data": {}, "headers": {"ETag": "e"}}
     client.put.side_effect = CheckMKAPIError("HTTP 412: Precondition Failed", 412, {})

@@ -177,6 +177,8 @@ ignore = [
 # A token missing at startup has to reach the operator's terminal, and the
 # logger is not configured yet at that point. stderr is the right channel.
 "src/vibemk/server/cli.py" = ["T201"]
+# Command-line dev scripts (export, bench, live sweep): their output is the point.
+"scripts/*" = ["T201", "PTH", "C408", "N815"]
 
 [tool.ruff.format]
 # black owns formatting; ruff is here to lint, not to fight over it.
@@ -204,9 +206,10 @@ warn_redundant_casts = true
 show_error_codes = true
 # Ignore missing imports for external libraries
 ignore_missing_imports = true
-# Type-check the shipped source only: build/ is a local artefact and the
+# Type-check the shipped source only: build/ is a local artefact, the dev
+# scripts are throwaway command-line tools, and the
 # test suite is deliberately untyped.
-exclude = ["^build/", "^tests/"]
+exclude = ["^build/", "^tests/", "^scripts/"]
 
 [tool.isort]
 profile = "black"

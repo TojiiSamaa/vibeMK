@@ -5,7 +5,7 @@ Handles service discovery operations for hosts
 
 import asyncio
 import time
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from vibemk.api import CheckMKClient
 from vibemk.api.exceptions import CheckMKAPIError, CheckMKNotFoundError
@@ -230,7 +230,7 @@ class DiscoveryHandler(BaseHandler):
             logger.exception(f"Error in fallback bulk discovery for {host_name}")
             return self.error_text(f"❌ Error in fallback discovery method: {str(e)}")
 
-    def _post_bulk_start(self, data: Dict[str, Any]):
+    def _post_bulk_start(self, data: Dict[str, Any]) -> Tuple[Dict[str, Any], str]:
         """Start a bulk discovery; return (result, job_id).
 
         2.5 answers 303 to objects/background_job/<id> and following it drops

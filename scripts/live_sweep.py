@@ -11,7 +11,15 @@ right answer. A step passes when isError matches. `$name` strings are resolved j
 call, from CheckMK itself or from an earlier answer, so ids never have to be guessed.
 """
 
-import base64, datetime as dt, json, os, re, subprocess, sys, time, urllib.request
+import base64
+import datetime as dt
+import json
+import os
+import re
+import subprocess
+import sys
+import time
+import urllib.request
 
 LABEL, CMD = sys.argv[1], sys.argv[2:]
 URL, SITE = os.environ["CHECKMK_SERVER_URL"], os.environ["CHECKMK_SITE"]
@@ -145,7 +153,9 @@ READS = [
         ("vibemk_list_process_rules", {}),
         ("vibemk_checkmk_rules_guide", {}),
     ]
-] + [("vibemk_baking_status", {}, "err")]  # Raw/Community has no agent bakery
+] + [
+    ("vibemk_baking_status", {}, "err")
+]  # Raw/Community has no agent bakery
 
 NO_AGENT = {"tag_agent": "no-agent", "tag_snmp_ds": "no-snmp"}
 SETUP = [
