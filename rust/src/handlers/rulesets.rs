@@ -53,6 +53,44 @@ fn lower(v: &Value) -> String {
     ps(v).to_lowercase()
 }
 
+pub const RULESET_COLLECTION: &str = "domain-types/ruleset/collections/all";
+
+/// The ruleset's description (CheckMK's "help"), None when it has none
+/// (CheckMK sends the string "None" for a ruleset without help text).
+pub fn ruleset_help(ext: &Value) -> Option<String> {
+    let text = ext.get("help")?.as_str()?.trim();
+    (!text.is_empty() && text != "None").then(|| text.to_string())
+}
+
+/// The collection entry of one ruleset, the only place its help text is sent.
+/// objects/ruleset/{name} holds only the title and the rule count. In the
+/// collection, `name` matches substrings and the default lists only rulesets
+/// that hold rules (`used=false` lists only the others), so both are asked and
+/// the exact id is kept. Measured on CheckMK 2.3.0p52 and 2.5.0p18.
+pub async fn find_ruleset(client: &CheckMkClient, name: &str) -> Option<Value> {
+    for params in [
+        json!({"name": name}),
+        json!({"name": name, "used": "false"}),
+    ] {
+        let reply = client
+            .get(RULESET_COLLECTION, Some(&params), &[])
+            .await
+            .ok()?;
+        let found = reply
+            .data
+            .get("value")
+            .and_then(Value::as_array)
+            .and_then(|all| {
+                all.iter()
+                    .find(|r| r.get("id").and_then(Value::as_str) == Some(name))
+            });
+        if let Some(r) = found {
+            return Some(r.clone());
+        }
+    }
+    None
+}
+
 pub struct RulesetsHandler {
     base: Base,
 }
@@ -168,7 +206,10 @@ impl RulesetsHandler {
         let name = ps(name);
         let seg = path_segment(&name).map_err(|e| Fail::Other(e.to_string()))?;
         match self.base.client.get(&format!("objects/ruleset/{seg}"), None, &[]).await {
-            Ok(r) => Ok(text(Self::format_details(&name, &r.data))),
+            Ok(r) => {
+                let listed = find_ruleset(&self.base.client, &name).await;
+                Ok(text(Self::format_details(&name, &r.data, listed.as_ref())))
+            }
             Err(e) => Ok(self.status_error(
                 &e,
                 &[
@@ -245,14 +286,12 @@ impl RulesetsHandler {
             let ext = rs.get("extensions").unwrap_or(&NULL);
             let id = str_or(rs, "id", "Unknown");
             let title = str_or(ext, "title", "No title");
-            let mut help = str_or(ext, "help", "");
+            // In full: cut at 100 characters it rarely got past its first sentence.
+            let help = ruleset_help(ext).unwrap_or_default();
             let deprecated = truthy(get_or(ext, "deprecated", &NULL));
             let n = ext
                 .get("number_of_rules")
                 .map_or_else(|| "0".to_string(), ps);
-            if help.chars().count() > 100 {
-                help = format!("{}...", help.chars().take(100).collect::<String>());
-            }
             let icon = if deprecated { "⚠️" } else { "✅" };
             r.push_str(&format!(
                 "**{}. {icon} {id}**\n   📋 Title: {title}\n   📊 Rules: {n}\n",
@@ -276,7 +315,7 @@ impl RulesetsHandler {
         r
     }
 
-    fn format_details(name: &str, data: &Value) -> String {
+    fn format_details(name: &str, data: &Value, listed: Option<&Value>) -> String {
         let ext = data.get("extensions").unwrap_or(&NULL);
         // objects/ruleset/{name}: title at the top level, extensions only has
         // name and number_of_rules (help and match_type are collection-only).
@@ -289,7 +328,19 @@ impl RulesetsHandler {
         if deprecated {
             r.push_str("⚠️ **DEPRECATED RULESET**\n\n");
         }
-        r.push_str(&format!("**Title:** {title}\n**Number of Rules:** {n}\n\n"));
+        r.push_str(&format!("**Title:** {title}\n**Number of Rules:** {n}\n"));
+        let listed_ext = listed.and_then(|l| l.get("extensions")).unwrap_or(&NULL);
+        if let Some(m) = listed_ext
+            .get("match_type")
+            .and_then(Value::as_str)
+            .filter(|m| !m.is_empty())
+        {
+            r.push_str(&format!("**Match Type:** {m}\n"));
+        }
+        match ruleset_help(listed_ext) {
+            Some(d) => r.push_str(&format!("\n**Description:**\n{d}\n\n")),
+            None => r.push_str("\n**Description:** CheckMK has none for this ruleset.\n\n"),
+        }
         r.push_str("**Available Operations:**\n");
         r.push_str("• Use `vibemk_get_ruleset` to see actual rules in this ruleset\n");
         r.push_str("• Use `vibemk_create_rule` to add new rules to this ruleset\n");

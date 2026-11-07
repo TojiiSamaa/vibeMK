@@ -8,6 +8,7 @@ from typing import Any, ClassVar, Dict, List, Optional, Tuple
 from vibemk.api.exceptions import CheckMKError
 from vibemk.api.paths import path_segment
 from vibemk.handlers.base import BaseHandler
+from vibemk.handlers.rulesets import find_ruleset, ruleset_help
 
 RULESET_DISPLAY_LIMIT = 20
 RULE_DISPLAY_LIMIT = 10
@@ -107,12 +108,10 @@ class RulesHandler(BaseHandler):
             ruleset_name = ruleset.get("id", "Unknown")
             extensions = ruleset.get("extensions", {})
             title = extensions.get("title", ruleset_name)
-            # CheckMK sends the string "None" for a ruleset without help text.
-            help_text = extensions.get("help")
-            if help_text in (None, "None", ""):
-                help_text = "No description"
+            # In full: cut at 100 characters it rarely got past its first sentence.
+            help_text = ruleset_help(extensions) or "No description"
 
-            ruleset_list.append(f"📋 **{ruleset_name}**\n   Title: {title}\n   Help: {help_text[:100]}...")
+            ruleset_list.append(f"📋 **{ruleset_name}**\n   Title: {title}\n   Help: {help_text}")
 
         response_text = f"📋 **Available Rulesets** ({len(rulesets)} total):\n\n" + "\n\n".join(ruleset_list)
         if len(rulesets) > RULESET_DISPLAY_LIMIT:
@@ -141,7 +140,9 @@ class RulesHandler(BaseHandler):
             rule_id = rule.get("id", f"Rule {i + 1}")
             extensions = rule.get("extensions", {})
             properties = extensions.get("properties", {})
-            comment = properties.get("comment", "No comment")
+            comment = properties.get("comment") or "No comment"
+            description = properties.get("description")
+            documentation_url = properties.get("documentation_url")
             disabled = properties.get("disabled", False)
             value_raw = extensions.get("value_raw", "No value")
             folder = extensions.get("folder", "/")
@@ -167,11 +168,21 @@ class RulesHandler(BaseHandler):
 
             rule_list.append(
                 f"🔧 **Rule {i + 1}** (ID: {rule_id})\n"
-                f"   Status: {status}\n"
+                + (f"   Description: {description}\n" if description else "")
+                + f"   Status: {status}\n"
                 f"   Value: {value_raw}\n"
                 f"   Folder: {folder}\n"
                 f"   Conditions: {conditions_text}\n"
-                f"   Comment: {comment}"
+                f"   Comment: {comment}" + (f"\n   Documentation: {documentation_url}" if documentation_url else "")
+            )
+
+        listed = find_ruleset(self.client, ruleset_name)
+        about = ""
+        if listed:
+            title = (listed.get("extensions") or {}).get("title")
+            help_text = ruleset_help(listed.get("extensions"))
+            about = (f"**Title:** {title}\n" if title else "") + (
+                f"**Description:** {help_text}\n\n" if help_text else ("\n" if title else "")
             )
 
         return [
@@ -179,7 +190,8 @@ class RulesHandler(BaseHandler):
                 "type": "text",
                 "text": (
                     f"📋 **Ruleset: {ruleset_name}**\n\n"
-                    f"Rules ({len(rules)} total):\n\n"
+                    + about
+                    + f"Rules ({len(rules)} total):\n\n"
                     + ("\n\n".join(rule_list) if rule_list else "No rules configured in this ruleset")
                     + (
                         f"\n\n... and {len(rules) - RULE_DISPLAY_LIMIT} more rules"

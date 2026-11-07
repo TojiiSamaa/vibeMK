@@ -10,6 +10,7 @@ use serde_json::{json, Map, Value};
 
 use crate::client::{ApiError, CheckMkClient};
 use crate::handlers::base::{py_repr, Base, Handler};
+use crate::handlers::rulesets::{find_ruleset, ruleset_help};
 use crate::paths::path_segment;
 
 const RULESET_DISPLAY_LIMIT: usize = 20;
@@ -398,13 +399,9 @@ impl RulesHandler {
                 let name = get_or(rs, "id", "Unknown");
                 let ext = rs.get("extensions").cloned().unwrap_or_else(|| json!({}));
                 let title = get_or(&ext, "title", &name);
-                // CheckMK sends the string "None" for a ruleset without help text.
-                let help = match ext.get("help").and_then(Value::as_str) {
-                    None | Some("None" | "") => "No description",
-                    Some(h) => h,
-                };
-                let help: String = help.chars().take(100).collect();
-                format!("📋 **{name}**\n   Title: {title}\n   Help: {help}...")
+                // In full: cut at 100 characters it rarely got past its first sentence.
+                let help = ruleset_help(&ext).unwrap_or_else(|| "No description".to_string());
+                format!("📋 **{name}**\n   Title: {title}\n   Help: {help}")
             })
             .collect();
 
@@ -453,7 +450,19 @@ impl RulesHandler {
                 let id = rule.get("id").map_or_else(|| format!("Rule {}", i + 1), py_str);
                 let ext = rule.get("extensions").cloned().unwrap_or_else(|| json!({}));
                 let props = ext.get("properties").cloned().unwrap_or_else(|| json!({}));
-                let comment = get_or(&props, "comment", "No comment");
+                let comment = props
+                    .get("comment")
+                    .filter(|c| truthy(c))
+                    .map_or_else(|| "No comment".to_string(), py_str);
+                let line = |key: &str, label: &str| {
+                    props
+                        .get(key)
+                        .filter(|v| truthy(v))
+                        .map_or_else(String::new, |v| format!("{label}{}", py_str(v)))
+                };
+                let description = line("description", "   Description: ");
+                let description = if description.is_empty() { description } else { description + "\n" };
+                let documentation = line("documentation_url", "\n   Documentation: ");
                 let status = if props.get("disabled").is_some_and(truthy) { "🔒 Disabled" } else { "✅ Active" };
                 let value = get_or(&ext, "value_raw", "No value");
                 let folder = get_or(&ext, "folder", "/");
@@ -473,7 +482,7 @@ impl RulesHandler {
                 let conditions = if summary.is_empty() { "All hosts".to_string() } else { summary.join(", ") };
 
                 format!(
-                    "🔧 **Rule {}** (ID: {id})\n   Status: {status}\n   Value: {value}\n   Folder: {folder}\n   Conditions: {conditions}\n   Comment: {comment}",
+                    "🔧 **Rule {}** (ID: {id})\n{description}   Status: {status}\n   Value: {value}\n   Folder: {folder}\n   Conditions: {conditions}\n   Comment: {comment}{documentation}",
                     i + 1
                 )
             })
@@ -492,8 +501,27 @@ impl RulesHandler {
         } else {
             String::new()
         };
+        let mut about = String::new();
+        if let Some(listed) = find_ruleset(&self.base.client, &name_s).await {
+            let ext = listed
+                .get("extensions")
+                .cloned()
+                .unwrap_or_else(|| json!({}));
+            let title = ext
+                .get("title")
+                .and_then(Value::as_str)
+                .filter(|t| !t.is_empty());
+            if let Some(t) = title {
+                about.push_str(&format!("**Title:** {t}\n"));
+            }
+            match ruleset_help(&ext) {
+                Some(h) => about.push_str(&format!("**Description:** {h}\n\n")),
+                None if title.is_some() => about.push('\n'),
+                None => {}
+            }
+        }
         Ok(text(format!(
-            "📋 **Ruleset: {name_s}**\n\nRules ({} total):\n\n{body}{more}",
+            "📋 **Ruleset: {name_s}**\n\n{about}Rules ({} total):\n\n{body}{more}",
             rules.len()
         )))
     }

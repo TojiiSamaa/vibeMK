@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Added
+- Ruleset descriptions reach the model: `vibemk_show_ruleset` gives CheckMK's full
+  description of the ruleset (its Setup help text, read from the ruleset collection,
+  including rulesets that hold no rule yet) and its match type; `vibemk_get_ruleset`
+  starts with the ruleset's title and description and shows each rule's
+  description and documentation URL next to its comment; ruleset searches no
+  longer cut the description at 100 characters
 - Rust port of the server (`rust/`): same tools, schemas, flags and
   environment variables, stdio and HTTP with bearer auth; `--read-only` lists only read tools and
   refuses the others;

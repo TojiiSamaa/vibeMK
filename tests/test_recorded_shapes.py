@@ -50,7 +50,8 @@ async def test_get_rulesets_hides_the_none_string_checkmk_sends_for_no_help(mock
 
     text = (await RulesHandler(mock_checkmk_client).handle("vibemk_get_rulesets", {}))[0]["text"]
 
-    assert "Help: No description..." in text
+    assert "Help: No description" in text
+    assert "..." not in text
     assert "None" not in text
 
 

@@ -2,11 +2,44 @@
 Rulesets management handlers for CheckMK ruleset discovery and display
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from vibemk.api.exceptions import CheckMKError
 from vibemk.api.paths import path_segment
 from vibemk.handlers.base import BaseHandler
+
+RULESET_COLLECTION = "domain-types/ruleset/collections/all"
+
+
+def ruleset_help(extensions: Any) -> Optional[str]:
+    """The ruleset's description (CheckMK's "help"), or None when it has none.
+
+    CheckMK sends the string "None" for a ruleset without help text.
+    """
+    text = extensions.get("help") if isinstance(extensions, dict) else None
+    if not isinstance(text, str) or text.strip() in ("", "None"):
+        return None
+    return text.strip()
+
+
+def find_ruleset(client: Any, name: str) -> Optional[Dict[str, Any]]:
+    """The collection entry of one ruleset, the only place its help text is sent.
+
+    objects/ruleset/{name} holds only the title and the rule count. In the
+    collection, `name` matches substrings and the default lists only rulesets
+    that hold rules (`used=false` lists only the others), so both are asked
+    and the exact id is kept. Measured on CheckMK 2.3.0p52 and 2.5.0p18.
+    """
+    for params in ({"name": name}, {"name": name, "used": "false"}):
+        try:
+            result = client.get(RULESET_COLLECTION, params=params)
+        except CheckMKError:
+            return None
+        values = (result.get("data") or {}).get("value") if isinstance(result, dict) else None
+        for ruleset in values if isinstance(values, list) else []:
+            if isinstance(ruleset, dict) and ruleset.get("id") == name:
+                return ruleset
+    return None
 
 
 class RulesetsHandler(BaseHandler):
@@ -123,11 +156,12 @@ class RulesetsHandler(BaseHandler):
         try:
             result = self.client.get(f"objects/ruleset/{path_segment(ruleset_name)}")
             ruleset_data = result["data"]
+            listed = find_ruleset(self.client, ruleset_name)
 
             return [
                 {
                     "type": "text",
-                    "text": self._format_ruleset_details(ruleset_name, ruleset_data),
+                    "text": self._format_ruleset_details(ruleset_name, ruleset_data, listed),
                 }
             ]
 
@@ -203,13 +237,11 @@ class RulesetsHandler(BaseHandler):
             extensions = ruleset.get("extensions", {})
             ruleset_id = ruleset.get("id", "Unknown")
             title = extensions.get("title", "No title")
-            help_text = extensions.get("help", "")
+            # In full: the help says what the ruleset does, and cut at 100
+            # characters it rarely got past its first sentence.
+            help_text = ruleset_help(extensions)
             deprecated = extensions.get("deprecated", False)
             number_of_rules = extensions.get("number_of_rules", 0)
-
-            # Truncate help text
-            if help_text and len(help_text) > 100:
-                help_text = help_text[:100] + "..."
 
             status_icon = "⚠️" if deprecated else "✅"
 
@@ -231,7 +263,9 @@ class RulesetsHandler(BaseHandler):
 
         return response
 
-    def _format_ruleset_details(self, ruleset_name: str, ruleset_data: Dict[str, Any]) -> str:
+    def _format_ruleset_details(
+        self, ruleset_name: str, ruleset_data: Dict[str, Any], listed: Optional[Dict[str, Any]] = None
+    ) -> str:
         """Format detailed ruleset information"""
         extensions = ruleset_data.get("extensions", {})
 
@@ -249,7 +283,17 @@ class RulesetsHandler(BaseHandler):
             response += "⚠️ **DEPRECATED RULESET**\n\n"
 
         response += f"**Title:** {title}\n"
-        response += f"**Number of Rules:** {number_of_rules}\n\n"
+        response += f"**Number of Rules:** {number_of_rules}\n"
+        listed_ext = (listed or {}).get("extensions") or {}
+        match_type = listed_ext.get("match_type")
+        if match_type:
+            response += f"**Match Type:** {match_type}\n"
+        description = ruleset_help(listed_ext)
+        response += (
+            f"\n**Description:**\n{description}\n\n"
+            if description
+            else "\n**Description:** CheckMK has none for this ruleset.\n\n"
+        )
 
         # Show available operations
         response += "**Available Operations:**\n"

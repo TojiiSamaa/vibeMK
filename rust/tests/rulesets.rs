@@ -48,7 +48,7 @@ async fn search_sends_filters_and_lists_results() {
             &json!({"fulltext": "cpu", "folder": "/x", "name": "n"}),
         )
         .await;
-    let expected = format!("🔍 **Ruleset Search Results**\n\n**Search Criteria:**\n• fulltext: cpu\n• folder: /x\n• deprecated: false\n• used: true\n• name: n\n\n**Found 2 rulesets**\n\n**1. ⚠️ a_rs**\n   📋 Title: A\n   📊 Rules: 3\n   💡 {}...\n   ⚠️ Deprecated ruleset\n\n**2. ✅ b_rs**\n   📋 Title: B\n   📊 Rules: 2\n\n💡 **Use `vibemk_show_ruleset` with ruleset name for detailed information**", "x".repeat(100));
+    let expected = format!("🔍 **Ruleset Search Results**\n\n**Search Criteria:**\n• fulltext: cpu\n• folder: /x\n• deprecated: false\n• used: true\n• name: n\n\n**Found 2 rulesets**\n\n**1. ⚠️ a_rs**\n   📋 Title: A\n   📊 Rules: 3\n   💡 {}\n   ⚠️ Deprecated ruleset\n\n**2. ✅ b_rs**\n   📋 Title: B\n   📊 Rules: 2\n\n💡 **Use `vibemk_show_ruleset` with ruleset name for detailed information**", "x".repeat(120));
     assert_eq!(text(&out), expected);
     assert!(!is_error(&out));
 }
@@ -114,7 +114,7 @@ async fn show_gets_the_ruleset_and_formats_details() {
             &json!({"ruleset_name": "checkgroup_parameters:cpu"}),
         )
         .await;
-    assert_eq!(text(&out), "📋 **Ruleset Details: checkgroup_parameters:cpu**\n\n⚠️ **DEPRECATED RULESET**\n\n**Title:** T\n**Number of Rules:** 4\n\n**Available Operations:**\n• Use `vibemk_get_ruleset` to see actual rules in this ruleset\n• Use `vibemk_create_rule` to add new rules to this ruleset\n• Use `vibemk_search_rulesets` to find related rulesets\n\n⚠️ **Note:** This is a deprecated ruleset. Consider using newer alternatives.");
+    assert_eq!(text(&out), "📋 **Ruleset Details: checkgroup_parameters:cpu**\n\n⚠️ **DEPRECATED RULESET**\n\n**Title:** T\n**Number of Rules:** 4\n\n**Description:** CheckMK has none for this ruleset.\n\n**Available Operations:**\n• Use `vibemk_get_ruleset` to see actual rules in this ruleset\n• Use `vibemk_create_rule` to add new rules to this ruleset\n• Use `vibemk_search_rulesets` to find related rulesets\n\n⚠️ **Note:** This is a deprecated ruleset. Consider using newer alternatives.");
 }
 
 #[tokio::test]
@@ -226,6 +226,115 @@ async fn get_rulesets_hides_the_none_string_checkmk_sends_for_no_help() {
         .handle("vibemk_get_rulesets", &json!({}))
         .await;
     let t = text(&out);
-    assert!(t.contains("Help: No description..."), "{t}");
+    assert!(t.contains("Help: No description"), "{t}");
+    assert!(!t.contains("..."), "{t}");
     assert!(!t.contains("None"), "{t}");
+}
+
+// Shapes measured on CheckMK 2.3.0p52 and 2.5.0p18 (7 Nov 2026): the help is in
+// the collection alone; `name` matches substrings; the default lists only rulesets
+// that hold rules and `used=false` only the others.
+const CMK_INV_HELP: &str = "All hosts configured via this rule set will do a hardware and software inventory. For each configured host a new active check will be created. You should also create a rule for changing the normal interval for that check to something between a couple of hours and one day.";
+
+fn listed(id: &str, help: &str, title: &str) -> Value {
+    json!({"id": id, "extensions": {"name": id, "title": title, "match_type": "all", "help": help, "number_of_rules": 0}})
+}
+
+async fn collection(server: &MockServer, used: Vec<Value>, unused: Vec<Value>) {
+    Mock::given(method("GET"))
+        .and(path(ALL))
+        .and(query_param("used", "false"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({ "value": unused })))
+        .with_priority(1)
+        .mount(server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path(ALL))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({ "value": used })))
+        .with_priority(2)
+        .mount(server)
+        .await;
+}
+
+#[tokio::test]
+async fn find_ruleset_keeps_the_exact_id_and_looks_among_unused_rulesets() {
+    let (server, client) = common::fake_checkmk().await;
+    collection(
+        &server,
+        vec![listed("host_groups_extra", "wrong", "W")],
+        vec![listed("host_groups", "right", "R")],
+    )
+    .await;
+    let found = vibemk::handlers::rulesets::find_ruleset(&client, "host_groups")
+        .await
+        .expect("found");
+    assert_eq!(found["extensions"]["help"], "right");
+}
+
+#[tokio::test]
+async fn show_ruleset_gives_the_whole_description() {
+    let (server, h) = setup().await;
+    Mock::given(method("GET"))
+        .and(path("/cmk/check_mk/api/1.0/objects/ruleset/active_checks%3Acmk_inv"))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({"id": "active_checks:cmk_inv", "title": "Do hardware/software inventory", "extensions": {"number_of_rules": 0}})))
+        .mount(&server)
+        .await;
+    collection(
+        &server,
+        vec![],
+        vec![listed(
+            "active_checks:cmk_inv",
+            CMK_INV_HELP,
+            "Do hardware/software inventory",
+        )],
+    )
+    .await;
+    let out = h
+        .handle(
+            "vibemk_show_ruleset",
+            &json!({"ruleset_name": "active_checks:cmk_inv"}),
+        )
+        .await;
+    let t = text(&out);
+    assert!(
+        t.contains(&format!("**Description:**\n{CMK_INV_HELP}\n")),
+        "{t}"
+    );
+    assert!(t.contains("**Match Type:** all"), "{t}");
+}
+
+#[tokio::test]
+async fn get_ruleset_shows_the_ruleset_and_each_rules_description() {
+    let (server, client) = common::fake_checkmk().await;
+    let rule = json!({"id": "a1b2", "extensions": {"folder": "/", "value_raw": "{}", "conditions": {},
+        "properties": {"description": "Shipped rule to monitor site's automation helpers",
+            "comment": "This rule is shipped with Checkmk.",
+            "documentation_url": "https://docs.checkmk.com/latest/en/", "disabled": false}}});
+    Mock::given(method("GET"))
+        .and(path(
+            "/cmk/check_mk/api/1.0/domain-types/rule/collections/all",
+        ))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({"value": [rule]})))
+        .mount(&server)
+        .await;
+    collection(
+        &server,
+        vec![listed(
+            "inventory_processes_rules",
+            CMK_INV_HELP,
+            "Process discovery",
+        )],
+        vec![],
+    )
+    .await;
+    let out = vibemk::handlers::rules::RulesHandler::new(client)
+        .handle(
+            "vibemk_get_ruleset",
+            &json!({"ruleset_name": "inventory_processes_rules"}),
+        )
+        .await;
+    let t = text(&out);
+    assert!(t.starts_with(&format!("📋 **Ruleset: inventory_processes_rules**\n\n**Title:** Process discovery\n**Description:** {CMK_INV_HELP}\n\nRules (1 total)")), "{t}");
+    assert!(t.contains("(ID: a1b2)\n   Description: Shipped rule to monitor site's automation helpers\n   Status:"), "{t}");
+    assert!(t.contains("Comment: This rule is shipped with Checkmk.\n   Documentation: https://docs.checkmk.com/latest/en/"), "{t}");
 }

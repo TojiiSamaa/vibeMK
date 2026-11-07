@@ -14,8 +14,8 @@ Script: `scripts/bench.py`. Median of 10 starts, 300 sequential `tools/call`.
 | Sequential throughput | 53 calls/s | 251 calls/s | 4.7x |
 | Peak memory (process tree) | 75 MB | 54 MB | 28 % less |
 | Install footprint | 75.5 MB of dependencies (31 packages) + a Python interpreter | one 11.1 MB binary | |
-| Source lines (src) | 17,126 | 15,312 | |
-| Tests (offline, 7 Nov 2026) | 603 pytest cases (516 passed, 87 live tests skipped), 7,162 lines | 574 tests passed, 13,281 lines | |
+| Source lines (src) | 17,186 | 15,391 | |
+| Tests (offline, 7 Nov 2026) | 610 pytest cases (523 passed, 87 live tests skipped), 7,328 lines | 577 tests passed, 13,390 lines | |
 | Live sweep, 154 tools on a real CheckMK 2.3.0p52 / 2.5.0p18 | 270/270 on both | 270/270 on both | |
 | Tools offered | 154 | 154 (identical `tools.json`) | |
 

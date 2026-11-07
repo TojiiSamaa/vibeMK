@@ -853,7 +853,8 @@ def get_rule_management_tools() -> List[Dict[str, Any]]:
         {
             "name": "vibemk_get_ruleset",
             "description": (
-                "📋 List the rules of a ruleset, optionally filtered by host name. Shows the rule IDs vibemk_delete_rule needs."
+                "📋 List the rules of a ruleset, optionally filtered by host name, with the ruleset's description and each "
+                "rule's description and comment. Shows the rule IDs vibemk_delete_rule needs."
             ),
             "inputSchema": {
                 "type": "object",
@@ -985,7 +986,10 @@ def get_ruleset_discovery_tools() -> List[Dict[str, Any]]:
         },
         {
             "name": "vibemk_show_ruleset",
-            "description": "📋 Show ruleset details - Display detailed information about a specific ruleset",
+            "description": (
+                "📋 Show a ruleset: title, rule count, match type and CheckMK's full description of what it does "
+                "and how it is evaluated (the help text of the Setup GUI)"
+            ),
             "inputSchema": {
                 "type": "object",
                 "properties": {
