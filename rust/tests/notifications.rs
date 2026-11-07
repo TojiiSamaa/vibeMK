@@ -12,7 +12,7 @@ const COLLECTION: &str = "domain-types/notification_rule/collections/all";
 
 fn rule() -> Value {
     json!({"id": "1", "extensions": {"rule_config": {
-        "description": "Notify admins by email",
+        "rule_properties": {"description": "Notify admins by email"},
         "disabled": false,
         "notification_method": {"notify_plugin": {"option": "mail"}}
     }}})
@@ -76,9 +76,7 @@ async fn shows_a_single_rule_by_id() {
     let t = text(&out);
     assert!(t.starts_with("📢 **Notification Rule `1`**\n\nDescription: Notify admins by email\n\nFull rule_config"), "{t}");
     assert!(
-        t.contains(
-            "```json\n{\n  \"description\": \"Notify admins by email\",\n  \"disabled\": false,"
-        ),
+        t.contains("\"rule_properties\": {\n    \"description\": \"Notify admins by email\"\n  }"),
         "{t}"
     );
 }

@@ -506,24 +506,24 @@ class DiscoveryHandler(BaseHandler):
 
                 # Extract background job information
                 job_state = extensions.get("state", "unknown")
-                started = extensions.get("started", "Unknown")
-                finished = extensions.get("finished", "Not finished")
-                duration = extensions.get("duration", "Unknown")
+                # 2.3 and 2.5 send state, active and logs; no start or end time.
+                logs = extensions.get("logs") or {}
+                log_lines = (logs.get("result") or []) + (logs.get("progress") or [])[-5:]
 
                 status_emoji = {"running": "🔄", "finished": "✅", "stopped": "⏹️", "exception": "❌"}.get(
                     job_state, "❓"
                 )
 
+                log_text = "".join(f"• {line}\n" for line in log_lines)
                 return [
                     {
                         "type": "text",
                         "text": f"{status_emoji} **Discovery Background Job**\n\n"
                         f"Host: **{host_name}**\n"
                         f"State: {job_state.upper()}\n"
-                        f"Started: {started}\n"
-                        f"Finished: {finished}\n"
-                        f"Duration: {duration}\n\n"
-                        f"💡 Use 'get_discovery_status' to see discovery results.",
+                        f"Active: {'yes' if extensions.get('active') else 'no'}\n"
+                        + (f"\n{log_text}" if log_text else "")
+                        + "\n💡 Use 'get_discovery_status' to see discovery results.",
                     }
                 ]
             else:

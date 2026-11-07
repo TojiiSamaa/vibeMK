@@ -673,6 +673,20 @@ async fn modify_by_id_and_by_query() {
         json!({}),
     )
     .await;
+    // The read-back finds every targeted downtime at its new end.
+    let end = "2026-03-01T23:00:00+00:00";
+    mount(
+        &server,
+        "GET",
+        "domain-types/downtime/collections/all",
+        200,
+        json!({"value": [
+            {"id": "12", "extensions": {"host_name": "db01", "end_time": end}},
+            {"id": "7", "extensions": {"host_name": "db01", "end_time": end}},
+            {"id": "13", "extensions": {"host_name": "web01", "service_description": "CPU", "end_time": end}}
+        ]}),
+    )
+    .await;
     let out = h
         .handle(
             "vibemk_modify_downtime",
@@ -774,4 +788,43 @@ async fn has_host_level_downtime_reads_the_running_host_downtimes() {
     )
     .await;
     assert!(!h2.has_host_level_downtime("web01").await);
+}
+
+#[tokio::test]
+async fn modify_ignored_by_the_core_is_not_reported_as_done() {
+    // CheckMK 2.3 and 2.5 Raw/Community answer 204; Nagios logs "Unrecognized external command".
+    let (server, h) = handler().await;
+    mount(
+        &server,
+        "PUT",
+        "domain-types/downtime/actions/modify/invoke",
+        204,
+        json!({}),
+    )
+    .await;
+    mount(
+        &server,
+        "GET",
+        "domain-types/downtime/collections/all",
+        200,
+        json!({"value": [{"id": "24", "extensions": {"host_name": "web01", "end_time": "2026-11-06T03:21:15+00:00"}}]}),
+    )
+    .await;
+    let out = h
+        .handle(
+            "vibemk_modify_downtime",
+            &json!({"downtime_id": 24, "end_time": "2026-11-06T05:21:16Z"}),
+        )
+        .await;
+    assert!(
+        text(&out).starts_with("❌ **Downtime not modified**"),
+        "{}",
+        text(&out)
+    );
+    assert_eq!(
+        requests(&server, "GET", "domain-types/downtime/collections/all")
+            .await
+            .len(),
+        5
+    );
 }

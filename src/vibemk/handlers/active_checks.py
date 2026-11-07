@@ -112,6 +112,24 @@ class ActiveChecksHandler(BaseHandler):
             self._is_23 = str(version).startswith("2.3")
         return self._is_23
 
+    # 2.3 still runs these rulesets on legacy valuespecs (shapes accepted by
+    # CheckMK 2.3.0p52, probed live): certificate age as integer days,
+    # response time as float milliseconds, credentials as (user, ("password", secret)).
+    def _days_levels(self, warn: Any, crit: Any) -> Any:
+        if self._plain_levels():
+            return (int(warn), int(crit))
+        return _fixed_levels(warn, crit, _DAY)
+
+    def _seconds_levels(self, warn: Any, crit: Any) -> Any:
+        if self._plain_levels():
+            return (float(warn) * 1000.0, float(crit) * 1000.0)
+        return _fixed_levels(warn, crit)
+
+    def _user_password(self, user_key: str, user: str, password: str) -> Any:
+        if self._plain_levels():
+            return (user, ("password", password))
+        return {user_key: user, "password": _explicit_password(password)}
+
     def _post_rule(
         self, ruleset: str, value_raw: str, hostname: str, folder: str, description: str = ""
     ) -> Dict[str, Any]:
@@ -191,7 +209,7 @@ class ActiveChecksHandler(BaseHandler):
 
         # --- mode block ---
         if cert_mode:
-            mode = ("cert", {"cert_days": _fixed_levels(cert_days_warn, cert_days_crit, _DAY)})
+            mode = ("cert", {"cert_days": self._days_levels(cert_days_warn, cert_days_crit)})
         else:
             url_params: Dict[str, Any] = {}
             if uri and uri != "/" or uri:
@@ -201,12 +219,17 @@ class ActiveChecksHandler(BaseHandler):
             if expect_string:
                 url_params["expect_string"] = expect_string
             if expect_regex:
-                url_params["expect_regex"] = {
-                    "regex": expect_regex,
-                    "case_insensitive": False,
-                    "crit_if_found": False,
-                    "multiline": False,
-                }
+                # 2.3: (regex, case_insensitive, crit_if_found, multiline)
+                url_params["expect_regex"] = (
+                    (expect_regex, False, False, False)
+                    if self._plain_levels()
+                    else {
+                        "regex": expect_regex,
+                        "case_insensitive": False,
+                        "crit_if_found": False,
+                        "multiline": False,
+                    }
+                )
             if expect_response:
                 url_params["expect_response"] = (
                     expect_response if isinstance(expect_response, list) else [expect_response]
@@ -214,7 +237,7 @@ class ActiveChecksHandler(BaseHandler):
             if timeout:
                 url_params["timeout"] = int(timeout)
             if warn_seconds and crit_seconds:
-                url_params["response_time"] = _fixed_levels(warn_seconds, crit_seconds)
+                url_params["response_time"] = self._seconds_levels(warn_seconds, crit_seconds)
             if method:
                 url_params["method"] = method.upper()
             if no_body:
@@ -224,7 +247,7 @@ class ActiveChecksHandler(BaseHandler):
             if extended_perfdata:
                 url_params["extended_perfdata"] = True
             if auth_user and auth_password:
-                url_params["auth"] = {"user": auth_user, "password": _explicit_password(auth_password)}
+                url_params["auth"] = self._user_password("user", auth_user, auth_password)
             mode = ("url", url_params)
 
         value = {"name": name, "host": host_cfg, "mode": mode}
@@ -279,7 +302,7 @@ class ActiveChecksHandler(BaseHandler):
         if use_ssl:
             value["ssl"] = True
         if cert_warn and cert_crit:
-            value["cert_days"] = _fixed_levels(cert_warn, cert_crit, _DAY)
+            value["cert_days"] = self._days_levels(cert_warn, cert_crit)
         if expect:
             value["expect"] = expect if isinstance(expect, list) else [expect]
         if refuse_state:
@@ -289,7 +312,7 @@ class ActiveChecksHandler(BaseHandler):
         if timeout:
             value["timeout"] = int(timeout)
         if warn_s and crit_s:
-            value["response_time"] = _fixed_levels(warn_s, crit_s)
+            value["response_time"] = self._seconds_levels(warn_s, crit_s)
 
         result = self._post_rule("active_checks:tcp", repr(value), hostname, folder, description)
         if result.get("success"):
@@ -437,7 +460,7 @@ class ActiveChecksHandler(BaseHandler):
         if starttls:
             value["starttls"] = True
         if starttls or arguments.get("check_cert"):
-            value["cert_days"] = _fixed_levels(cert_warn, cert_crit, _DAY)
+            value["cert_days"] = self._days_levels(cert_warn, cert_crit)
 
         result = self._post_rule("active_checks:smtp", repr(value), hostname, folder, description)
         if result.get("success"):
@@ -501,7 +524,7 @@ class ActiveChecksHandler(BaseHandler):
             "response_time": (warn_ms, crit_ms) if self._plain_levels() else _fixed_levels(warn_ms, crit_ms, 0.001),
         }
         if bind_dn and password:
-            value["authentication"] = {"bind_dn": bind_dn, "password": _explicit_password(password)}
+            value["authentication"] = self._user_password("bind_dn", bind_dn, password)
         if port:
             value["port"] = int(port)
         if attribute:
@@ -541,7 +564,7 @@ class ActiveChecksHandler(BaseHandler):
             "levels": (warn_pct, crit_pct) if self._plain_levels() else _fixed_levels(warn_pct, crit_pct),
         }
         if username and password:
-            value["auth"] = {"user": username, "password": _explicit_password(password)}
+            value["auth"] = self._user_password("user", username, password)
         if workgroup:
             value["workgroup"] = workgroup
 

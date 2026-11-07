@@ -12,12 +12,14 @@ from vibemk.handlers.configuration import ConfigurationHandler
 
 PENDING = {"success": True, "data": {"value": [{"id": "c1"}]}, "headers": {"ETag": '"a"'}}
 EMPTY = {"success": True, "data": {"value": []}, "headers": {"ETag": '"b"'}}
+# activate first asks collections/running whether a run is in progress.
+IDLE = {"success": True, "data": {"value": []}, "headers": {}}
 STALE = CheckMKAPIError("HTTP 412: PRECONDITION FAILED", 412, {})
 
 
 @pytest.mark.asyncio
 async def test_a_412_then_no_pending_changes_is_not_an_error(mock_checkmk_client):
-    mock_checkmk_client.get.side_effect = [PENDING, EMPTY]
+    mock_checkmk_client.get.side_effect = [IDLE, PENDING, EMPTY]
     mock_checkmk_client.post.side_effect = [STALE]
 
     result = await ConfigurationHandler(mock_checkmk_client).handle("vibemk_activate_changes", {})
@@ -27,7 +29,7 @@ async def test_a_412_then_no_pending_changes_is_not_an_error(mock_checkmk_client
 
 @pytest.mark.asyncio
 async def test_a_412_is_retried_with_the_fresh_etag(mock_checkmk_client):
-    mock_checkmk_client.get.side_effect = [PENDING, {**PENDING, "headers": {"ETag": '"c"'}}]
+    mock_checkmk_client.get.side_effect = [IDLE, PENDING, {**PENDING, "headers": {"ETag": '"c"'}}]
     mock_checkmk_client.post.side_effect = [STALE, {"success": True, "data": {"id": "act-1"}}]
 
     result = await ConfigurationHandler(mock_checkmk_client).handle("vibemk_activate_changes", {})
@@ -38,7 +40,7 @@ async def test_a_412_is_retried_with_the_fresh_etag(mock_checkmk_client):
 
 @pytest.mark.asyncio
 async def test_a_second_412_is_reported(mock_checkmk_client):
-    mock_checkmk_client.get.side_effect = [PENDING, PENDING]
+    mock_checkmk_client.get.side_effect = [IDLE, PENDING, PENDING]
     mock_checkmk_client.post.side_effect = [STALE, STALE]
 
     result = await ConfigurationHandler(mock_checkmk_client).handle("vibemk_activate_changes", {})

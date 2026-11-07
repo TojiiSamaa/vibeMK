@@ -85,7 +85,10 @@ async fn service_discovery_workflow() {
     if !enabled() {
         return;
     }
-    let r = call(&real_dispatcher(), "vibemk_get_all_services", json!({})).await;
+    // The tool is vibemk_get_checkmk_services (rust/tools.json); an unknown name
+    // returns no `content`, which is how this test used to fail on 2.3 and 2.5.
+    let r = call(&real_dispatcher(), "vibemk_get_checkmk_services", json!({})).await;
+    assert_eq!(r["isError"], false, "{r}");
     assert!(r["content"].is_array());
 }
 

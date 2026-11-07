@@ -86,7 +86,7 @@ class RulesHandler(BaseHandler):
 
         params = {}
         if search:
-            params["search"] = search
+            params["fulltext"] = search  # CheckMK matches name, title and help; it has no "search" field
 
         result = self.client.get("domain-types/ruleset/collections/all", params=params)
 
@@ -107,7 +107,10 @@ class RulesHandler(BaseHandler):
             ruleset_name = ruleset.get("id", "Unknown")
             extensions = ruleset.get("extensions", {})
             title = extensions.get("title", ruleset_name)
-            help_text = extensions.get("help", "No description")
+            # CheckMK sends the string "None" for a ruleset without help text.
+            help_text = extensions.get("help")
+            if help_text in (None, "None", ""):
+                help_text = "No description"
 
             ruleset_list.append(f"📋 **{ruleset_name}**\n   Title: {title}\n   Help: {help_text[:100]}...")
 

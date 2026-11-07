@@ -90,7 +90,7 @@ impl NotificationHandler {
         for rule in &rules {
             let config = rule.pointer("/extensions/rule_config");
             let description = or_text(
-                config.and_then(|c| c.get("description")),
+                config.and_then(|c| c.pointer("/rule_properties/description")),
                 "(no description)",
             );
             let state = if config.and_then(|c| c.get("disabled")).is_some_and(truthy) {
@@ -121,7 +121,10 @@ impl NotificationHandler {
             .pointer("/extensions/rule_config")
             .cloned()
             .unwrap_or_else(|| json!({}));
-        let description = or_text(config.get("description"), "(no description)");
+        let description = or_text(
+            config.pointer("/rule_properties/description"),
+            "(no description)",
+        );
         // ensure_ascii=False, indent=2: what serde_json prints.
         let pretty = serde_json::to_string_pretty(&config).unwrap_or_default();
         Ok(vec![json!({"type": "text", "text": format!(

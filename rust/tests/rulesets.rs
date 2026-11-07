@@ -98,7 +98,8 @@ async fn search_maps_http_statuses() {
 #[tokio::test]
 async fn show_gets_the_ruleset_and_formats_details() {
     let (server, h) = setup().await;
-    let body = json!({"extensions": {"title": "T", "help": "H", "deprecated": true, "number_of_rules": 4, "type": "dict", "match_type": "first"}});
+    // The shape objects/ruleset/{name} has on 2.3 and 2.5.
+    let body = json!({"id": "checkgroup_parameters:cpu", "title": "T", "extensions": {"name": "checkgroup_parameters:cpu", "deprecated": true, "number_of_rules": 4}});
     Mock::given(method("GET"))
         .and(path(
             "/cmk/check_mk/api/1.0/objects/ruleset/checkgroup_parameters%3Acpu",
@@ -113,7 +114,7 @@ async fn show_gets_the_ruleset_and_formats_details() {
             &json!({"ruleset_name": "checkgroup_parameters:cpu"}),
         )
         .await;
-    assert_eq!(text(&out), "📋 **Ruleset Details: checkgroup_parameters:cpu**\n\n⚠️ **DEPRECATED RULESET**\n\n**Title:** T\n**Type:** dict\n**Match Type:** first\n**Number of Rules:** 4\n\n**Description:**\nH\n\n**Available Operations:**\n• Use `vibemk_get_ruleset` to see actual rules in this ruleset\n• Use `vibemk_create_rule` to add new rules to this ruleset\n• Use `vibemk_search_rulesets` to find related rulesets\n\n⚠️ **Note:** This is a deprecated ruleset. Consider using newer alternatives.");
+    assert_eq!(text(&out), "📋 **Ruleset Details: checkgroup_parameters:cpu**\n\n⚠️ **DEPRECATED RULESET**\n\n**Title:** T\n**Number of Rules:** 4\n\n**Available Operations:**\n• Use `vibemk_get_ruleset` to see actual rules in this ruleset\n• Use `vibemk_create_rule` to add new rules to this ruleset\n• Use `vibemk_search_rulesets` to find related rulesets\n\n⚠️ **Note:** This is a deprecated ruleset. Consider using newer alternatives.");
 }
 
 #[tokio::test]
@@ -209,4 +210,22 @@ async fn list_defaults_and_errors() {
         text(&h.handle("vibemk_nope", &json!({})).await),
         "❌ **Unknown tool**\n\nTool 'vibemk_nope' is not supported"
     );
+}
+
+#[tokio::test]
+async fn get_rulesets_hides_the_none_string_checkmk_sends_for_no_help() {
+    let (server, client) = common::fake_checkmk().await;
+    let body = json!({"value": [{"id": "checkgroup_parameters:interfaces",
+        "extensions": {"title": "Network interfaces and switch ports", "help": "None"}}]});
+    Mock::given(method("GET"))
+        .and(path(ALL))
+        .respond_with(ResponseTemplate::new(200).set_body_json(body))
+        .mount(&server)
+        .await;
+    let out = vibemk::handlers::rules::RulesHandler::new(client)
+        .handle("vibemk_get_rulesets", &json!({}))
+        .await;
+    let t = text(&out);
+    assert!(t.contains("Help: No description..."), "{t}");
+    assert!(!t.contains("None"), "{t}");
 }

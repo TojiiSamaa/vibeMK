@@ -62,7 +62,7 @@ class NotificationHandler(BaseHandler):
         lines = [f"📢 **Notification Rules** ({len(rules)})", ""]
         for rule in rules:
             config = rule.get("extensions", {}).get("rule_config", {})
-            description = config.get("description") or "(no description)"
+            description = config.get("rule_properties", {}).get("description") or "(no description)"
             state = "disabled" if config.get("disabled") else "enabled"
             plugin = config.get("notification_method", {}).get("notify_plugin", {}).get("option", "unknown")
             lines.append(f"• **{description}** — id `{rule.get('id', '?')}`, {state}, via `{plugin}`")
@@ -79,7 +79,7 @@ class NotificationHandler(BaseHandler):
             return self.error_response(f"Failed to retrieve notification rule '{rule_id}'", str(result.get("data")))
 
         config = result.get("data", {}).get("extensions", {}).get("rule_config", {})
-        description = config.get("description") or "(no description)"
+        description = config.get("rule_properties", {}).get("description") or "(no description)"
         return [
             {
                 "type": "text",

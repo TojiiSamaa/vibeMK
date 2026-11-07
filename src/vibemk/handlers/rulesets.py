@@ -235,12 +235,12 @@ class RulesetsHandler(BaseHandler):
         """Format detailed ruleset information"""
         extensions = ruleset_data.get("extensions", {})
 
-        title = extensions.get("title", "No title")
-        help_text = extensions.get("help", "No help available")
+        # objects/ruleset/{name} has the title at the top level and only name and
+        # number_of_rules in extensions; help and match_type exist in the
+        # collection alone, which 2.5 limits to rulesets that hold rules.
+        title = ruleset_data.get("title") or "No title"
         deprecated = extensions.get("deprecated", False)
         number_of_rules = extensions.get("number_of_rules", 0)
-        ruleset_type = extensions.get("type", "Unknown")
-        match_type = extensions.get("match_type", "Unknown")
 
         # Format the response
         response = f"📋 **Ruleset Details: {ruleset_name}**\n\n"
@@ -249,11 +249,7 @@ class RulesetsHandler(BaseHandler):
             response += "⚠️ **DEPRECATED RULESET**\n\n"
 
         response += f"**Title:** {title}\n"
-        response += f"**Type:** {ruleset_type}\n"
-        response += f"**Match Type:** {match_type}\n"
         response += f"**Number of Rules:** {number_of_rules}\n\n"
-
-        response += f"**Description:**\n{help_text}\n\n"
 
         # Show available operations
         response += "**Available Operations:**\n"

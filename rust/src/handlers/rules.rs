@@ -373,7 +373,8 @@ impl RulesHandler {
     }
 
     async fn get_rulesets(&self, args: &Value) -> R {
-        let params = arg(args, "search").map(|s| json!({"search": s}));
+        // CheckMK matches name, title and help with `fulltext`; it has no "search" field.
+        let params = arg(args, "search").map(|s| json!({"fulltext": s}));
         let result = self
             .base
             .client
@@ -397,10 +398,12 @@ impl RulesHandler {
                 let name = get_or(rs, "id", "Unknown");
                 let ext = rs.get("extensions").cloned().unwrap_or_else(|| json!({}));
                 let title = get_or(&ext, "title", &name);
-                let help: String = get_or(&ext, "help", "No description")
-                    .chars()
-                    .take(100)
-                    .collect();
+                // CheckMK sends the string "None" for a ruleset without help text.
+                let help = match ext.get("help").and_then(Value::as_str) {
+                    None | Some("None" | "") => "No description",
+                    Some(h) => h,
+                };
+                let help: String = help.chars().take(100).collect();
                 format!("📋 **{name}**\n   Title: {title}\n   Help: {help}...")
             })
             .collect();

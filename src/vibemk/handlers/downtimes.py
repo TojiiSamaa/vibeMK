@@ -2,11 +2,15 @@
 Downtime management handlers for CheckMK maintenance scheduling
 """
 
+import asyncio
 import datetime as dt
 from typing import Any, Dict, List, Optional
 
 from vibemk.api.exceptions import CheckMKError
 from vibemk.handlers.base import BaseHandler
+
+# The core applies a modify command asynchronously: read it back this many times, one second apart.
+MODIFY_READBACK_TRIES = 5
 
 
 def unix_time(timestamp: Any) -> float:
@@ -1275,6 +1279,33 @@ class DowntimeHandler(BaseHandler):
         self.logger.warning(f"Downtime verification failed after {max_retries} attempts")
         return False
 
+    async def _end_time_applied(
+        self, downtime_id: Any, host_name: Optional[str], service_description: Optional[str], end_time: str
+    ) -> bool:
+        """Read the targeted downtimes back until they end at `end_time`.
+
+        The API answers 204 whatever the core does with the command, and the
+        Nagios core logs "Unrecognized external command" for MODIFY_*_DOWNTIME.
+        """
+        wanted = unix_time(end_time)
+        for attempt in range(MODIFY_READBACK_TRIES):
+            listed = self.client.get("domain-types/downtime/collections/all").get("data", {}).get("value", [])
+            targets = [
+                d.get("extensions", {})
+                for d in listed
+                if (
+                    str(d.get("id")) == str(downtime_id)
+                    if downtime_id
+                    else d.get("extensions", {}).get("host_name") == host_name
+                    and (not service_description or d["extensions"].get("service_description") == service_description)
+                )
+            ]
+            if targets and all(abs(unix_time(t.get("end_time")) - wanted) < 60 for t in targets):
+                return True
+            if attempt + 1 < MODIFY_READBACK_TRIES:
+                await asyncio.sleep(1)
+        return False
+
     async def _modify_downtime(self, arguments: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Modify an existing downtime (extend/shorten end time or change comment)."""
         downtime_id = arguments.get("downtime_id")
@@ -1307,6 +1338,13 @@ class DowntimeHandler(BaseHandler):
         result = self.client.put("domain-types/downtime/actions/modify/invoke", data=data)
 
         if result.get("success"):
+            if not await self._end_time_applied(downtime_id, host_name, service_description, end_time):
+                return self.error_response(
+                    "Downtime not modified",
+                    "CheckMK accepted the request but the monitoring core did not apply it: the Nagios core "
+                    "of the Raw and Community editions has no MODIFY_*_DOWNTIME command. "
+                    "Delete the downtime and schedule a new one instead.",
+                )
             target = f"downtime #{downtime_id}" if downtime_id else host_name
             return [{"type": "text", "text": f"⏰ **Downtime Modified**\n\nTarget: {target}\nNew end: {end_time}"}]
         else:

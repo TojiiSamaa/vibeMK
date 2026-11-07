@@ -2,14 +2,28 @@
 Configuration management handlers
 """
 
+import asyncio
+import time
 from typing import Any, Dict, List
 
 from vibemk.api.exceptions import CheckMKError
-from vibemk.handlers.base import BaseHandler
+from vibemk.handlers.base import ACTIVATION_RUNNING, BaseHandler
+
+RUNNING = ACTIVATION_RUNNING
 
 
 class ConfigurationHandler(BaseHandler):
     """Handle configuration management operations"""
+
+    async def _wait_for_running_activation(self) -> None:
+        """Wait, at most running_wait_s, until no activation run is in progress.
+
+        Why: see BaseHandler._activation_in_progress. Write tools that
+        activate on their own (set_process_thresholds) start such runs.
+        """
+        deadline = time.monotonic() + self.running_wait_s
+        while self._activation_in_progress() and time.monotonic() < deadline:
+            await asyncio.sleep(self.running_poll_s)
 
     async def handle(self, tool_name: str, arguments: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Handle configuration-related tool calls"""
@@ -63,6 +77,7 @@ class ConfigurationHandler(BaseHandler):
 
         # A 412 means the pending changes moved between the read and the POST
         # (e.g. a host rename job activates on its own): read them again once.
+        await self._wait_for_running_activation()
         for attempt in range(2):
             pending_result = self.client.get("domain-types/activation_run/collections/pending_changes")
 

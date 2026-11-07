@@ -278,21 +278,18 @@ impl RulesetsHandler {
 
     fn format_details(name: &str, data: &Value) -> String {
         let ext = data.get("extensions").unwrap_or(&NULL);
-        let title = str_or(ext, "title", "No title");
-        let help = str_or(ext, "help", "No help available");
+        // objects/ruleset/{name}: title at the top level, extensions only has
+        // name and number_of_rules (help and match_type are collection-only).
+        let title = str_or(data, "title", "No title");
         let deprecated = truthy(get_or(ext, "deprecated", &NULL));
         let n = ext
             .get("number_of_rules")
             .map_or_else(|| "0".to_string(), ps);
-        let (ty, mt) = (
-            str_or(ext, "type", "Unknown"),
-            str_or(ext, "match_type", "Unknown"),
-        );
         let mut r = format!("📋 **Ruleset Details: {name}**\n\n");
         if deprecated {
             r.push_str("⚠️ **DEPRECATED RULESET**\n\n");
         }
-        r.push_str(&format!("**Title:** {title}\n**Type:** {ty}\n**Match Type:** {mt}\n**Number of Rules:** {n}\n\n**Description:**\n{help}\n\n"));
+        r.push_str(&format!("**Title:** {title}\n**Number of Rules:** {n}\n\n"));
         r.push_str("**Available Operations:**\n");
         r.push_str("• Use `vibemk_get_ruleset` to see actual rules in this ruleset\n");
         r.push_str("• Use `vibemk_create_rule` to add new rules to this ruleset\n");

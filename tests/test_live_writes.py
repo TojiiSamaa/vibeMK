@@ -272,7 +272,9 @@ def test_event_console_events_are_acknowledged_changed_and_deleted(registry: Too
 
 
 def test_the_agent_bakery_bakes_or_says_why_it_cannot(registry: ToolRegistry, host: str) -> None:
-    commercial = ".community" not in ok(registry, "vibemk_get_checkmk_version", {})
+    # The free edition is "2.3.0p52.cre" (Raw) up to 2.4 and "2.5.0p18.community" since.
+    version = ok(registry, "vibemk_get_checkmk_version", {})
+    commercial = ".cre" not in version and ".community" not in version
     failed, text = call(registry, "vibemk_bake_agents", {})
     if not commercial:
         assert failed

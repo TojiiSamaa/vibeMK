@@ -462,9 +462,11 @@ async fn wait_gives_up_after_the_timeout() {
 }
 
 #[tokio::test]
-async fn background_job_shows_state_and_times() {
+async fn background_job_shows_state_and_logs() {
     let (server, h) = setup().await;
-    let body = json!({"extensions": {"state": "running", "started": "10:00"}});
+    // The shape 2.3 and 2.5 send: no start or end time.
+    let body = json!({"extensions": {"active": true, "state": "running",
+        "logs": {"result": [], "progress": ["Starting job...", "Completed."]}}});
     mount(
         &server,
         "GET",
@@ -479,7 +481,7 @@ async fn background_job_shows_state_and_times() {
         )
         .await,
     );
-    assert!(t.starts_with("🔄 **Discovery Background Job**\n\nHost: **web01**\nState: RUNNING\nStarted: 10:00\nFinished: Not finished\nDuration: Unknown"), "{t}");
+    assert_eq!(t, "🔄 **Discovery Background Job**\n\nHost: **web01**\nState: RUNNING\nActive: yes\n\n• Starting job...\n• Completed.\n\n💡 Use 'get_discovery_status' to see discovery results.");
 }
 
 #[tokio::test]

@@ -360,6 +360,9 @@ fn minutes(n: i64) -> Result<Duration, String> {
     Duration::try_minutes(n).ok_or_else(|| "Python int too large to convert to C int".to_string())
 }
 
+/// The core applies a modify command asynchronously: read it back this many times.
+const MODIFY_READBACK_TRIES: usize = 5;
+
 const WEEKDAYS: [&str; 7] = [
     "monday",
     "tuesday",
@@ -1378,6 +1381,46 @@ impl DowntimeHandler {
         false
     }
 
+    /// Read the targeted downtimes back until they end at `end`. The API answers 204 whatever the
+    /// core does, and the Nagios core logs "Unrecognized external command" for MODIFY_*_DOWNTIME.
+    async fn end_time_applied(&self, args: &Value, end: &Value) -> R<bool> {
+        let wanted = unix_time(end);
+        let (id, host) = (arg(args, "downtime_id"), arg(args, "host_name"));
+        let service = arg(args, "service_description");
+        for attempt in 0..MODIFY_READBACK_TRIES {
+            let listed = self
+                .base
+                .client
+                .get("domain-types/downtime/collections/all", None, &[])
+                .await?;
+            let empty = vec![];
+            let ends: Vec<f64> = listed
+                .data
+                .get("value")
+                .and_then(Value::as_array)
+                .unwrap_or(&empty)
+                .iter()
+                .filter(|d| match id {
+                    Some(id) => d.get("id").map(py_str) == Some(py_str(id)),
+                    None => {
+                        let ext = &d["extensions"];
+                        ext.get("host_name") == host
+                            && service.is_none_or(|s| ext.get("service_description") == Some(s))
+                    }
+                })
+                .map(|d| unix_time(&d["extensions"]["end_time"]))
+                .collect();
+            if !ends.is_empty() && ends.iter().all(|e| (e - wanted).abs() < 60.0) {
+                return Ok(true);
+            }
+            if attempt + 1 < MODIFY_READBACK_TRIES {
+                // One second apart like Python, or the shortened test delay.
+                tokio::time::sleep(self.verify_delay.min(StdDuration::from_secs(1))).await;
+            }
+        }
+        Ok(false)
+    }
+
     async fn modify_downtime(&self, args: &Value) -> R<Vec<Value>> {
         let end = args
             .get("end_time")
@@ -1424,6 +1467,12 @@ impl DowntimeHandler {
                 &[],
             )
             .await?;
+        if !self.end_time_applied(args, &end).await? {
+            return Ok(self.base.error_response(
+                "Downtime not modified",
+                Some("CheckMK accepted the request but the monitoring core did not apply it: the Nagios core of the Raw and Community editions has no MODIFY_*_DOWNTIME command. Delete the downtime and schedule a new one instead."),
+            ));
+        }
         let target = arg(args, "downtime_id").map_or_else(
             || arg(args, "host_name").map_or_else(String::new, py_str),
             |id| format!("downtime #{}", py_str(id)),

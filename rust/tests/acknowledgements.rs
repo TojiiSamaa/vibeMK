@@ -12,7 +12,7 @@ use wiremock::{Mock, MockServer, ResponseTemplate};
 use common::{fake_checkmk, API};
 
 const COMMENTS: &str = "domain-types/comment/collections/all";
-const DELETE: &str = "domain-types/comment/actions/delete/invoke";
+const DELETE: &str = "domain-types/acknowledge/actions/delete/invoke";
 
 async fn handler() -> (MockServer, AcknowledgementHandler) {
     let (server, client) = fake_checkmk().await;
@@ -175,10 +175,11 @@ async fn missing_arguments_and_unknown_tools_are_refused() {
     );
 }
 
+// Deleting the acknowledgement's comment leaves the problem acknowledged; the delete action clears it.
+
 #[tokio::test]
-async fn remove_by_host_deletes_only_matching_kind_by_integer_id() {
+async fn remove_by_host_goes_through_the_delete_action() {
     let (server, h) = handler().await;
-    mount(&server, "GET", COMMENTS, 200, json!({"value": [comment("7", "web01", false), comment("8", "web01", true), comment("9", "db01", false), comment("x", "web01", false)]})).await;
     mount(&server, "POST", DELETE, 204, json!({})).await;
     let t = text(
         &h.handle(
@@ -187,30 +188,81 @@ async fn remove_by_host_deletes_only_matching_kind_by_integer_id() {
         )
         .await,
     );
-    assert_eq!(t, "✅ Successfully removed 1 acknowledgements for web01");
+    assert_eq!(t, "✅ Acknowledgement removed for web01");
     let sent: Value = requests(&server, "POST", DELETE).await[0]
         .body_json()
         .unwrap();
     assert_eq!(
         sent,
-        json!({"delete_type": "by_id", "comment_id": 7, "site_id": "cmk"})
+        json!({"acknowledge_type": "host", "host_name": "web01"})
     );
 }
 
 #[tokio::test]
-async fn remove_by_id_and_without_target() {
+async fn remove_by_id_names_the_service_its_comment_belongs_to() {
     let (server, h) = handler().await;
-    mount(&server, "DELETE", "objects/comment/42", 204, json!({})).await;
+    let mut service_ack = comment("42", "web01", true);
+    service_ack["extensions"]["service_description"] = json!("Disk");
+    mount(
+        &server,
+        "GET",
+        COMMENTS,
+        200,
+        json!({"value": [comment("7", "web01", false), service_ack]}),
+    )
+    .await;
+    mount(&server, "POST", DELETE, 204, json!({})).await;
     assert_eq!(
         text(
             &h.handle(
                 "vibemk_remove_acknowledgement",
-                &json!({"acknowledgement_id": "42"})
+                &json!({"acknowledgement_id": 42})
             )
             .await
         ),
-        "✅ Successfully removed acknowledgement #42"
+        "✅ Acknowledgement removed for web01/Disk"
     );
+    let sent: Value = requests(&server, "POST", DELETE).await[0]
+        .body_json()
+        .unwrap();
+    assert_eq!(
+        sent,
+        json!({"acknowledge_type": "service", "host_name": "web01", "service_description": "Disk"})
+    );
+    let unknown = h
+        .handle(
+            "vibemk_remove_acknowledgement",
+            &json!({"acknowledgement_id": "8"}),
+        )
+        .await;
+    assert!(text(&unknown).contains("No acknowledgements found #8"));
+    assert_eq!(requests(&server, "POST", DELETE).await.len(), 1);
+}
+
+#[tokio::test]
+async fn remove_on_a_checkmk_without_the_action_says_so() {
+    // CheckMK 2.3 answers 404 for the route.
+    let (server, h) = handler().await;
+    mount(
+        &server,
+        "POST",
+        DELETE,
+        404,
+        json!({"title": "Not Found", "status": 404}),
+    )
+    .await;
+    let out = h
+        .handle(
+            "vibemk_remove_acknowledgement",
+            &json!({"host_name": "web01"}),
+        )
+        .await;
+    assert!(text(&out).contains("no REST endpoint to remove an acknowledgement"));
+}
+
+#[tokio::test]
+async fn remove_without_target() {
+    let (_server, h) = handler().await;
     let none = h.handle("vibemk_remove_acknowledgement", &json!({})).await;
     assert!(text(&none).contains("acknowledgement_id, host_name, or comment_pattern is required"));
     assert_eq!(none[1]["type"], "_error");

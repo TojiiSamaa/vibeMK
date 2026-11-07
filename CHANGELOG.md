@@ -45,6 +45,37 @@ All notable changes to this project will be documented in this file.
     literal, so tuples survive
   - `create_aux_tag` requires and sends `topic`
   - LDAP and SMB active checks send plain `(warn, crit)` levels on 2.3
+- Found by the second run of the live tests and sweeps (6 Nov 2026), fixed in Python and Rust:
+  - `remove_acknowledgement` uses `acknowledge/actions/delete` (deleting the
+    comment left the problem acknowledged); CheckMK 2.3 has no such route and
+    gets a clear message
+  - ruleset searches (the ruleset list and the host group rule search) send `fulltext`,
+    the only search field CheckMK knows; a ruleset without help no longer shows "None"
+  - `modify_downtime` reads the downtime back and reports "Downtime not
+    modified" when the Nagios core ignores the command (Raw and Community)
+  - the discovery background job shows its state, activity and log lines instead of
+    start and end times CheckMK does not send
+  - notification rules show the description from `rule_properties`
+  - `get_ruleset` reads the title where `objects/ruleset` puts it and no
+    longer prints type, match type and help that only the collection holds
+  - `activate_changes` on 2.3 waits for an activation already running; the
+    site refused the second one ("Locked") and left changes pending. The
+    activation that write tools run on their own (`activate_changes=true`,
+    `set_process_thresholds`) waits the same way
+  - HTTP, TCP, SMTP, LDAP and SMB active checks send the legacy shapes on 2.3
+    (whole-day certificate age, response time in ms, `(user, ('password', secret))`,
+    tuple `expect_regex`); 2.3 answered 400 to the 2.5 shapes
+- Test bench (`scripts/live_sweep.py`, live tests):
+  - the sweep deleted "the first rule" of `inventory_processes_rules` instead of
+    its own; on 2.5, which ships default process rules, each run deleted one of
+    CheckMK's and left its own behind. It now deletes the rule it wrote for its host
+  - the sweep removes the active check, interface and memory rules it creates
+    (deleting a host keeps the rules that name it) and its last step checks that
+    no rule names a test host
+  - the Rust integration test called a tool that does not exist
+    (`vibemk_get_all_services`, now `vibemk_get_checkmk_services`)
+  - the agent bakery live test recognises the free edition on 2.3 (`.cre`) as
+    well as on 2.5 (`.community`)
 
 ## [0.6.4] - 2026-10-03
 

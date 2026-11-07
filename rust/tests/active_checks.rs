@@ -530,3 +530,69 @@ async fn listing_shows_rules_of_the_host_and_deleting_by_host_needs_one_match() 
         .path()
         .ends_with("/objects/rule/r1"));
 }
+
+/// CheckMK 2.3.0p52 validates these rulesets with legacy valuespecs: the shapes
+/// below are the ones that site accepted (POST rule, 200), the 2.5 form-spec
+/// shapes ('fixed' levels, dict credentials) were refused with 400.
+#[tokio::test]
+async fn on_checkmk_23_the_legacy_valuespec_shapes_are_sent() {
+    let cases = [
+        (
+            "vibemk_create_http_check",
+            json!({"name": "c", "cert_mode": true, "cert_days_warn": 30, "cert_days_crit": 14}),
+            vec!["'cert_days': (30, 14)"],
+        ),
+        (
+            "vibemk_create_http_check",
+            json!({"name": "u", "uri": "/", "expect_regex": "ok", "response_time_warn": 1,
+                   "response_time_crit": 2, "auth_user": "probe", "auth_password": "s"}),
+            vec![
+                "'response_time': (1000.0, 2000.0)",
+                "'auth': ('probe', ('password', 's'))",
+                "'expect_regex': ('ok', False, False, False)",
+            ],
+        ),
+        (
+            "vibemk_create_tcp_check",
+            json!({"port": 443, "cert_days_warn": 30, "cert_days_crit": 14,
+                   "response_time_warn": 1, "response_time_crit": 2}),
+            vec!["'cert_days': (30, 14)", "'response_time': (1000.0, 2000.0)"],
+        ),
+        (
+            "vibemk_create_smtp_check",
+            json!({"name": "m", "starttls": true, "cert_days_warn": 30, "cert_days_crit": 14}),
+            vec!["'cert_days': (30, 14)"],
+        ),
+        (
+            "vibemk_create_ldap_check",
+            json!({"name": "l", "base_dn": "dc=x", "bind_dn": "cn=probe", "password": "s"}),
+            vec!["'authentication': ('cn=probe', ('password', 's'))"],
+        ),
+        (
+            "vibemk_create_smb_check",
+            json!({"share": "data", "username": "probe", "password": "s"}),
+            vec!["'auth': ('probe', ('password', 's'))"],
+        ),
+    ];
+    for (tool, mut args, wanted) in cases {
+        let (server, h) = setup().await;
+        Mock::given(method("GET"))
+            .and(path("/cmk/check_mk/api/1.0/version"))
+            .respond_with(
+                ResponseTemplate::new(200)
+                    .set_body_json(json!({"versions": {"checkmk": "2.3.0p52.cre"}})),
+            )
+            .mount(&server)
+            .await;
+        args["hostname"] = json!("web01");
+        let _ = h.handle(tool, &args).await;
+        let raw = sent_rule(&server).await["value_raw"]
+            .as_str()
+            .unwrap()
+            .to_string();
+        assert_python_literal(&raw);
+        for w in wanted {
+            assert!(raw.contains(w), "{tool}: {w} not in {raw}");
+        }
+    }
+}

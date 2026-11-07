@@ -21,6 +21,7 @@ logger: logging.Logger = get_logger(__name__)
 T = TypeVar("T")
 R = TypeVar("R")
 
+ACTIVATION_RUNNING = "domain-types/activation_run/collections/running"
 _SECONDS_PER_MINUTE = 60
 _SECONDS_PER_HOUR = 3600
 _SECONDS_PER_DAY = 86400
@@ -134,6 +135,37 @@ class BaseHandler(ABC):
             logger.warning("No ETag available: falling back to If-Match '*', concurrent edits will not be detected")
         return etag or "*"
 
+    # How long an activation waits for a run already in progress, and how often it looks.
+    running_wait_s = 60.0
+    running_poll_s = 1.0
+
+    def _activation_in_progress(self) -> bool:
+        """True when CheckMK shows an activation run with is_running set.
+
+        CheckMK 2.3 accepts a second activate-changes while one is running
+        (HTTP 200, a new run id), but the site refuses it: the run ends at
+        once as "Complete." and its per-site state is "Locked -- cmkadmin is
+        currently activating changes on this site". The changes made after
+        the running one started then stay pending. The running collection
+        still lists finished runs, so only is_running counts. A failed read
+        answers False: it must never block an activation.
+        """
+        try:
+            running = self.client.get(ACTIVATION_RUNNING)
+        except CheckMKError:
+            return False
+        data = running.get("data") if isinstance(running, dict) and running.get("success") else None
+        runs = data.get("value") if isinstance(data, dict) else None
+        if not isinstance(runs, list):
+            return False
+        return any(isinstance(run, dict) and (run.get("extensions") or {}).get("is_running") is True for run in runs)
+
+    def _wait_for_running_activation_blocking(self) -> None:
+        """Wait, at most running_wait_s, until no activation run is in progress."""
+        deadline = time.monotonic() + self.running_wait_s
+        while self._activation_in_progress() and time.monotonic() < deadline:
+            time.sleep(self.running_poll_s)
+
     def _run_activation(self) -> str:
         """Activate pending changes and return a single status line.
 
@@ -148,6 +180,9 @@ class BaseHandler(ABC):
         if self.client.config.never_activate_changes:
             return "🚫 Changes were not activated: NEVER_ACTIVATE_CHANGES is set."
 
+        # Same guard as vibemk_activate_changes: an activation sent while
+        # another runs is accepted then refused by the site (see above).
+        self._wait_for_running_activation_blocking()
         try:
             pending = self.client.get("domain-types/activation_run/collections/pending_changes")
             if not pending.get("success"):

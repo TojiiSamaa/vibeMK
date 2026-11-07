@@ -193,3 +193,63 @@ class TestListingAndDeleting:
         await handler.handle("vibemk_delete_active_check", {"rule_id": "rule-42"})
 
         assert "rule-42" in handler.client.delete.call_args[0][0]
+
+
+# CheckMK 2.3.0p52 still validates these rulesets with legacy valuespecs. The
+# shapes below are the ones that 2.3 site accepted (POST rule, 200); the 2.5
+# form-spec shapes ('fixed' levels, dict credentials) were refused with 400.
+SHAPES_23 = [
+    (
+        "vibemk_create_http_check",
+        {"name": "c", "cert_mode": True, "cert_days_warn": 30, "cert_days_crit": 14},
+        lambda v: v["mode"] == ("cert", {"cert_days": (30, 14)}),
+    ),
+    (
+        "vibemk_create_http_check",
+        {
+            "name": "u",
+            "uri": "/",
+            "expect_regex": "ok",
+            "response_time_warn": 1,
+            "response_time_crit": 2,
+            "auth_user": "probe",
+            "auth_password": "s",
+        },
+        lambda v: v["mode"][1]["response_time"] == (1000.0, 2000.0)
+        and v["mode"][1]["auth"] == ("probe", ("password", "s"))
+        and v["mode"][1]["expect_regex"] == ("ok", False, False, False),
+    ),
+    (
+        "vibemk_create_tcp_check",
+        {"port": 443, "cert_days_warn": 30, "cert_days_crit": 14, "response_time_warn": 1, "response_time_crit": 2},
+        lambda v: v["cert_days"] == (30, 14) and v["response_time"] == (1000.0, 2000.0),
+    ),
+    (
+        "vibemk_create_smtp_check",
+        {"name": "m", "starttls": True, "cert_days_warn": 30, "cert_days_crit": 14},
+        lambda v: v["cert_days"] == (30, 14),
+    ),
+    (
+        "vibemk_create_ldap_check",
+        {"name": "l", "base_dn": "dc=x", "bind_dn": "cn=probe", "password": "s"},
+        lambda v: v["authentication"] == ("cn=probe", ("password", "s")),
+    ),
+    (
+        "vibemk_create_smb_check",
+        {"share": "data", "username": "probe", "password": "s"},
+        lambda v: v["auth"] == ("probe", ("password", "s")),
+    ),
+]
+
+
+@pytest.mark.parametrize(("tool", "arguments", "shape_ok"), SHAPES_23)
+async def test_on_checkmk_23_the_legacy_valuespec_shapes_are_sent(handler, tool, arguments, shape_ok):
+    def get(endpoint, *args, **kwargs):
+        if endpoint == "version":
+            return {"success": True, "data": {"versions": {"checkmk": "2.3.0p52.cre"}}}
+        return {"success": True, "data": {"extensions": {"folder": "/"}}}
+
+    handler.client.get.side_effect = get
+    await handler.handle(tool, {"hostname": "web01", **arguments})
+    value = ast.literal_eval(sent_rule(handler)["value_raw"])
+    assert shape_ok(value), value

@@ -88,7 +88,7 @@ impl HostGroupRulesHandler {
                 .client
                 .get(
                     "domain-types/ruleset/collections/all",
-                    Some(&json!({"search": term})),
+                    Some(&json!({"fulltext": term})),
                     &[],
                 )
                 .await

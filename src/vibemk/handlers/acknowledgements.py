@@ -5,8 +5,7 @@ Handles problem acknowledgements for hosts and services
 
 from typing import Any, Dict, List, Optional
 
-from vibemk.api import CheckMKClient
-from vibemk.api.paths import path_segment
+from vibemk.api import CheckMKClient, CheckMKNotFoundError
 from vibemk.handlers.base import BaseHandler
 from vibemk.utils import get_logger
 
@@ -16,6 +15,11 @@ logger = get_logger(__name__)
 ACKNOWLEDGEMENT_COMMENTS = "domain-types/comment/collections/all"
 # Livestatus comments.entry_type: 1 user, 2 downtime, 3 flapping, 4 acknowledgement.
 ACKNOWLEDGEMENT_ENTRY_TYPE = "4"
+REMOVE_ACKNOWLEDGEMENT = "domain-types/acknowledge/actions/delete/invoke"
+NO_REMOVE_ENDPOINT = (
+    "❌ This CheckMK version has no REST endpoint to remove an acknowledgement\n\n"
+    "Remove it in the GUI; a non-sticky acknowledgement also clears itself when the state changes."
+)
 
 
 class AcknowledgementHandler(BaseHandler):
@@ -205,24 +209,20 @@ class AcknowledgementHandler(BaseHandler):
             logger.exception(f"Error acknowledging service problem for {host_name}/{service_description}")
             return self.error_text(f"❌ Error acknowledging service problem: {str(e)}")
 
-    def _delete_comment(self, comment_id: Any) -> Dict[str, Any]:
-        """Delete one comment through the action endpoint.
+    def _remove_acknowledgement_of(self, host_name: str, service_description: Optional[str]) -> None:
+        """Remove the acknowledgement of one host or service.
 
-        `objects/comment/{id}` serves GET only and answers 405 on DELETE.
-        Deletion goes through `domain-types/comment/actions/delete/invoke`,
-        which discriminates on `delete_type` and requires the site. The schema
-        types comment_id as an integer, so a string id is converted rather
-        than sent on.
+        Deleting the acknowledgement's comment leaves the problem acknowledged
+        (measured on 2.3 and 2.5), so this goes through the dedicated action.
+        CheckMK 2.3 lacks it and answers 404 for the route; an unknown host is a 400.
         """
-        try:
-            numeric_id = int(comment_id)
-        except (TypeError, ValueError):
-            return {"success": False, "data": {"detail": f"'{comment_id}' is not a comment id"}}
-
-        return self.client.post(
-            "domain-types/comment/actions/delete/invoke",
-            data={"delete_type": "by_id", "comment_id": numeric_id, "site_id": self.client.config.site},
-        )
+        data: Dict[str, Any] = {
+            "acknowledge_type": "service" if service_description else "host",
+            "host_name": host_name,
+        }
+        if service_description:
+            data["service_description"] = service_description
+        self.client.post(REMOVE_ACKNOWLEDGEMENT, data=data)
 
     async def list_acknowledgements(self, args: Dict[str, Any]) -> List[Dict[str, str]]:
         """List all current acknowledgements"""
@@ -284,112 +284,42 @@ class AcknowledgementHandler(BaseHandler):
             return self.error_text(f"❌ Error listing acknowledgements: {str(e)}")
 
     async def remove_acknowledgement(self, args: Dict[str, Any]) -> List[Dict[str, str]]:
-        """Remove an acknowledgement"""
+        """Remove the acknowledgement of a host or service, or of those an id or a comment pattern names"""
+        ack_id = args.get("acknowledgement_id")
+        host_name = args.get("host_name")
+        comment_pattern = args.get("comment_pattern")
         try:
-            # Support multiple removal methods
-            ack_id = args.get("acknowledgement_id")
-            host_name = args.get("host_name")
-            service_description = args.get("service_description")
-            comment_pattern = args.get("comment_pattern")
-            delete_all_matching = args.get("delete_all_matching", False)
-
-            if ack_id:
-                # Remove by acknowledgement ID (stored as comment in CheckMK 2.4)
-                endpoint = f"objects/comment/{path_segment(ack_id)}"
-                result = self.client.delete(endpoint)
-
-                if result.get("success"):
-                    return [{"type": "text", "text": f"✅ Successfully removed acknowledgement #{ack_id}"}]
-                else:
-                    error_msg = result.get("data", {}).get("detail", "Unknown error")
-                    return self.error_text(f"❌ Failed to remove acknowledgement: {error_msg}")
-
-            elif comment_pattern and delete_all_matching:
-                # Remove all acknowledgements matching comment pattern
-                # First get all comments
-                list_result = self.client.get("domain-types/comment/collections/all")
-                if not list_result.get("success"):
-                    return self.error_text("❌ Unable to retrieve comments for pattern matching")
-
-                comments = list_result.get("data", {}).get("value", [])
-                deleted_count = 0
-
-                for comment in comments:
-                    extensions = comment.get("extensions", {})
-                    comment_text = extensions.get("comment", "")
-                    comment_id = comment.get("id")
-
-                    # Check if comment matches pattern and appears to be an acknowledgement
-                    if comment_pattern.lower() in comment_text.lower() and (
-                        "acknowledge" in comment_text.lower() or "ack" in comment_text.lower()
-                    ):
-
-                        delete_result = self._delete_comment(comment_id)
-                        if delete_result.get("success"):
-                            deleted_count += 1
-
-                if deleted_count > 0:
-                    return [
-                        {
-                            "type": "text",
-                            "text": f"✅ Successfully removed {deleted_count} acknowledgements matching pattern '{comment_pattern}'",
-                        }
-                    ]
-                else:
-                    return self.error_text(f"❌ No acknowledgements found matching pattern '{comment_pattern}'")
-
-            elif host_name:
-                # For CheckMK 2.4, we need to find and delete acknowledgements by comment ID
-                # since there are no direct host/service action endpoints for removal
-                # Ask CheckMK for acknowledgements (entry_type 4) rather than
-                # guessing from the comment text, for the same reason the
-                # listing does: the ids found here are the ids deleted below.
-                list_result = self.client.get(
+            if ack_id or (comment_pattern and args.get("delete_all_matching", False)):
+                # Ids and texts belong to the acknowledgement comments; each names the host or service to clear.
+                listed = self.client.get(
                     ACKNOWLEDGEMENT_COMMENTS,
                     params={"query": {"op": "=", "left": "entry_type", "right": ACKNOWLEDGEMENT_ENTRY_TYPE}},
                 )
-                if not list_result.get("success"):
-                    return self.error_text("❌ Unable to retrieve acknowledgements for removal")
-
-                comments = list_result.get("data", {}).get("value", [])
-                deleted_count = 0
-
-                for comment in comments:
-                    extensions = comment.get("extensions", {})
-                    comment_host = extensions.get("host_name", "")
-                    comment_text = extensions.get("comment", "").lower()
-                    comment_id = comment.get("id")
-                    is_service = extensions.get("is_service", False)
-
-                    # Check if this is an acknowledgement for the specified host/service
-                    if comment_host == host_name:
-
-                        # If service_description is specified, only match service acknowledgements
-                        if service_description and not is_service:
-                            continue
-                        # If no service_description, only match host acknowledgements
-                        if not service_description and is_service:
-                            continue
-
-                        delete_result = self._delete_comment(comment_id)
-                        if delete_result.get("success"):
-                            deleted_count += 1
-
-                if deleted_count > 0:
-                    target = f"{host_name}/{service_description}" if service_description else host_name
-                    return [
-                        {
-                            "type": "text",
-                            "text": f"✅ Successfully removed {deleted_count} acknowledgements for {target}",
-                        }
-                    ]
+                found = [(c.get("id"), c.get("extensions", {})) for c in listed.get("data", {}).get("value", [])]
+                if ack_id:
+                    matches = [e for i, e in found if str(i) == str(ack_id)]
+                    label = f"#{ack_id}"
                 else:
-                    target = f"{host_name}/{service_description}" if service_description else host_name
-                    return self.error_text(f"❌ No acknowledgements found for {target}")
-
+                    matches = [e for _, e in found if str(comment_pattern).lower() in str(e.get("comment", "")).lower()]
+                    label = f"matching pattern '{comment_pattern}'"
+                targets = {
+                    (e.get("host_name"), e.get("service_description") if e.get("is_service") else None) for e in matches
+                }
+                if not targets:
+                    return self.error_text(f"❌ No acknowledgements found {label}")
+            elif host_name:
+                targets = {(host_name, args.get("service_description") or None)}
             else:
                 return self.error_text("❌ Error: acknowledgement_id, host_name, or comment_pattern is required")
 
+            ordered = sorted(targets, key=lambda t: (str(t[0]), t[1] or ""))
+            for host, service in ordered:
+                self._remove_acknowledgement_of(host, service)
+        except CheckMKNotFoundError:
+            return self.error_text(NO_REMOVE_ENDPOINT)
         except Exception as e:
             logger.exception("Error removing acknowledgement")
             return self.error_text(f"❌ Error removing acknowledgement: {str(e)}")
+
+        names = ", ".join(host if service is None else f"{host}/{service}" for host, service in ordered)
+        return [{"type": "text", "text": f"✅ Acknowledgement removed for {names}"}]

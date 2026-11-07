@@ -27,7 +27,7 @@ RULE = {
     "id": "1",
     "extensions": {
         "rule_config": {
-            "description": "Notify admins by email",
+            "rule_properties": {"description": "Notify admins by email"},
             "disabled": False,
             "notification_method": {"notify_plugin": {"option": "mail"}},
         }
@@ -60,7 +60,7 @@ class TestListing:
         result = await handler.handle("vibemk_get_notification_rule", {"rule_id": "1"})
 
         handler.client.get.assert_called_once_with("objects/notification_rule/1")
-        assert "Notify admins by email" in result[0]["text"]
+        assert "Description: Notify admins by email" in result[0]["text"]
 
     @pytest.mark.asyncio
     async def test_show_requires_a_rule_id(self, handler):

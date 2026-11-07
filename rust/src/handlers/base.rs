@@ -26,6 +26,11 @@ pub const STRUCTURED_BLOCK: &str = "_structured";
 pub const ERROR_BLOCK: &str = "_error";
 /// Low on purpose: a production site has better things to do than answer one tool call.
 pub const MAX_CONCURRENT_REQUESTS: usize = 4;
+/// Activation runs, finished ones included; `extensions.is_running` tells them apart.
+pub const ACTIVATION_RUNNING: &str = "domain-types/activation_run/collections/running";
+/// How long an activation waits for a run already in progress, and how often it looks.
+pub const ACTIVATION_RUNNING_WAIT: std::time::Duration = std::time::Duration::from_secs(60);
+pub const ACTIVATION_RUNNING_POLL: std::time::Duration = std::time::Duration::from_millis(500);
 
 #[async_trait]
 pub trait Handler: Send + Sync {
@@ -170,11 +175,44 @@ impl Base {
             .to_string()
     }
 
+    /// Wait, at most `ACTIVATION_RUNNING_WAIT`, until no activation run is in progress.
+    ///
+    /// CheckMK 2.3 accepts a second activate-changes while one is running
+    /// (HTTP 200, a new run id), but the site refuses it: the run ends at once
+    /// as "Complete." with the per-site state "Locked -- cmkadmin is currently
+    /// activating changes on this site", and the later changes stay pending.
+    /// Write tools that activate on their own (set_process_thresholds) start
+    /// such runs. The running collection still lists finished runs, so only
+    /// `is_running` counts; an error reading it never blocks the activation.
+    pub async fn wait_for_running_activation(&self) {
+        let deadline = tokio::time::Instant::now() + ACTIVATION_RUNNING_WAIT;
+        loop {
+            let Ok(running) = self.client.get(ACTIVATION_RUNNING, None, &[]).await else {
+                return;
+            };
+            let busy = running
+                .data
+                .get("value")
+                .and_then(Value::as_array)
+                .is_some_and(|runs| {
+                    runs.iter().any(|run| {
+                        run.pointer("/extensions/is_running") == Some(&Value::Bool(true))
+                    })
+                });
+            if !busy || tokio::time::Instant::now() >= deadline {
+                return;
+            }
+            tokio::time::sleep(ACTIVATION_RUNNING_POLL).await;
+        }
+    }
+
     /// Activate pending changes, return one status line, never fail (l.132).
     pub async fn run_activation(&self) -> String {
         if self.client.config.never_activate_changes {
             return "🚫 Changes were not activated: NEVER_ACTIVATE_CHANGES is set.".to_string();
         }
+        // Same guard as vibemk_activate_changes (see wait_for_running_activation).
+        self.wait_for_running_activation().await;
         let pending = match self
             .client
             .get(

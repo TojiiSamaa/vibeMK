@@ -31,7 +31,7 @@ async fn find_searches_five_terms_and_groups_rulesets_by_kind() {
     for term in ["contact", "group", "host", "notification", "assignment"] {
         Mock::given(method("GET"))
             .and(path(RULESETS))
-            .and(query_param("search", term))
+            .and(query_param("fulltext", term))
             .respond_with(ResponseTemplate::new(200).set_body_json(value.clone()))
             .expect(1)
             .mount(&server)
@@ -51,7 +51,7 @@ async fn find_reports_a_failed_search_and_goes_on() {
     let (server, client) = common::fake_checkmk().await;
     Mock::given(method("GET"))
         .and(path(RULESETS))
-        .and(query_param("search", "contact"))
+        .and(query_param("fulltext", "contact"))
         .respond_with(ResponseTemplate::new(500))
         .mount(&server)
         .await;

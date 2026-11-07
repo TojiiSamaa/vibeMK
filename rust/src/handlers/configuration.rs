@@ -66,6 +66,7 @@ impl ConfigurationHandler {
         let body = json!({"redirect": false, "sites": used_sites, "force_foreign_changes": force});
         // A 412 means the pending changes moved between the read and the POST
         // (e.g. a host rename job activates on its own): read them again once.
+        self.base.wait_for_running_activation().await;
         let mut attempt = 0;
         let (result, count) = loop {
             let pending = self.base.client.get(PENDING, None, &[]).await?;

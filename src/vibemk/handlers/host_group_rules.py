@@ -46,7 +46,7 @@ class HostGroupRulesHandler(BaseHandler):
 
         for search_term in search_terms:
             try:
-                result = self.client.get("domain-types/ruleset/collections/all", params={"search": search_term})
+                result = self.client.get("domain-types/ruleset/collections/all", params={"fulltext": search_term})
 
                 if result.get("success"):
                     rulesets = result["data"].get("value", [])

@@ -184,6 +184,33 @@ impl ActiveChecksHandler {
         }
     }
 
+    // 2.3 still runs these rulesets on legacy valuespecs (shapes accepted by
+    // CheckMK 2.3.0p52, probed live): certificate age as integer days, response
+    // time as float milliseconds, credentials as (user, ("password", secret)).
+    async fn days_levels(&self, warn: &Value, crit: &Value) -> Result<String> {
+        if self.plain_levels().await {
+            Ok(tup(&[int(warn)?.to_string(), int(crit)?.to_string()]))
+        } else {
+            fixed_levels(warn, crit, DAY)
+        }
+    }
+
+    async fn seconds_levels(&self, warn: &Value, crit: &Value) -> Result<String> {
+        if self.plain_levels().await {
+            Ok(tup(&[fl(flt(warn)? * 1000.0), fl(flt(crit)? * 1000.0)]))
+        } else {
+            fixed_levels(warn, crit, 1.0)
+        }
+    }
+
+    async fn user_password(&self, key: &str, user: &Value, pw: &Value) -> String {
+        if self.plain_levels().await {
+            tup(&[py_repr(user), tup(&[s("password"), py_repr(pw)])])
+        } else {
+            dict(&[(key, py_repr(user)), ("password", explicit_password(pw))])
+        }
+    }
+
     /// Explicit folder, else the host's own folder as "~a~b"; the root when it cannot be read.
     async fn resolve_folder(&self, hostname: &str, explicit: Option<&Value>) -> String {
         if let Some(f) = explicit {
@@ -313,7 +340,7 @@ impl ActiveChecksHandler {
         let mode = if cert_mode {
             tup(&[
                 s("cert"),
-                dict(&[("cert_days", fixed_levels(&cert_warn, &cert_crit, DAY)?)]),
+                dict(&[("cert_days", self.days_levels(&cert_warn, &cert_crit).await?)]),
             ])
         } else {
             let mut u: Vec<(&str, String)> = vec![("uri", s(&uri))];
@@ -329,9 +356,16 @@ impl ActiveChecksHandler {
                     ("crit_if_found", "False"),
                     ("multiline", "False"),
                 ];
-                let mut d = vec![("regex", py_repr(e))];
-                d.extend(flags.iter().map(|(k, v)| (*k, v.to_string())));
-                u.push(("expect_regex", dict(&d)));
+                if self.plain_levels().await {
+                    // 2.3: (regex, case_insensitive, crit_if_found, multiline)
+                    let mut t = vec![py_repr(e)];
+                    t.extend(flags.iter().map(|(_, v)| v.to_string()));
+                    u.push(("expect_regex", tup(&t)));
+                } else {
+                    let mut d = vec![("regex", py_repr(e))];
+                    d.extend(flags.iter().map(|(k, v)| (*k, v.to_string())));
+                    u.push(("expect_regex", dict(&d)));
+                }
             }
             if let Some(e) = expect_response {
                 u.push(("expect_response", as_list(e)));
@@ -340,7 +374,7 @@ impl ActiveChecksHandler {
                 u.push(("timeout", int(t)?.to_string()));
             }
             if let (Some(w), Some(c)) = (a.on("response_time_warn"), a.on("response_time_crit")) {
-                u.push(("response_time", fixed_levels(w, c, 1.0)?));
+                u.push(("response_time", self.seconds_levels(w, c).await?));
             }
             if let Some(m) = method {
                 u.push(("method", s(&txt(m).to_uppercase())));
@@ -355,10 +389,7 @@ impl ActiveChecksHandler {
                 u.push(("extended_perfdata", "True".into()));
             }
             if let (Some(user), Some(pw)) = (a.on("auth_user"), a.on("auth_password")) {
-                u.push((
-                    "auth",
-                    dict(&[("user", py_repr(user)), ("password", explicit_password(pw))]),
-                ));
+                u.push(("auth", self.user_password("user", user, pw).await));
             }
             tup(&[s("url"), dict(&u)])
         };
@@ -430,7 +461,7 @@ impl ActiveChecksHandler {
             v.push(("ssl", "True".into()));
         }
         if let (Some(w), Some(c)) = (a.on("cert_days_warn"), a.on("cert_days_crit")) {
-            v.push(("cert_days", fixed_levels(w, c, DAY)?));
+            v.push(("cert_days", self.days_levels(w, c).await?));
         }
         if let Some(e) = expect {
             v.push(("expect", as_list(e)));
@@ -445,7 +476,7 @@ impl ActiveChecksHandler {
             v.push(("timeout", int(t)?.to_string()));
         }
         if let (Some(w), Some(c)) = (a.on("response_time_warn"), a.on("response_time_crit")) {
-            v.push(("response_time", fixed_levels(w, c, 1.0)?));
+            v.push(("response_time", self.seconds_levels(w, c).await?));
         }
 
         let rule_id = self
@@ -623,7 +654,7 @@ impl ActiveChecksHandler {
             v.push(("starttls", "True".into()));
         }
         if truthy(&starttls) || a.on("check_cert").is_some() {
-            v.push(("cert_days", fixed_levels(&warn, &crit, DAY)?));
+            v.push(("cert_days", self.days_levels(&warn, &crit).await?));
         }
         let rule_id = self
             .post_rule(
@@ -694,10 +725,7 @@ impl ActiveChecksHandler {
             ("response_time", self.levels(&warn, &crit, 0.001).await?),
         ];
         if let (Some(b), Some(p)) = (a.on("bind_dn"), a.on("password")) {
-            v.push((
-                "authentication",
-                dict(&[("bind_dn", py_repr(b)), ("password", explicit_password(p))]),
-            ));
+            v.push(("authentication", self.user_password("bind_dn", b, p).await));
         }
         if let Some(p) = a.on("port") {
             v.push(("port", int(p)?.to_string()));
@@ -741,10 +769,7 @@ impl ActiveChecksHandler {
             ("levels", self.levels(&warn, &crit, 1.0).await?),
         ];
         if let (Some(u), Some(p)) = (a.on("username"), a.on("password")) {
-            v.push((
-                "auth",
-                dict(&[("user", py_repr(u)), ("password", explicit_password(p))]),
-            ));
+            v.push(("auth", self.user_password("user", u, p).await));
         }
         if let Some(w) = a.on("workgroup") {
             v.push(("workgroup", py_repr(w)));

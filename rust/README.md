@@ -14,13 +14,16 @@ Script: `scripts/bench.py`. Median of 10 starts, 300 sequential `tools/call`.
 | Sequential throughput | 53 calls/s | 251 calls/s | 4.7x |
 | Peak memory (process tree) | 75 MB | 54 MB | 28 % less |
 | Install footprint | 75.5 MB of dependencies (31 packages) + a Python interpreter | one 11.1 MB binary | |
-| Source lines (src) | 16,941 | 14,657 | |
-| Tests | 464 pytest cases, 6,496 lines | 537 tests, 12,131 lines | |
+| Source lines (src) | 17,062 | 15,230 | |
+| Tests (offline, 7 Nov 2026) | 591 pytest cases (504 passed, 87 live tests skipped), 7,019 lines | 566 tests passed, 13,087 lines | |
+| Live sweep, 154 tools on a real CheckMK 2.3.0p52 / 2.5.0p18 | 270/270 on both | 270/270 on both | |
 | Tools offered | 154 | 154 (identical `tools.json`) | |
 
 Limits: a local fake server answers in microseconds, so these numbers show the server's own overhead, not
 what you will see against a real CheckMK, where the network and CheckMK dominate. One machine, one run.
-The Rust port is tested against the same fake CheckMK, never against a real instance. See `AUDIT.md`.
+Both servers are also run against real CheckMK 2.3.0p52 Raw and 2.5.0p18 Community sites (Docker) by
+`scripts/live_sweep.py`, and the Rust integration tests (`rust/tests/integration.rs`, 9/9) pass on both.
+See `AUDIT.md`.
 
 Rust port of the vibeMK CheckMK MCP server. Same 154 tools, same schemas
 (`rust/tools.json` is generated from the Python reference), same environment

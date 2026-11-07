@@ -327,3 +327,149 @@ async fn the_rules_guide_and_unknown_tools() {
         "❌ **Unknown tool**\n\nTool 'vibemk_nope' is not supported"
     );
 }
+
+const RUNNING: &str = "/cmk/check_mk/api/1.0/domain-types/activation_run/collections/running";
+
+/// Body of collections/running copied from CheckMK 2.3.0p52 (127.0.0.1:5080).
+fn running_body(title: &str, is_running: bool) -> Value {
+    json!({"id": "activation_run", "domainType": "activation_run", "value": [{
+        "domainType": "activation_run",
+        "id": "6389bbe2-d9a0-45e3-be4f-e0e137baef31",
+        "title": title,
+        "members": {},
+        "extensions": {"sites": ["cmk"], "is_running": is_running, "force_foreign_changes": true,
+                       "time_started": "2026-11-06T21:38:12.721958+00:00", "changes": []}
+    }]})
+}
+
+/// 2.3 accepts a second activate-changes while a run is in progress, then
+/// marks the site "Locked" and leaves the later changes pending: the POST
+/// must wait for the running run to finish.
+#[tokio::test]
+async fn activation_waits_for_the_run_already_in_progress() {
+    let (server, client) = common::fake_checkmk().await;
+    Mock::given(method("GET"))
+        .and(path(RUNNING))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(running_body("Activation status: In progress.", true)),
+        )
+        .up_to_n_times(2)
+        .expect(2)
+        .with_priority(1)
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path(RUNNING))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(running_body("Activation status: Complete.", false)),
+        )
+        .expect(1)
+        .with_priority(2)
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path(PENDING))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .insert_header("ETag", "\"etag-9\"")
+                .set_body_json(json!({"value": [{"id": "85822ffa-1673-4999-9e6b-7f66c35a75dd", "user_id": "cmkadmin", "action_name": "new-rule"}]})),
+        )
+        .mount(&server)
+        .await;
+    Mock::given(method("POST"))
+        .and(path(ACTIVATE))
+        .and(header("If-Match", "\"etag-9\""))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({"id": "d072208a"})))
+        .expect(1)
+        .mount(&server)
+        .await;
+    let r = ConfigurationHandler::new(client)
+        .handle("vibemk_activate_changes", &json!({}))
+        .await;
+    assert!(text(&r).contains("Activation ID: d072208a"), "{}", text(&r));
+    // The three GETs on collections/running all happened before the POST.
+    let reqs = server.received_requests().await.expect("recording");
+    let order: Vec<String> = reqs
+        .iter()
+        .map(|q| format!("{} {}", q.method, q.url.path()))
+        .collect();
+    let post_at = order
+        .iter()
+        .position(|o| o.starts_with("POST"))
+        .expect("a POST");
+    assert_eq!(
+        order[..post_at]
+            .iter()
+            .filter(|o| o.ends_with("/running"))
+            .count(),
+        3,
+        "{order:?}"
+    );
+}
+
+/// The activation a write tool runs on its own (activate_changes=true,
+/// set_process_thresholds) used to POST straight away and hit the same
+/// "Locked" refusal on 2.3: it must wait for the run in progress too.
+#[tokio::test]
+async fn write_tools_activation_also_waits_for_the_run_in_progress() {
+    let (server, client) = common::fake_checkmk().await;
+    Mock::given(method("GET"))
+        .and(path(RUNNING))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(running_body("Activation status: In progress.", true)),
+        )
+        .up_to_n_times(1)
+        .expect(1)
+        .with_priority(1)
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path(RUNNING))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .set_body_json(running_body("Activation status: Complete.", false)),
+        )
+        .expect(1)
+        .with_priority(2)
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .and(path(PENDING))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .insert_header("ETag", "\"etag-9\"")
+                .set_body_json(json!({"value": [{"id": "85822ffa-1673-4999-9e6b-7f66c35a75dd"}]})),
+        )
+        .mount(&server)
+        .await;
+    Mock::given(method("POST"))
+        .and(path(ACTIVATE))
+        .respond_with(ResponseTemplate::new(200).set_body_json(json!({"id": "act-3"})))
+        .expect(1)
+        .mount(&server)
+        .await;
+    let line = vibemk::handlers::base::Base::new(client)
+        .run_activation()
+        .await;
+    assert!(line.starts_with("✅ Activation started"), "{line}");
+    let reqs = server.received_requests().await.expect("recording");
+    let order: Vec<String> = reqs
+        .iter()
+        .map(|q| format!("{} {}", q.method, q.url.path()))
+        .collect();
+    let post_at = order
+        .iter()
+        .position(|o| o.starts_with("POST"))
+        .expect("a POST");
+    assert_eq!(
+        order[..post_at]
+            .iter()
+            .filter(|o| o.ends_with("/running"))
+            .count(),
+        2,
+        "{order:?}"
+    );
+}

@@ -110,19 +110,72 @@ Aucun test rouge dans la suite lancée en A6. Restent des décisions ou preuves,
 - hosts.py:733 : un `CheckMKAPIError` hors 412/428 est relancé et rattrapé par `handle()` (message d'erreur différent, non couvert par un test).
 - E10b / flaky : un échec isolé de `test_handlers_downtimes_times::test_an_iso_string_with_z_is_understood` a été vu une fois par A5c, non reproduit (464 passés ici).
 
-## Test réel : les 154 outils contre CheckMK 2.3 et 2.5 (06/11/2026)
+## Test réel : les 154 outils contre CheckMK 2.3 et 2.5 (06-07/11/2026)
 
-Banc : `scripts/live_sweep.py <label> <commande du serveur>`. Il appelle chacun des 154 outils sur un vrai site (Docker : 2.3.0p52 Raw et 2.5.0p18 Community), puis supprime tout ce qu'il a créé. Résultats bruts : `scripts/live_sweep_{py,rs}{23,25}.json`.
+Étiquettes : **MESURÉ** = lu dans un fichier JSON ou une sortie de ce run ; **DÉDUIT** = conclusion tirée d'une mesure.
+
+Banc : `scripts/live_sweep.py <label> <commande du serveur>`. Il appelle chacun des 154 outils sur un vrai site (Docker : 2.3.0p52 Raw sur 5080, 2.5.0p18 Community sur 5081), relit 69 des écritures, puis supprime ce qu'il a créé et vérifie qu'il ne reste ni objet de test ni règle qui nomme un hôte de test. Résultats bruts : `scripts/live_sweep_{py,rs}{23,25}.json`.
+
+### Sweeps (MESURÉ, champs `passed`, `steps`, `called`, `listed`, `verified` des JSON, 07/11 00:23-00:31)
 
 | | 2.3.0p52 | 2.5.0p18 |
 |---|---|---|
-| Python | 173/174 étapes, 154/154 outils appelés | 174/174 |
-| Rust | 173/174, 154/154 | 174/174 |
+| Python | 270/270 | 270/270 |
+| Rust | 270/270 | 270/270 |
 
-Le seul échec est le même en Python et en Rust : `acknowledge_service_problem` sur 2.3. CheckMK répond 422 « has no problem » tant que la PING de l'hôte de test n'a pas encore été vérifiée (`has_been_checked: 0`). Rejoué à la main une fois la PING en CRIT : accepté sur 2.3 et 2.5. Cela dépend du moment où l'appel arrive, pas de vibeMK.
+Dans les quatre JSON : 154 outils listés, 154 appelés, 0 non appelé, 69 étapes vérifiées. Les quatre ont tourné avec le code final (activation corrigée sur les deux chemins, banc corrigé), un seul sweep à la fois par instance, sur des sites vérifiés propres avant.
 
-Bugs trouvés par ce banc et corrigés en Python puis en Rust (détail dans `CHANGELOG.md`) : `add_comment`, `delete_comment` (by_query), `create_cluster_host`, `modify_downtime`, `start_bulk_discovery` (303 sur 2.5), `get_bulk_discovery_status` (2.3), `search_metrics`, `move_host`, `move_folder`, `rename_host`, `activate_changes` (412 après un renommage), `logout_site` (2.5), `create_host_hostgroup_rule`, `create_rule` et `update_rule` (tuples), `create_aux_tag`, et les checks actifs LDAP et SMB (2.3).
+Le passage à 270 étapes (257 avant) vient du nettoyage ajouté : 10 `delete_active_check`, 2 `delete_rule` (règles interface et mémoire) et la vérification finale « no rule names a test host any more ».
 
-Cas signalé par Tom : `update_rule` sur une règle filtrée par label, et `get_ruleset`. Sur les deux versions, la valeur est bien modifiée, les `host_label_groups` sont conservés, et `get_ruleset` affiche « Labels: 1 conditions », pas « All hosts ».
+### Tests live (MESURÉ, sorties pytest et cargo du 07/11, code final)
+
+Variables : `LIVE_SMOKE_TEST`, `LIVE_WRITE_TEST`, `INTEGRATION_TESTS` à true, hôte `vmk-live` créé pour le run puis supprimé (pending 0 après).
+
+| Fichier | 2.3 (5080) | 2.5 (5081) |
+|---|---|---|
+| `tests/test_live_smoke.py` | 58 passés, 0 échec, 1 ignoré | 58 passés, 0 échec, 1 ignoré |
+| `tests/test_live_writes.py` | 18 passés, 0 échec, 1 ignoré | 18 passés, 0 échec, 1 ignoré |
+| `tests/test_live_findings.py` | 10 passés | 10 passés |
+| `tests/test_integration.py` | 9 passés | 9 passés |
+| `rust/tests/smoke.rs` | 1 passé | 1 passé |
+| `rust/tests/integration.rs` | 9 passés, 0 échec | 9 passés, 0 échec |
+
+Ignorés : smoke « nothing is failing on this instance right now » (aucun service en échec à détecter) ; writes « needs two open vibemk-probe events » (pas d'événements de la console sur l'hôte).
+Le smoke demande un hôte avec agent (service `Check_MK`) : avec `vmk-live` en `no-agent`, `get_service_status` échoue sur les deux versions (MESURÉ, 1 échec chacun), ce qui vient de l'hôte de test et non de vibeMK.
+
+Avant les correctifs de ce run, sur 2.3 : writes 11 passés / 7 échecs (6 créations de check actif refusées en 400 car vibeMK envoyait les formes de 2.5, plus la bakery), et `integration.rs` 8/1 sur les deux versions.
+
+### Changements en attente après l'activation (2.3)
+
+Cause (MESURÉ, rejeu sur 5080) : sur 2.3, un `activate-changes` envoyé pendant qu'une autre activation tourne reçoit HTTP 200 et un nouvel id, mais le site le refuse. Le run se termine en 0,4 s, titre « Activation status: Complete. », avec l'état par site `warning / Locked` (« cmkadmin is currently activating changes on this site »), visible seulement dans le fichier d'état `site_cmk.mk` du conteneur. Dans le sweep, l'activation en cours vient de `set_process_thresholds` avec `run_discovery` (~6 s), l'appel explicite arrivant ~3,9 s après. Les 2 changements créés après le début du run restaient donc en attente, ce qui était le symptôme de py23.
+
+Correctif, sur les deux chemins d'activation : avant de lire les changements en attente, vibeMK attend qu'aucun run de `collections/running` n'ait `is_running == true` (60 s au plus ; une erreur de lecture ne bloque pas).
+- `vibemk_activate_changes` : Python `ConfigurationHandler._wait_for_running_activation`, Rust `Base::wait_for_running_activation`.
+- Activation lancée par un outil d'écriture (`activate_changes=true`, `set_process_thresholds`) : Python `BaseHandler._run_activation`, Rust `Base::run_activation`.
+
+Tests : `tests/test_handlers_configuration.py` (4) et `rust/tests/configuration.rs` (`activation_waits_for_the_run_already_in_progress`, `write_tools_activation_also_waits_for_the_run_in_progress`), sur les corps réels de 2.3.0p52. Mutation (MESURÉ) : sans l'attente dans `_run_activation` / `run_activation`, le test du chemin d'écriture est rouge (1 échec en Python, 1 sur 14 en Rust), vert avec.
+
+### Défauts du banc trouvés et corrigés (MESURÉ)
+
+- `$PROC_RULE` prenait la première règle de `inventory_processes_rules`, pas celle du sweep. Sur 2.3 le ruleset est vide, c'était donc la bonne. Sur 2.5, qui livre des règles de processus par défaut, chaque sweep supprimait la règle n° 0 de CheckMK et laissait la sienne : le journal d'audit de 5081 compte 5 suppressions « Deleted rule #0 » dans ce ruleset. Il reste 24 règles par défaut sur 5081 ; **le site de test 5081 a perdu 5 règles de processus par défaut** (sans effet sur vibeMK, à recréer si le site sert à autre chose). Le résolveur prend maintenant la règle qui nomme l'hôte du sweep.
+- Le sweep laissait 12 règles sur `vmk-h1` (10 checks actifs, interface, mémoire) en annonçant « every test object is gone » : supprimer un hôte ne supprime pas les règles qui le nomment. Elles sont maintenant supprimées par les outils de vibeMK, et la dernière étape le vérifie.
+- `rust/tests/integration.rs::service_discovery_workflow` appelait `vibemk_get_all_services`, un outil qui n'existe pas (le bon nom est `vibemk_get_checkmk_services`) : la réponse n'avait pas de `content`. Le test vérifie aussi `isError` maintenant. 9/9 sur les deux versions.
+- `test_the_agent_bakery_bakes_or_says_why_it_cannot` reconnaissait l'édition gratuite par `.community` (2.5) seulement ; 2.3 répond `2.3.0p52.cre` (MESURÉ sur `/version`). Corrigé : sur 2.3 le test vérifie que l'outil explique qu'il n'y a pas de bakery.
+
+### Échec possible sur un site neuf
+
+`search_metrics` (`vmk-h1`/PING/rta), HTTP 400 « The requested graph does not exist » : côté CheckMK. Preuve : le même corps envoyé directement à `metric/actions/get/invoke`, sans vibeMK, donne 200 quand les RRD de l'hôte existent et 400 sur 40 appels en 162 s quand ils sont mis de côté ; PING était CRITICAL sans que `PING_*.rrd` apparaisse. Le premier sweep après la création du site tombe dessus, les suivants non (DÉDUIT de py25 le 06/11, 256/257, puis 270/270 le 07/11).
+
+### Downtimes
+
+MESURÉ sur 5081 : `modify_downtime` renvoie l'erreur « Downtime not modified » (7,7 s) et l'heure de fin ne bouge pas. Le cœur Nagios des éditions Raw et Community n'a pas de commande `MODIFY_*_DOWNTIME`, alors que l'API répond 204. Ce n'est pas un défaut de vibeMK.
+
+### Hors live (MESURÉ, 07/11)
+
+`pytest -q` : 504 passés, 87 ignorés, 0 échec. Les 87 ignorés sont tous des tests live désactivés sans leurs variables (59 smoke, 19 writes, 9 integration), lancés ci-dessus sur les deux sites. `cargo test --offline` : 566 passés, 0 échec. black, isort, ruff, mypy, `cargo fmt --check` et clippy `-D warnings` : verts.
+
+### Cas signalé par Tom (rappel du run précédent, non rejoué dans ce run)
+
+`update_rule` sur une règle filtrée par label, et `get_ruleset` : la valeur est modifiée, les `host_label_groups` sont conservés, et `get_ruleset` affiche « Labels: 1 conditions ».
 
 Écarts Python/Rust connus (non couverts par un test) : Rust reconnaît un littéral Python dans `value_raw` avec son propre analyseur. Comparé à `ast.literal_eval` sur environ 90 cas, il ne montre aucun écart, mais trois raccourcis sont commentés dans `rust/src/handlers/rules.rs`.

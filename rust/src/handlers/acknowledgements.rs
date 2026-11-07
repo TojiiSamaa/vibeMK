@@ -8,13 +8,14 @@ use std::sync::{Arc, Mutex};
 use async_trait::async_trait;
 use serde_json::{json, Value};
 
-use crate::client::{ApiError, CheckMkClient};
+use crate::client::{ApiError, ApiErrorKind, CheckMkClient};
 use crate::handlers::base::{py_repr, Base, Handler};
-use crate::paths::path_segment;
 
 const ACKNOWLEDGEMENT_COMMENTS: &str = "domain-types/comment/collections/all";
 /// Livestatus comments.entry_type: 1 user, 2 downtime, 3 flapping, 4 acknowledgement.
 const ACKNOWLEDGEMENT_ENTRY_TYPE: &str = "4";
+const REMOVE_ACKNOWLEDGEMENT: &str = "domain-types/acknowledge/actions/delete/invoke";
+const NO_REMOVE_ENDPOINT: &str = "❌ This CheckMK version has no REST endpoint to remove an acknowledgement\n\nRemove it in the GUI; a non-sticky acknowledgement also clears itself when the state changes.";
 
 pub struct AcknowledgementHandler {
     base: Base,
@@ -50,18 +51,6 @@ fn arg<'a>(args: &'a Value, key: &str) -> Option<&'a Value> {
 
 fn text(t: String) -> Vec<Value> {
     vec![json!({"type": "text", "text": t})]
-}
-
-/// Python `int(x)`; None when it would raise.
-fn py_int(v: &Value) -> Option<i64> {
-    match v {
-        Value::Number(n) => n
-            .as_i64()
-            .or_else(|| n.as_f64().filter(|f| f.is_finite()).map(|f| f as i64)),
-        Value::String(s) => s.trim().parse().ok(),
-        Value::Bool(b) => Some(i64::from(*b)),
-        _ => None,
-    }
 }
 
 /// Query asking CheckMK for acknowledgements only (exact, not guessed from the comment text).
@@ -186,21 +175,23 @@ impl AcknowledgementHandler {
         )))
     }
 
-    /// Delete one comment through the action endpoint; an id that is not an integer is not sent.
-    async fn delete_comment(&self, comment_id: Option<&Value>) -> Result<bool, ApiError> {
-        let Some(id) = comment_id.and_then(py_int) else {
-            return Ok(false);
-        };
-        let body = json!({"delete_type": "by_id", "comment_id": id, "site_id": self.base.client.config.site});
+    /// Remove the acknowledgement of one host or service. Deleting its comment leaves the problem
+    /// acknowledged (measured on 2.3 and 2.5); CheckMK 2.3 lacks this action and answers 404.
+    async fn remove_acknowledgement_of(
+        &self,
+        host: &str,
+        service: Option<&str>,
+    ) -> Result<(), ApiError> {
+        let kind = if service.is_some() { "service" } else { "host" };
+        let mut body = json!({"acknowledge_type": kind, "host_name": host});
+        if let Some(s) = service {
+            body["service_description"] = json!(s);
+        }
         self.base
             .client
-            .post(
-                "domain-types/comment/actions/delete/invoke",
-                Some(&body),
-                &[],
-            )
+            .post(REMOVE_ACKNOWLEDGEMENT, Some(&body), &[])
             .await?;
-        Ok(true)
+        Ok(())
     }
 
     async fn list_acknowledgements(&self) -> Result<Vec<Value>, String> {
@@ -251,101 +242,78 @@ impl AcknowledgementHandler {
     }
 
     async fn remove(&self, args: &Value) -> R {
-        let client = &self.base.client;
-        if let Some(id) = arg(args, "acknowledgement_id") {
-            let id = py_str(id);
-            client
-                .delete(
-                    &format!("objects/comment/{}", path_segment(&id)?),
-                    None,
-                    &[],
-                )
+        let id = arg(args, "acknowledgement_id").map(py_str);
+        let pattern = arg(args, "comment_pattern")
+            .filter(|_| args.get("delete_all_matching").is_some_and(truthy))
+            .map(|p| py_str(p).to_lowercase());
+        let mut targets: Vec<(String, Option<String>)> = if id.is_some() || pattern.is_some() {
+            // Ids and texts belong to the acknowledgement comments; each names the host or service to clear.
+            let list = self
+                .base
+                .client
+                .get(ACKNOWLEDGEMENT_COMMENTS, Some(&ack_query()), &[])
                 .await?;
-            return Ok(text(format!(
-                "✅ Successfully removed acknowledgement #{id}"
-            )));
-        }
-
-        let empty = vec![];
-        if let (Some(pattern), true) = (
-            arg(args, "comment_pattern"),
-            args.get("delete_all_matching").is_some_and(truthy),
-        ) {
-            let pattern = py_str(pattern);
-            let list = client.get(ACKNOWLEDGEMENT_COMMENTS, None, &[]).await?;
-            let mut deleted = 0;
-            for comment in list
+            let empty = vec![];
+            let found: Vec<_> = list
                 .data
                 .get("value")
                 .and_then(Value::as_array)
                 .unwrap_or(&empty)
-            {
-                let body = get_or(
-                    &comment
-                        .get("extensions")
-                        .cloned()
-                        .unwrap_or_else(|| json!({})),
-                    "comment",
-                    "",
-                )
-                .to_lowercase();
-                if body.contains(&pattern.to_lowercase())
-                    && (body.contains("acknowledge") || body.contains("ack"))
-                    && self.delete_comment(comment.get("id")).await?
-                {
-                    deleted += 1;
-                }
+                .iter()
+                .filter(|c| match (&id, &pattern) {
+                    (Some(id), _) => c.get("id").map(py_str).as_ref() == Some(id),
+                    (None, Some(p)) => get_or(&c["extensions"], "comment", "")
+                        .to_lowercase()
+                        .contains(p.as_str()),
+                    _ => false,
+                })
+                .map(|c| {
+                    let ext = &c["extensions"];
+                    let service = ext
+                        .get("is_service")
+                        .is_some_and(truthy)
+                        .then(|| get_or(ext, "service_description", ""));
+                    (get_or(ext, "host_name", ""), service)
+                })
+                .collect();
+            if found.is_empty() {
+                let label = id.as_ref().map_or_else(
+                    || format!("matching pattern '{}'", py_str(&args["comment_pattern"])),
+                    |id| format!("#{id}"),
+                );
+                return Ok(self
+                    .base
+                    .error_text(&format!("❌ No acknowledgements found {label}")));
             }
-            return Ok(if deleted > 0 {
-                text(format!("✅ Successfully removed {deleted} acknowledgements matching pattern '{pattern}'"))
-            } else {
-                self.base.error_text(&format!(
-                    "❌ No acknowledgements found matching pattern '{pattern}'"
-                ))
-            });
-        }
-
-        let Some(host) = arg(args, "host_name") else {
+            found
+        } else if let Some(host) = arg(args, "host_name") {
+            vec![(py_str(host), arg(args, "service_description").map(py_str))]
+        } else {
             return Ok(self.base.error_text(
                 "❌ Error: acknowledgement_id, host_name, or comment_pattern is required",
             ));
         };
-        let desc = arg(args, "service_description");
-        let list = client
-            .get(ACKNOWLEDGEMENT_COMMENTS, Some(&ack_query()), &[])
-            .await?;
-        let mut deleted = 0;
-        for comment in list
-            .data
-            .get("value")
-            .and_then(Value::as_array)
-            .unwrap_or(&empty)
-        {
-            let ext = comment
-                .get("extensions")
-                .cloned()
-                .unwrap_or_else(|| json!({}));
-            let is_service = ext.get("is_service").is_some_and(truthy);
-            // A service_description matches service acknowledgements only, none matches host ones only.
-            if ext.get("host_name") == Some(host)
-                && desc.is_some() == is_service
-                && self.delete_comment(comment.get("id")).await?
+        targets.sort();
+        targets.dedup();
+        for (host, service) in &targets {
+            match self
+                .remove_acknowledgement_of(host, service.as_deref())
+                .await
             {
-                deleted += 1;
+                Err(e) if e.kind == ApiErrorKind::NotFound => {
+                    return Ok(self.base.error_text(NO_REMOVE_ENDPOINT))
+                }
+                r => r?,
             }
         }
-        let target = desc.map_or_else(
-            || py_str(host),
-            |d| format!("{}/{}", py_str(host), py_str(d)),
-        );
-        Ok(if deleted > 0 {
-            text(format!(
-                "✅ Successfully removed {deleted} acknowledgements for {target}"
-            ))
-        } else {
-            self.base
-                .error_text(&format!("❌ No acknowledgements found for {target}"))
-        })
+        let names: Vec<String> = targets
+            .iter()
+            .map(|(h, s)| s.as_ref().map_or_else(|| h.clone(), |s| format!("{h}/{s}")))
+            .collect();
+        Ok(text(format!(
+            "✅ Acknowledgement removed for {}",
+            names.join(", ")
+        )))
     }
 }
 

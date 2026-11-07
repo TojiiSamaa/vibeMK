@@ -426,12 +426,32 @@ impl DiscoveryHandler {
             "exception" => "❌",
             _ => "❓",
         };
+        // 2.3 and 2.5 send state, active and logs; no start or end time.
+        let lines = |k: &str| {
+            ext.pointer(&format!("/logs/{k}"))
+                .and_then(Value::as_array)
+                .cloned()
+                .unwrap_or_default()
+        };
+        let progress = lines("progress");
+        let mut log_text = String::new();
+        for l in lines("result")
+            .iter()
+            .chain(&progress[progress.len().saturating_sub(5)..])
+        {
+            log_text.push_str(&format!("• {}\n", pystr(l)));
+        }
+        if !log_text.is_empty() {
+            log_text.insert(0, '\n');
+        }
+        let active = if ext.get("active").is_some_and(truthy) {
+            "yes"
+        } else {
+            "no"
+        };
         text_block(format!(
-            "{emoji} **Discovery Background Job**\n\nHost: **{host_name}**\nState: {}\nStarted: {}\nFinished: {}\nDuration: {}\n\n💡 Use 'get_discovery_status' to see discovery results.",
+            "{emoji} **Discovery Background Job**\n\nHost: **{host_name}**\nState: {}\nActive: {active}\n{log_text}\n💡 Use 'get_discovery_status' to see discovery results.",
             job_state.to_uppercase(),
-            field("started", "Unknown"),
-            field("finished", "Not finished"),
-            field("duration", "Unknown"),
         ))
     }
 }

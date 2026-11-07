@@ -14,17 +14,21 @@ Script: `scripts/bench.py`. Median of 10 starts, 300 sequential `tools/call`.
 | Sequential throughput | 53 calls/s | 251 calls/s | 4.7x |
 | Peak memory (process tree) | 75 MB | 54 MB | 28 % less |
 | Install footprint | 75.5 MB of dependencies (31 packages) + a Python interpreter | one 11.1 MB binary | |
-| Source lines (src) | 16,941 | 14,657 | |
-| Tests | 474 pytest cases, 6,601 lines | 559 tests, 12,690 lines | |
-| Live sweep, 154 tools on a real CheckMK 2.3.0p52 / 2.5.0p18 | 173/174, 174/174 steps | 173/174, 174/174 steps | same result |
+| Source lines (src) | 17,062 | 15,230 | |
+| Tests (offline, 7 Nov 2026) | 504 pytest passed, 87 skipped (the live tests) | 566 cargo tests passed | |
+| Live sweep, 154 tools on a real CheckMK 2.3.0p52 / 2.5.0p18 (steps passed) | 270/270 on 2.3, 270/270 on 2.5 | 270/270 on 2.3, 270/270 on 2.5 | all 154 tools called in each run |
+| Live tests on both sites (smoke, writes, findings, integration) | 58 + 18 + 10 + 9 passed, 0 failed | smoke 1 + integration 9 passed, 0 failed | |
 | Tools offered | 154 | 154 (identical `tools.json`) | |
 
 Limits: a local fake server answers in microseconds, so these numbers show the server's own overhead, not
 what you will see against a real CheckMK, where the network and CheckMK dominate. One machine, one run.
 Both servers are also run against real CheckMK sites (2.3.0p52 Raw and 2.5.0p18 Community, Docker) by
-`scripts/live_sweep.py`, which calls every one of the 154 tools and cleans up after itself. The one step
-that can fail, `acknowledge_service_problem` on 2.3, depends on timing: CheckMK refuses the acknowledgement
-while the service has not been checked yet. Results: `scripts/live_sweep_{py,rs}{23,25}.json`. See `AUDIT.md`.
+`scripts/live_sweep.py`, which calls every one of the 154 tools, reads back 69 of the writes, and checks at
+the end that no test object and no rule naming a test host is left. Measured on 7 Nov 2026 (read from
+`scripts/live_sweep_{py,rs}{23,25}.json`): 270/270 steps for Python and Rust on both versions. One step can
+still fail on a fresh site: `search_metrics` gets CheckMK's 400 "The requested graph does not exist" until
+CheckMK has written the host's first RRD files (the same request sent without vibeMK gives the same 400).
+Details in `AUDIT.md`.
 
 **CheckMK Monitoring via LLM - Professional MCP Server**
 
