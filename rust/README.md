@@ -14,8 +14,8 @@ Script: `scripts/bench.py`. Median of 10 starts, 300 sequential `tools/call`.
 | Sequential throughput | 53 calls/s | 251 calls/s | 4.7x |
 | Peak memory (process tree) | 75 MB | 54 MB | 28 % less |
 | Install footprint | 75.5 MB of dependencies (31 packages) + a Python interpreter | one 11.1 MB binary | |
-| Source lines (src) | 17,062 | 15,230 | |
-| Tests (offline, 7 Nov 2026) | 591 pytest cases (504 passed, 87 live tests skipped), 7,019 lines | 566 tests passed, 13,087 lines | |
+| Source lines (src) | 17,126 | 15,312 | |
+| Tests (offline, 7 Nov 2026) | 603 pytest cases (516 passed, 87 live tests skipped), 7,162 lines | 574 tests passed, 13,281 lines | |
 | Live sweep, 154 tools on a real CheckMK 2.3.0p52 / 2.5.0p18 | 270/270 on both | 270/270 on both | |
 | Tools offered | 154 | 154 (identical `tools.json`) | |
 
@@ -119,8 +119,12 @@ the original Python behaviour:
 - E8: the `*` ETag fallback is logged as a warning.
 - E9a: an activation is reported as started, not finished.
 - E10a: `time_ago` of a future date is 0.
+- S2: an automatic activation never activates other users' changes, and says so when they block it.
+- E9c: the 422 "no changes to activate" is an info; the 401/403 for foreign changes is explained.
+- E5: a DELETE retried after a 5xx that gets 404 counts as deleted.
+- E10b: downtime times are shown in local time.
 
-Decisions left open (no test): S2 and E5. Details in `AUDIT.md`.
+No audit finding is left open. Details in `AUDIT.md`.
 
 ## Regenerating `tools.json`
 

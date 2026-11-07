@@ -9,7 +9,7 @@ new run id), yet the site refuses it ("Locked") and the run ends at once as
 
 import pytest
 
-from vibemk.api.exceptions import CheckMKError
+from vibemk.api.exceptions import CheckMKAPIError, CheckMKAuthenticationError, CheckMKError, CheckMKPermissionError
 from vibemk.handlers.configuration import ConfigurationHandler
 
 PENDING = "domain-types/activation_run/collections/pending_changes"
@@ -155,3 +155,88 @@ def test_write_tools_activation_also_waits_for_the_run_in_progress(mock_checkmk_
 
     assert line.startswith("✅ Activation started")
     assert calls == [("GET", RUNNING), ("GET", RUNNING), ("GET", PENDING), ("POST", ACTIVATE)]
+
+
+# Bodies answered by the live sites on 7 Nov 2026 (scripts/live_foreign_changes.py):
+# a second admin's host left pending, then activate-changes without force.
+FOREIGN = "There are changes from other users and foreign changes are not allowed in this API call."
+FOREIGN_23 = CheckMKAuthenticationError(
+    "Authentication failed: UNAUTHORIZED",
+    401,
+    {"title": "The operation has failed.", "status": 401, "detail": FOREIGN},
+)
+FOREIGN_25 = CheckMKPermissionError(
+    "Permission denied: FORBIDDEN", 403, {"title": "Forbidden", "status": 403, "detail": FOREIGN}
+)
+NOTHING = CheckMKAPIError(
+    "HTTP 422: UNPROCESSABLE ENTITY",
+    422,
+    {"title": "The operation has failed.", "status": 422, "detail": "Currently there are no changes to activate."},
+)
+
+
+def idle_get(endpoint, *a, **k):
+    return ok({"value": []}) if endpoint == RUNNING else pending_ok()
+
+
+@pytest.mark.parametrize("refusal", [FOREIGN_23, FOREIGN_25])
+def test_write_tools_never_activate_other_users_changes(mock_checkmk_client, refusal):
+    """S2: a write tool's own activation used to send force_foreign_changes=True,
+    publishing whatever another admin had left half done."""
+    h = ConfigurationHandler(mock_checkmk_client)
+    mock_checkmk_client.config.never_activate_changes = False
+    mock_checkmk_client.get.side_effect = idle_get
+    mock_checkmk_client.post.side_effect = refusal
+
+    line = h._run_activation()
+
+    assert mock_checkmk_client.post.call_args.kwargs["data"]["force_foreign_changes"] is False
+    assert "other users have pending changes" in line
+    assert "force_foreign_changes=true" in line
+    assert "Authentication" not in line
+    assert "Permission" not in line
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("refusal", [FOREIGN_23, FOREIGN_25])
+async def test_activate_changes_explains_a_refusal_for_foreign_changes(handler, mock_checkmk_client, refusal):
+    mock_checkmk_client.get.side_effect = idle_get
+    mock_checkmk_client.post.side_effect = refusal
+
+    result = await handler.handle("vibemk_activate_changes", {})
+
+    assert "other users have pending changes" in result[0]["text"]
+    assert "Authentication failed" not in result[0]["text"]
+    assert result[-1]["type"] == handler.ERROR_BLOCK
+
+
+@pytest.mark.asyncio
+async def test_activate_changes_reads_the_422_as_nothing_to_activate(handler, mock_checkmk_client):
+    """E9c: the pending list was not empty when read, the site had nothing left when posted."""
+    mock_checkmk_client.get.side_effect = idle_get
+    mock_checkmk_client.post.side_effect = NOTHING
+
+    result = await handler.handle("vibemk_activate_changes", {})
+
+    assert result[0]["text"].startswith("ℹ️ **No Pending Changes**")
+    assert all(block.get("type") != handler.ERROR_BLOCK for block in result)
+
+
+def test_write_tools_read_the_422_as_nothing_to_activate(mock_checkmk_client):
+    h = ConfigurationHandler(mock_checkmk_client)
+    mock_checkmk_client.config.never_activate_changes = False
+    mock_checkmk_client.get.side_effect = idle_get
+    mock_checkmk_client.post.side_effect = NOTHING
+
+    assert h._run_activation() == "ℹ️ No pending changes to activate."
+
+
+def test_an_ordinary_401_is_still_a_failure(mock_checkmk_client):
+    h = ConfigurationHandler(mock_checkmk_client)
+    mock_checkmk_client.config.never_activate_changes = False
+    mock_checkmk_client.get.side_effect = idle_get
+    mock_checkmk_client.post.side_effect = CheckMKAuthenticationError(
+        "Authentication failed: UNAUTHORIZED", 401, {"detail": "Wrong credentials"}
+    )
+
+    assert h._run_activation().startswith("⚠️ Activation failed")

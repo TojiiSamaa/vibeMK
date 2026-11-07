@@ -148,3 +148,19 @@ def test_e6_update_host_412_gives_the_concurrency_advice():
     client.put.side_effect = CheckMKAPIError("HTTP 412: Precondition Failed", 412, {})
     out = asyncio.run(HostHandler(client)._update_host({"host_name": "h", "attributes": {"alias": "a"}}))
     assert "Concurrent modification" in out[0]["text"]
+
+
+def test_update_host_other_api_errors_are_not_called_concurrency():
+    """hosts.py: only 412/428 mean "modified by another process"; a 400 is re-raised
+    and reported by handle() with CheckMK's own explanation."""
+    client = MagicMock()
+    client.get.return_value = {"success": True, "data": {}, "headers": {"ETag": "e"}}
+    client.put.side_effect = CheckMKAPIError(
+        "HTTP 400: Bad Request", 400, {"title": "Bad Request", "detail": "Unknown attribute: 'colour'"}
+    )
+    handler = HostHandler(client)
+    out = asyncio.run(handler.handle("vibemk_update_host", {"host_name": "h", "attributes": {"colour": "red"}}))
+    text = out[0]["text"]
+    assert "Concurrent modification" not in text
+    assert "Unknown attribute: 'colour'" in text
+    assert out[-1]["type"] == handler.ERROR_BLOCK

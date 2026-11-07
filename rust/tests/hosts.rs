@@ -455,6 +455,31 @@ async fn update_host_412_gives_the_concurrency_advice() {
     assert_eq!(r["content"][0]["text"], "❌ **Concurrent modification detected**\n\nHost 'web1' was modified by another process. Please re-read it and retry the operation.");
 }
 
+/// Only 412/428 mean "modified by another process"; a 400 is reported with CheckMK's own detail.
+#[tokio::test]
+async fn update_host_other_api_errors_are_not_called_concurrency() {
+    let (s, c, _h) = handler().await;
+    on(&s, "GET", "objects/host_config/web1", 200, CONFIG()).await;
+    on(
+        &s,
+        "PUT",
+        "objects/host_config/web1",
+        400,
+        json!({"title": "Bad Request", "detail": "Unknown attribute: 'colour'"}),
+    )
+    .await;
+    let r = call(
+        c,
+        "vibemk_update_host",
+        json!({"host_name": "web1", "attributes": {"colour": "red"}}),
+    )
+    .await;
+    assert_eq!(r["isError"], true);
+    let text = r["content"][0]["text"].as_str().unwrap();
+    assert!(!text.contains("Concurrent modification"), "{text}");
+    assert!(text.contains("Unknown attribute: 'colour'"), "{text}");
+}
+
 #[tokio::test]
 async fn bulk_create_maps_root_folder_and_lists_hosts() {
     let (s, _c, h) = handler().await;

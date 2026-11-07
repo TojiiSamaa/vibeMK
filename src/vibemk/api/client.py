@@ -307,6 +307,13 @@ class CheckMKClient:
                 endpoint, method, data, params, custom_headers, retry_count + 1, use_api_prefix, follow_redirects
             )
 
+        # E5: a DELETE is only replayed after a 5xx/429, and a 5xx does not say
+        # whether the first attempt went through. A 404 on the replay means the
+        # object is gone, which is what was asked: the delete succeeded.
+        if error.code == 404 and retry_count > 0 and method.upper() == "DELETE":
+            logger.warning("DELETE %s: 404 on the retry, the first attempt had deleted it", endpoint)
+            return self._result(204, {}, "", {})
+
         # Map HTTP status codes to custom exceptions
         if error.code == 401:
             raise CheckMKAuthenticationError(f"Authentication failed: {error.reason}", error.code, error_data)

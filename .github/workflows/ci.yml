@@ -89,6 +89,37 @@ jobs:
           coverage report --format=markdown >> "$GITHUB_STEP_SUMMARY"
           coverage report
 
+  test-os:
+    # P3 (AUDIT.md): the suite also runs on Windows and macOS. A separate job
+    # so the required "test (3.x)" checks keep their names.
+    name: test-os
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ env.DEFAULT_PYTHON }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - run: pip install -e ".[dev]"
+
+      - name: Tests
+        run: python -m pytest -q
+        env:
+          CI: "true"
+          PYTHONUTF8: "1"
+          CHECKMK_SERVER_URL: http://localhost:8080
+          CHECKMK_SITE: test
+          CHECKMK_USERNAME: automation
+          CHECKMK_PASSWORD: test-password
+
   package:
     name: package
     runs-on: ubuntu-latest

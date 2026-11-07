@@ -34,7 +34,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 552,
+   "ms": 538,
    "placeholders": [],
    "text": "✅ **CheckMK Connection Successful**\n\n🌐 Server: http://127.0.0.1:5080\n🏢 Site: cmk\n👤 User: cmkadmin\n🔒 SSL Verify: True\n🔗 API Base URL: http://127.0.0.1:5080/cmk/check_mk/api/1.0\n📊 Version: 2.3.0p52.cre\n📦 Edition: cre"
   },
@@ -58,7 +58,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 526,
+   "ms": 516,
    "placeholders": [],
    "text": "✅ **Direct URL Test Successful**\n\nURL: http://127.0.0.1:5080/cmk/check_mk/api/1.0/version\nStatus: 200\nResponse: {\n  \"site\": \"cmk\",\n  \"group\": \"\",\n  \"rest_api\": {\n    \"revision\": \"0\"\n  },\n  \"versions\": {\n    \"apache\": [\n      2,\n      4,\n      52\n    ],\n    \"checkmk\": \"2.3.0p52.cre\",\n    \"python\": \"3.12.13 (main, Aug 14 2026, 08:30:27) [GCC 14.2.0]\",\n    \"mod_wsgi\": [\n      4,\n      9,\n      4\n    ],\n    \"wsgi\": [\n      1,\n      0\n    ]\n  },\n  \"edition\": \"cre\",\n  \"demo\": false\n}"
   },
@@ -69,7 +69,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 4508,
+   "ms": 4021,
    "placeholders": [],
    "text": "🧪 **API Endpoint Test Results**\n\n✅ version - Version info (HTTP 200)\n✅ domain-types/host_config/collections/all - Host Configs (HTTP 200)\n✅ domain-types/service/collections/all - Services (HTTP 200)\n✅ domain-types/folder_config/collections/all - Folders (HTTP 200)\n✅ domain-types/downtime/collections/all - Downtimes (HTTP 200)\n❌ domain-types/acknowledge/collections/all - Acknowledgments (Error: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.)\n❌ domain-types/activation_run/collections/all - Activations (Error: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.)\n✅ domain-types/user_config/collections/all - Users (HTTP 200)\n✅ domain-types/host_group_config/collections/all - Host Groups (HTTP 200)\n✅ domain-types/service_group_config/collections/all - Service Groups (HTTP 200)"
   },
@@ -80,7 +80,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 366,
+   "ms": 346,
    "placeholders": [],
    "text": "📋 **CheckMK Version Information**\n\nVersion: 2.3.0p52.cre\nEdition: cre\nSite: cmk\nServer: http://127.0.0.1:5080"
   },
@@ -91,7 +91,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 358,
+   "ms": 349,
    "placeholders": [],
    "text": "📭 No hosts found"
   },
@@ -102,7 +102,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 415,
+   "ms": 363,
    "placeholders": [],
    "text": "📭 No services found"
   },
@@ -113,7 +113,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1316,
+   "ms": 743,
    "placeholders": [],
    "text": "✅ No current problems found"
   },
@@ -124,7 +124,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 532,
+   "ms": 383,
    "placeholders": [],
    "text": "ℹ️ **No Pending Changes**\n\nAll configuration changes have been activated.\nThe CheckMK configuration is up to date."
   },
@@ -135,7 +135,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 530,
+   "ms": 363,
    "placeholders": [],
    "text": "📁 No folders found"
   },
@@ -146,7 +146,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 521,
+   "ms": 551,
    "placeholders": [],
    "text": "👥 **CheckMK Users** (3 total):\n\n👤 **cmkadmin** (cmkadmin)\n   📧 No email\n   🔑 Roles: admin\n   ✅ Active\n\n👤 **automation** (Check_MK Automation - used for calling web services)\n   📧 \n   🔑 Roles: admin\n   ✅ Active\n\n👤 **agent_registration** (Check_MK Agent Registration - used for agent registration)\n   📧 \n   🔑 Roles: agent_registration\n   ✅ Active"
   },
@@ -157,7 +157,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 421,
+   "ms": 433,
    "placeholders": [],
    "text": "👥 **Contact Groups** (1 total):\n\n👥 **all** - all"
   },
@@ -168,7 +168,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 405,
+   "ms": 421,
    "placeholders": [],
    "text": "👥 **User Roles**\n\n**🏗️ Built-in Roles** (cannot be deleted):\n👤 **user** - Normal monitoring user\n   📊 376 permissions\n   💡 Normal user - can only see own hosts/services, limited changes\n\n👑 **admin** - Administrator\n   📊 455 permissions\n   💡 Full CheckMK administrator with all permissions\n\n👁️ **guest** - Guest user\n   📊 291 permissions\n   💡 Read-only access - can see everything but change nothing\n\n🎭 **agent_registration** - Agent registration user\n   📊 2 permissions\n   💡 Custom user role\n\n**💡 Available Operations:**\n• `vibemk_show_user_role` - View detailed role information\n• `vibemk_create_user_role` - Clone an existing role\n• `vibemk_update_user_role` - Modify custom role permissions\n• `vibemk_delete_user_role` - Delete custom roles\n"
   },
@@ -181,7 +181,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 532,
+   "ms": 353,
    "placeholders": [],
    "text": "👥 **User Role Details: user**\n\n🏗️ **Built-in Role** (cannot be deleted)\n\n**Role Information:**\n• **ID**: `user`\n• **Alias**: Normal monitoring user\n• **Type**: Built-in\n• **Permissions**: 376 total\n\n**Description:**\nNormal user - can only see own hosts/services, limited changes\n\n**Key Permissions** (showing first 10):\n✅ `general.edit_pagetype_topic`\n✅ `general.publish_pagetype_topic`\n✅ `general.publish_to_groups_pagetype_topic`\n✅ `general.see_user_pagetype_topic`\n✅ `general.edit_bookmark_list`\n✅ `general.publish_bookmark_list`\n✅ `general.publish_to_groups_bookmark_list`\n✅ `general.see_user_bookmark_list`\n✅ `general.edit_custom_snapin`\n✅ `general.publish_custom_snapin`\n... and 366 more permissions\n\n**Available Operations:**\n• `vibemk_create_user_role` - Clone this role to create a new one\n"
   },
@@ -192,7 +192,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 497,
+   "ms": 346,
    "placeholders": [],
    "text": "🏠 **No Host Groups Found**\n\nNo host groups are configured."
   },
@@ -203,7 +203,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 384,
+   "ms": 360,
    "placeholders": [],
    "text": "🔧 **No Service Groups Found**\n\nNo service groups are configured."
   },
@@ -214,7 +214,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 760,
+   "ms": 732,
    "placeholders": [],
    "text": "💬 No comments found"
   },
@@ -225,7 +225,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 362,
+   "ms": 361,
    "placeholders": [],
    "text": "ℹ️ No scheduled downtimes"
   },
@@ -236,7 +236,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 409,
+   "ms": 485,
    "placeholders": [
     "no description"
    ],
@@ -251,7 +251,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 562,
+   "ms": 538,
    "placeholders": [],
    "text": "📋 **Ruleset: checkgroup_parameters:temperature**\n\nRules (0 total):\n\nNo rules configured in this ruleset"
   },
@@ -262,7 +262,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 516,
+   "ms": 500,
    "placeholders": [],
    "text": "🏷️ **Host Tag Groups** (6 total):\n\n🏷️ **criticality** - criticality\n   Tags: Productive system, Business critical, Test system, ... (+1 more)\n   Total: 4 tags\n\n🏷️ **networking** - networking\n   Tags: Local network (low latency), WAN (high latency), DMZ (low latency, secure access)\n   Total: 3 tags\n\n🏷️ **agent** - agent\n   Tags: API integrations if configured, else Checkmk agent, Configured API integrations and Checkmk agent, Configured API integrations, no Checkmk agent, ... (+1 more)\n   Total: 4 tags\n\n🏷️ **piggyback** - piggyback\n   Tags: Use piggyback data from other hosts if present, Always use and expect piggyback data, Never use piggyback data\n   Total: 3 tags\n\n🏷️ **snmp_ds** - snmp_ds\n   Tags: No SNMP, SNMP v2 or v3, SNMP v1\n   Total: 3 tags\n\n🏷️ **address_family** - address_family\n   Tags: IPv4 only, IPv6 only, IPv4/IPv6 dual-stack, ... (+1 more)\n   Total: 4 tags"
   },
@@ -273,7 +273,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 447,
+   "ms": 399,
    "placeholders": [],
    "text": "⏰ **Time Periods** (1 total):\n\n⏰ **24X7** - Always\n   7 active ranges"
   },
@@ -284,7 +284,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 481,
+   "ms": 409,
    "placeholders": [],
    "text": "🔐 **No Passwords Found**\n\nNo stored passwords are configured."
   },
@@ -295,7 +295,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 381,
+   "ms": 407,
    "placeholders": [],
    "text": "📢 **Notification Rules** (1)\n\n• **Notify all contacts of a host/service via HTML email** — id `8df83ddf-bc43-479a-8aa0-575166c5b711`, enabled, via `create_notification_with_the_following_parameters`"
   },
@@ -306,7 +306,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 2190,
+   "ms": 2111,
    "placeholders": [],
    "text": "🔍 **CheckMK API Endpoints Debug**\n\n💥 **domain-types**\n   Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n\n💥 **domain-types/host**\n   Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n\n✅ **domain-types/host/collections/all**\n   Keys: ['links', 'id', 'domainType', 'value', 'extensions']\n   Sample: []...\n\n💥 **domain-types/service**\n   Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n\n✅ **domain-types/service/collections/all**\n   Keys: ['links', 'id', 'domainType', 'value', 'extensions']\n   Sample: []...\n\n💥 **objects**\n   Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."
   },
@@ -317,7 +317,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 2344,
+   "ms": 2322,
    "placeholders": [],
    "text": "🔐 **Permissions Debug**\n\n🧪 **API Version**\n   ✅ Access granted\n\n🧪 **Domain Types**\n   💥 Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n\n🧪 **User Info**\n   💥 Exception: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.\n\n🔒 **Host Monitoring Permissions**\n   ✅ Access granted - 0 items\n\n🔒 **Service Monitoring Permissions**\n   ✅ Access granted - 0 items\n\n🔒 **Host Config Permissions**\n   ✅ Access granted - 0 items"
   },
@@ -328,7 +328,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 2574,
+   "ms": 2840,
    "placeholders": [],
    "text": "🔍 **Host Grouping and Contact Assignment Rulesets**\n\n\n📞 **Contact Group Assignment Rules:**\n   • **host_contactgroups**: Assignment of hosts to contact groups\n\n📨 **Notification Rules:**\n   • **extra_host_conf:notification_options**: Notified events for hosts\n\n🔧 **Other Related Rules:**\n   • **host_check_commands**: Host check command\n   • **only_hosts**: Hosts to be monitored\n   • **bulkwalk_hosts**: Enable SNMPv2c for hosts\n   • **management_bulkwalk_hosts**: Enable SNMPv2c for management boards\n\n📊 **Summary:** Found 6 relevant rulesets"
   },
@@ -350,7 +350,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 564,
+   "ms": 504,
    "placeholders": [],
    "text": "📋 **No Downtimes Found**\n\nNo active downtimes"
   },
@@ -361,7 +361,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 473,
+   "ms": 408,
    "placeholders": [],
    "text": "🟢 **No Active Downtimes**\n\nNo downtimes are currently active"
   },
@@ -372,7 +372,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 452,
+   "ms": 335,
    "placeholders": [],
    "text": "ℹ️ **No Service Groups Found**\n\nUse 'create_service_group' to create one."
   },
@@ -385,7 +385,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 438,
+   "ms": 362,
    "placeholders": [],
    "text": "🔍 **No Rulesets Found**\n\nNo rulesets match text 'temperature'.\n\n💡 **Tips:**\n• Try broader search terms\n• Check if deprecated rulesets should be included\n• Verify folder path is correct"
   },
@@ -398,7 +398,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 416,
+   "ms": 356,
    "placeholders": [],
    "text": "📋 **Ruleset Details: checkgroup_parameters:temperature**\n\n**Title:** Temperature\n**Number of Rules:** 0\n\n**Available Operations:**\n• Use `vibemk_get_ruleset` to see actual rules in this ruleset\n• Use `vibemk_create_rule` to add new rules to this ruleset\n• Use `vibemk_search_rulesets` to find related rulesets\n"
   },
@@ -409,7 +409,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 413,
+   "ms": 898,
    "placeholders": [],
    "text": "📋 **Available Rulesets**\n\n**Showing 11 rulesets**\n\n**EXTRA:**\n  ✅ `extra_service_conf:check_interval` - Normal check interval for service checks\n  ✅ `extra_host_conf:notification_options` - Notified events for hosts\n\n**HOST:**\n  ✅ `host_contactgroups` - Assignment of hosts to contact groups\n  ✅ `host_check_commands` - Host check command\n\n\n💡 **Usage:**\n• `vibemk_show_ruleset` - Get detailed information about a specific ruleset\n• `vibemk_search_rulesets` - Search rulesets with filters\n• `vibemk_get_ruleset` - View rules within a ruleset\n"
   },
@@ -420,7 +420,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 543,
+   "ms": 514,
    "placeholders": [],
    "text": "✅ **Acknowledgements List**\n\nNo active acknowledgements found."
   },
@@ -431,7 +431,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1539,
+   "ms": 1652,
    "placeholders": [],
    "text": "🔍 **Active Checks**\n\n• [🟢 active] **active_checks:cmk_inv** — all hosts\n  ID: 7ba2ac2a-5a49-47ce-bc3c-1630fb191c7f\n  Value: `{'status_data_inventory': True}`\n• [🟢 active] **active_checks:cmk_inv** — all hosts\n  ID: b4b151f9-c7cc-4127-87a6-9539931fcd73\n  Value: `{'status_data_inventory': True}`\n• [🟢 active] **active_checks:cmk_inv** — all hosts\n  ID: 2527cb37-e9da-4a15-a7d9-80825a7f6661\n  Value: `{'status_data_inventory': True}`\n• [🟢 active] **active_checks:cmk_inv** — all hosts\n  ID: bea23477-f13a-4e9f-a472-08be507aac9e\n  Value: `{'status_data_inventory': True}`"
   },
@@ -442,7 +442,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 501,
+   "ms": 455,
    "placeholders": [],
    "text": "📭 No Event Console events found."
   },
@@ -453,7 +453,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 413,
+   "ms": 513,
    "placeholders": [],
    "text": "🏷️ **Aux Tags (6)**\n\n• **ip-v4** — IPv4 [Address]\n• **ip-v6** — IPv6 [Address]\n• **snmp** — Monitor via SNMP [Monitoring agents]\n• **tcp** — Monitor via Checkmk Agent or special agent [Monitoring agents]\n• **checkmk-agent** — Monitor via Checkmk Agent [Monitoring agents]\n• **ping** — Only ping this device [Monitoring agents]"
   },
@@ -464,9 +464,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 498,
+   "ms": 602,
    "placeholders": [],
-   "text": "📋 **Audit Log — 2026-11-07 (301 entries)**\n\n• `00:00:05` **cmkadmin** — new-rule [c57d5f0d-b7a9-448b-ac98-e9ba3fd594b8: Rule]\n  Created new rule #0 in ruleset \"Temperature\" in folder \"Main\"\n• `00:00:08` **cmkadmin** — snapshot-created\n  Created snapshot wato-snapshot-2026-11-07-00-00-07.tar\n• `00:00:08` **cmkadmin** — activate-changes\n  Starting activation (Sites: cmk)\n• `00:00:08` **cmkadmin** — activate-changes\n  Started activation of site cmk\n• `00:02:07` **cmkadmin** — edit-host [vmk-h1: Host]\n  Modified host vmk-h1.\n• `00:02:09` **cmkadmin** — edit-host [vmk-h1: Host]\n  Removed explicit attributes of host vmk-h1.\n• `00:02:13` **cmkadmin** — create-host [vmk-h2b: Host]\n  Created new host vmk-h2b.\n• `00:02:14` **cmkadmin** — edit-host [vmk-h2b: Host]\n  Modified host vmk-h2b.\n• `00:02:16` **cmkadmin** — create-host [vmk-h2: Host]\n  Created new host vmk-h2.\n• `00:02:17` **cmkadmin** — move-host [vmk-h2: Host]\n  Moved host from \"Main\" (ID: a54ba16bcc1c4277975e6aaa738ebb4e) to \"vmktest\" (ID: ad7957184aba4bb58169ceb9d0c4a354)\n• `00:02:20` **cmkadmin** — edit-folder [vmktest: Folder]\n  Edited properties of folder vibeMK test 2\n• `00:02:21` **cmkadmin** — create-host [vmk-cl: Host]\n  Created new host vmk-cl.\n• `00:02:24` **cmkadmin** — edit-rule [c57d5f0d-b7a9-448b-ac98-e9ba3fd594b8: Rule]\n  Changed properties of rule #0 in ruleset \"Temperature\" in folder \"Main\"\n• `00:02:27` **cmkadmin** — edit-ruleset [checkgroup_parameters:temperature: Ruleset]\n  Moved rule c57d5f0d-b7a9-448b-a"
+   "text": "📋 **Audit Log — 2026-11-07 (639 entries)**\n\n• `00:00:05` **cmkadmin** — new-rule [c57d5f0d-b7a9-448b-ac98-e9ba3fd594b8: Rule]\n  Created new rule #0 in ruleset \"Temperature\" in folder \"Main\"\n• `00:00:08` **cmkadmin** — snapshot-created\n  Created snapshot wato-snapshot-2026-11-07-00-00-07.tar\n• `00:00:08` **cmkadmin** — activate-changes\n  Starting activation (Sites: cmk)\n• `00:00:08` **cmkadmin** — activate-changes\n  Started activation of site cmk\n• `00:02:07` **cmkadmin** — edit-host [vmk-h1: Host]\n  Modified host vmk-h1.\n• `00:02:09` **cmkadmin** — edit-host [vmk-h1: Host]\n  Removed explicit attributes of host vmk-h1.\n• `00:02:13` **cmkadmin** — create-host [vmk-h2b: Host]\n  Created new host vmk-h2b.\n• `00:02:14` **cmkadmin** — edit-host [vmk-h2b: Host]\n  Modified host vmk-h2b.\n• `00:02:16` **cmkadmin** — create-host [vmk-h2: Host]\n  Created new host vmk-h2.\n• `00:02:17` **cmkadmin** — move-host [vmk-h2: Host]\n  Moved host from \"Main\" (ID: a54ba16bcc1c4277975e6aaa738ebb4e) to \"vmktest\" (ID: ad7957184aba4bb58169ceb9d0c4a354)\n• `00:02:20` **cmkadmin** — edit-folder [vmktest: Folder]\n  Edited properties of folder vibeMK test 2\n• `00:02:21` **cmkadmin** — create-host [vmk-cl: Host]\n  Created new host vmk-cl.\n• `00:02:24` **cmkadmin** — edit-rule [c57d5f0d-b7a9-448b-ac98-e9ba3fd594b8: Rule]\n  Changed properties of rule #0 in ruleset \"Temperature\" in folder \"Main\"\n• `00:02:27` **cmkadmin** — edit-ruleset [checkgroup_parameters:temperature: Ruleset]\n  Moved rule c57d5f0d-b7a9-448b-a"
   },
   {
    "phase": "read",
@@ -475,7 +475,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 406,
+   "ms": 416,
    "placeholders": [],
    "text": "🌐 **Monitoring Sites (1)**\n\n• **cmk** — Local site cmk [🔴 not connected]\n  Replication: disabled"
   },
@@ -486,7 +486,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 384,
+   "ms": 535,
    "placeholders": [],
    "text": "🔍 **Process monitoring rules (inventory_processes_rules)**\n\nNo process monitoring rules found."
   },
@@ -508,7 +508,7 @@
    "expected": "err",
    "got": "err",
    "ok": true,
-   "ms": 521,
+   "ms": 450,
    "placeholders": [],
    "text": "❌ **Agent bakery not available**\n\nThis CheckMK edition has no agent bakery -- it is part of the commercial editions only. On Raw/Community, install the vanilla agent from Setup > Agents > Linux / Windows."
   },
@@ -523,7 +523,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 598,
+   "ms": 586,
    "placeholders": [],
    "text": "✅ **Folder Created Successfully**\n\n📁 **Folder:** vmktest\n📝 **Title:** vibeMK test\n📂 **Parent:** /\n🔗 **Full Path:** /vmktest\n⚙️ **API Path:** ~vmktest\n\n⚠️ **Remember to activate changes!**"
   },
@@ -542,7 +542,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1202,
+   "ms": 1198,
    "placeholders": [],
    "text": "✅ **Host Created Successfully**\n\n**Host:** vmk-h1\n**Folder:** / (~)\n**Attributes Set:** 3\n\n📋 **Host Details:**\n• IP Address: 192.0.2.10\n\n⚠️ **Remember to activate changes!**\n\n💡 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review\n2️⃣ Use 'activate_changes' to apply configuration\n\n🤖 **Smart Routing Applied:** Single host detected → Individual Creation API\n📡 **API Endpoint:** POST domain-types/host_config/collections/all"
   },
@@ -556,7 +556,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 586,
+   "ms": 486,
    "placeholders": [],
    "text": "✅ **Host Group Created Successfully**\n\nName: vmkhg\nAlias: vmk host group\n\n⚠️ **Remember to activate changes!**"
   },
@@ -570,7 +570,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 602,
+   "ms": 664,
    "placeholders": [],
    "text": "✅ **Contact Group Created Successfully**\n\nName: vmkcg\nAlias: vmk contact group\nMembers: 0 users\n\n⚠️ **Remember to activate changes!**"
   },
@@ -584,7 +584,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 944,
+   "ms": 990,
    "placeholders": [],
    "text": "✅ **Service Group Created Successfully**\n\n**Name:** vmksg\n**Alias:** vmk service group\n\n⚠️ **Remember to activate changes!**\n\n💡 **Next Steps:**\n1️⃣ Use 'list_service_groups' to view all groups\n2️⃣ Use 'activate_changes' to apply configuration"
   },
@@ -606,7 +606,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 606,
+   "ms": 481,
    "placeholders": [],
    "text": "✅ **Bulk Service Groups Created Successfully**\n\n**Created:** 2 service groups\n\n📋 **Created Groups:**\n• vmksg2 (two)\n• vmksg3 (three)\n\n⚠️ **Remember to activate changes!**"
   },
@@ -621,7 +621,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1079,
+   "ms": 786,
    "placeholders": [],
    "text": "✅ **User Created Successfully**\n\nUsername: vmkuser\nFull Name: vmk user\nEmail: Not set\nRoles: user\nContact Groups: all\nLogin: Enabled\n\n⚠️ **Remember to activate changes!**"
   },
@@ -635,7 +635,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 526,
+   "ms": 433,
    "placeholders": [],
    "text": "✅ **User Role Created Successfully**\n\n**New Role Details:**\n• **Role ID**: `vmkrole`\n• **Cloned from**: `user`\n• **Alias**: Not specified\n\n**Inherited Permissions:**\nThe new role inherits all permissions from the 'user' role.\n\n💡 **Next Steps:**\n• Use `vibemk_show_user_role` to view detailed permissions\n• Use `vibemk_update_user_role` to customize permissions\n• Assign this role to users in user management"
   },
@@ -659,7 +659,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 528,
+   "ms": 442,
    "placeholders": [
     "none"
    ],
@@ -676,7 +676,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 651,
+   "ms": 601,
    "placeholders": [],
    "text": "✅ Auxiliary tag 'vmkaux' (vmk aux) created."
   },
@@ -701,7 +701,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 493,
+   "ms": 571,
    "placeholders": [],
    "text": "✅ **Time Period Created Successfully**\n\nName: **vmktp**\nAlias: vmk tp\nActive time ranges:\n  • Monday: 08:00-17:00\n\n⚠️ **Remember to activate changes!**"
   },
@@ -716,7 +716,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1959,
+   "ms": 1993,
    "placeholders": [
     "none"
    ],
@@ -746,9 +746,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 700,
+   "ms": 680,
    "placeholders": [],
-   "text": "✅ **Rule Created Successfully**\n\nRuleset: checkgroup_parameters:temperature\nRule ID: 1c6905d2-f583-4e79-9dae-64485a810812\nFolder: /\nComment: vmk rule\n\n⚠️ **Remember to activate changes!**"
+   "text": "✅ **Rule Created Successfully**\n\nRuleset: checkgroup_parameters:temperature\nRule ID: bad92780-23da-4c54-8d46-8005fac07197\nFolder: /\nComment: vmk rule\n\n⚠️ **Remember to activate changes!**"
   },
   {
    "phase": "setup",
@@ -924,9 +924,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1079,
+   "ms": 1118,
    "placeholders": [],
-   "text": "✅ **Notification rule created**\n\n**rule_id**: 20b2d467-d8cd-4189-bc95-f24d99d8a5ae\n**next step**: activate changes to apply it"
+   "text": "✅ **Notification rule created**\n\n**rule_id**: 745fcaed-228f-432a-99fa-ec4b964c25a3\n**next step**: activate changes to apply it"
   },
   {
    "phase": "setup",
@@ -935,9 +935,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1603,
+   "ms": 1514,
    "placeholders": [],
-   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: d5a8eab5-e379-4f77-8438-55a253405b9a\nSites: cmk\nForce foreign changes: False\nChanges to activate: 11\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
+   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: 3fc2a92b-b0f1-4f11-9a21-8b5f4bf42e40\nSites: cmk\nForce foreign changes: False\nChanges to activate: 11\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
   },
   {
    "phase": "setup",
@@ -946,7 +946,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 572,
+   "ms": 479,
    "text": ""
   },
   {
@@ -956,7 +956,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 562,
+   "ms": 575,
    "text": ""
   },
   {
@@ -966,7 +966,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 559,
+   "ms": 518,
    "text": ""
   },
   {
@@ -976,7 +976,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 528,
+   "ms": 450,
    "text": ""
   },
   {
@@ -986,7 +986,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 3758,
+   "ms": 1492,
    "text": ""
   },
   {
@@ -996,7 +996,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 519,
+   "ms": 448,
    "text": ""
   },
   {
@@ -1006,7 +1006,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 580,
+   "ms": 574,
    "text": ""
   },
   {
@@ -1016,7 +1016,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 521,
+   "ms": 432,
    "text": ""
   },
   {
@@ -1026,7 +1026,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 481,
+   "ms": 552,
    "text": ""
   },
   {
@@ -1036,7 +1036,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 522,
+   "ms": 434,
    "text": ""
   },
   {
@@ -1046,7 +1046,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 579,
+   "ms": 582,
    "text": ""
   },
   {
@@ -1056,7 +1056,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 2211,
+   "ms": 2152,
    "text": ""
   },
   {
@@ -1066,7 +1066,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 580,
+   "ms": 545,
    "text": ""
   },
   {
@@ -1076,7 +1076,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1525,
+   "ms": 1564,
    "text": ""
   },
   {
@@ -1088,9 +1088,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 584,
+   "ms": 537,
    "placeholders": [],
-   "text": "✅ **Host Status: vmk-h1**\n\n**Status:** 🔴 **DOWN**\n**State Code:** 1 (Hard State: 1)\n**Has Been Checked:** Yes\n**Last Check:** 45s ago\n**Last State Change:** 1m ago\n\n**Plugin Output:** CRITICAL - 192.0.2.10: rta nan, lost 100%\n\n✅ **Live monitoring data from CheckMK REST API**"
+   "text": "✅ **Host Status: vmk-h1**\n\n**Status:** 🔴 **DOWN**\n**State Code:** 1 (Hard State: 1)\n**Has Been Checked:** Yes\n**Last Check:** 42s ago\n**Last State Change:** 1m ago\n\n**Plugin Output:** CRITICAL - 192.0.2.10: rta nan, lost 100%\n\n✅ **Live monitoring data from CheckMK REST API**"
   },
   {
    "phase": "ops",
@@ -1101,7 +1101,7 @@
    "expected": "err",
    "got": "err",
    "ok": true,
-   "ms": 1038,
+   "ms": 1092,
    "placeholders": [],
    "text": "❌ **Host not found**\n\nHost 'vmk-does-not-exist' not found in host collections"
   },
@@ -1114,7 +1114,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 532,
+   "ms": 439,
    "placeholders": [],
    "text": "🔍 **Host Details: vmk-h1**\n\nFolder: /\nIP Address: 192.0.2.10\nAlias: Not set\nAgent Type: no-agent\nSite: Not set"
   },
@@ -1127,7 +1127,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 578,
+   "ms": 367,
    "placeholders": [],
    "text": "ℹ️ **Host Configuration: vmk-h1**\n\n**links**: 4\n**domainType**: host_config\n**id**: vmk-h1\n**title**: vmk-h1\n**members**: object\n**extensions**: object"
   },
@@ -1140,9 +1140,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 534,
+   "ms": 372,
    "placeholders": [],
-   "text": "📋 **Effective Host Attributes**\n\n**Host:** vmk-h1\n**Folder:** /\n\n🎯 **Effective Attributes:**\n• **ipaddress:** 192.0.2.10 _Host_\n• **meta_data:** {'created_at': '2026-11-07T00:24:34.627965+00:00', 'updated_at': '2026-11-07T00:24:40.206111+00:00', 'created_by': 'cmkadmin'} _Host_\n• **tag_agent:** no-agent _Host_\n• **tag_snmp_ds:** no-snmp _Host_\n"
+   "text": "📋 **Effective Host Attributes**\n\n**Host:** vmk-h1\n**Folder:** /\n\n🎯 **Effective Attributes:**\n• **ipaddress:** 192.0.2.10 _Host_\n• **meta_data:** {'created_at': '2026-11-07T01:22:30.194216+00:00', 'updated_at': '2026-11-07T01:22:35.122845+00:00', 'created_by': 'cmkadmin'} _Host_\n• **tag_agent:** no-agent _Host_\n• **tag_snmp_ds:** no-snmp _Host_\n"
   },
   {
    "phase": "ops",
@@ -1153,7 +1153,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1169,
+   "ms": 1111,
    "placeholders": [],
    "text": "🔍 **Host Configuration Validation**\n\n**Host:** vmk-h1\n**Operation:** create\n**Status:** ❌ Invalid\n\n🚨 **Errors:**\n• Host already exists\n\n"
   },
@@ -1169,9 +1169,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 564,
+   "ms": 604,
    "placeholders": [],
-   "text": "🔄 **Host State Comparison**\n\n**Host:** vmk-h1\n**Changes Required:** Yes\n\n📋 **Detected Changes:**\n**Removed:**\n• meta_data: {'created_at': '2026-11-07T00:24:34.627965+00:00', 'updated_at': '2026-11-07T00:24:40.206111+00:00', 'created_by': 'cmkadmin'}\n• tag_agent: no-agent\n• tag_snmp_ds: no-snmp\n"
+   "text": "🔄 **Host State Comparison**\n\n**Host:** vmk-h1\n**Changes Required:** Yes\n\n📋 **Detected Changes:**\n**Removed:**\n• meta_data: {'created_at': '2026-11-07T01:22:30.194216+00:00', 'updated_at': '2026-11-07T01:22:35.122845+00:00', 'created_by': 'cmkadmin'}\n• tag_agent: no-agent\n• tag_snmp_ds: no-snmp\n"
   },
   {
    "phase": "ops",
@@ -1183,7 +1183,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 569,
+   "ms": 511,
    "placeholders": [],
    "text": "🖥️ **CheckMK Hosts** (1 total, showing first 1):\n\n🖥️ vmk-h1 (DOWN)"
   },
@@ -1196,7 +1196,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 536,
+   "ms": 428,
    "placeholders": [],
    "text": "🔧 **CheckMK Services** (1 total, showing first 1):\n\n🔧 vmk-h1/PING (Status: CRITICAL)"
   },
@@ -1209,9 +1209,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 988,
+   "ms": 960,
    "placeholders": [],
-   "text": "🚨 **Current Problems** (2 total):\n\n🖥️ HOST: vmk-h1 - DOWN\n🔧 SERVICE: vmk-h1/PING - CRITICAL\n    CRITICAL - 192.0.2.10: rta nan, lost 100%\n    since 2026-11-07 00:25 UTC"
+   "text": "🚨 **Current Problems** (2 total):\n\n🖥️ HOST: vmk-h1 - DOWN\n🔧 SERVICE: vmk-h1/PING - CRITICAL\n    CRITICAL - 192.0.2.10: rta nan, lost 100%\n    since 2026-11-07 01:23 UTC"
   },
   {
    "phase": "ops",
@@ -1225,7 +1225,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1117,
+   "ms": 939,
    "placeholders": [],
    "text": "✅ **Host Updated Successfully**\n\n**Host:** vmk-h1\n**Update Mode:** update\n**Operation:** Merging with existing host attributes\n\n📋 **Changes Applied:**\n**Added:**\n• alias: vmk alias\n\n\n⚠️ **Remember to activate changes!**\n💡 Use 'vibemk_activate_changes' to apply the configuration"
   },
@@ -1236,7 +1236,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 605,
+   "ms": 700,
    "text": ""
   },
   {
@@ -1252,7 +1252,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1038,
+   "ms": 1058,
    "placeholders": [],
    "text": "✅ **Host Updated Successfully**\n\n**Host:** vmk-h1\n**Update Mode:** remove\n**Operation:** Removing attributes: alias\n\n📋 **Changes Applied:**\n**Removed:**\n• alias: vmk alias\n\n\n⚠️ **Remember to activate changes!**\n💡 Use 'vibemk_activate_changes' to apply the configuration"
   },
@@ -1263,7 +1263,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 601,
+   "ms": 598,
    "text": ""
   },
   {
@@ -1276,9 +1276,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 547,
+   "ms": 573,
    "placeholders": [],
-   "text": "🔴 **Service Status: vmk-h1/PING**\n\n**Status:** CRITICAL\n**State Code:** 2\n**Output:** CRITICAL - 192.0.2.10: rta nan, lost 100%\n**Since:** 2026-11-07 00:25 UTC"
+   "text": "🔴 **Service Status: vmk-h1/PING**\n\n**Status:** CRITICAL\n**State Code:** 2\n**Output:** CRITICAL - 192.0.2.10: rta nan, lost 100%\n**Since:** 2026-11-07 01:23 UTC"
   },
   {
    "phase": "ops",
@@ -1289,7 +1289,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 626,
+   "ms": 560,
    "placeholders": [],
    "text": "📊 **Available Metrics**\n\nTarget: vmk-h1\nMetrics (4 total):\n\n📈 rta\n📈 rtmax\n📈 rtmin\n📈 pl\n\n💡 **Usage:** pass one of these as metric_name to get its values"
   },
@@ -1303,7 +1303,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 562,
+   "ms": 447,
    "placeholders": [],
    "text": "📊 **Available Metrics**\n\nTarget: vmk-h1/PING\nMetrics (4 total):\n\n📈 rta\n📈 rtmax\n📈 rtmin\n📈 pl\n\n💡 **Usage:** pass one of these as metric_name to get its values"
   },
@@ -1316,7 +1316,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 450,
+   "ms": 445,
    "placeholders": [],
    "text": "📊 **Available Metrics**\n\nTarget: vmk-h1\nMetrics (4 total):\n\n📈 rta\n📈 rtmax\n📈 rtmin\n📈 pl\n\n💡 **Usage:** pass one of these as metric_name to get its values"
   },
@@ -1331,7 +1331,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 576,
+   "ms": 465,
    "placeholders": [],
    "text": "🔍 **Metrics Search Results**\n\nFilter: vmk-h1/PING\n\n📊 **Search Metrics: vmk-h1/PING**\n\nTime Range: 1h\nMetrics: 1 found\n\n📈 **Round trip average**\n   Latest: No data\n   Data points: 60\n   Line type: area\n   Color: #00e8ff\n\n\n💡 **Use specific metric_name for detailed data**"
   },
@@ -1344,7 +1344,7 @@
    "expected": "err",
    "got": "err",
    "ok": true,
-   "ms": 522,
+   "ms": 537,
    "placeholders": [],
    "text": "❌ **Failed to retrieve custom graph**\n\nCould not get custom graph 'nope': HTTP 404: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."
   },
@@ -1367,7 +1367,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 585,
+   "ms": 505,
    "placeholders": [],
    "text": "✅ **Bulk Host Creation Successful**\n\n**Hosts Created:** 1/1\n\n📋 **Created Hosts:**\n• vmk-h2b (Folder: /)\n⚠️ **Remember to activate changes!**\n\n💡 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review all changes\n2️⃣ Use 'activate_changes' to apply configuration\n"
   },
@@ -1378,7 +1378,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 620,
+   "ms": 602,
    "text": ""
   },
   {
@@ -1397,7 +1397,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 644,
+   "ms": 578,
    "placeholders": [],
    "text": "✅ **Bulk Update Successful**\n\n**updated**: 1\n**message**: Remember to activate changes!"
   },
@@ -1408,7 +1408,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 562,
+   "ms": 654,
    "text": ""
   },
   {
@@ -1421,7 +1421,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1074,
+   "ms": 1142,
    "placeholders": [],
    "text": "✅ Host 'vmk-h2' created as a clone of 'vmk-h1'.\nFolder: /\nAttributes: {\n  \"ipaddress\": \"192.0.2.10\",\n  \"tag_agent\": \"no-agent\",\n  \"tag_snmp_ds\": \"no-snmp\"\n}"
   },
@@ -1432,7 +1432,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 637,
+   "ms": 624,
    "text": ""
   },
   {
@@ -1445,7 +1445,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1107,
+   "ms": 1150,
    "placeholders": [],
    "text": "✅ **Host Moved Successfully**\n\n**host**: vmk-h2\n**folder**: /vmktest\n**message**: Remember to activate changes!"
   },
@@ -1456,7 +1456,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 591,
+   "ms": 612,
    "text": ""
   },
   {
@@ -1468,7 +1468,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 560,
+   "ms": 549,
    "placeholders": [],
    "text": "📁 **Hosts in Folder '/vmktest'** (1 total):\n\n⚙️ **API Path:** ~vmktest\n\n🖥️ vmk-h2"
   },
@@ -1482,7 +1482,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1089,
+   "ms": 1097,
    "placeholders": [],
    "text": "✅ **Folder Updated Successfully**\n\n📁 **Folder:** /vmktest\n⚙️ **API Path:** ~vmktest\n📝 **New Title:** vibeMK test 2\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1493,7 +1493,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 566,
+   "ms": 581,
    "text": ""
   },
   {
@@ -1509,7 +1509,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 626,
+   "ms": 601,
    "placeholders": [],
    "text": "✅ **Cluster Host Created Successfully**\n\n**Cluster Host:** vmk-cl\n**Folder:** ~\n**Nodes:** vmk-h1, vmk-h2\n\n📋 **Cluster Configuration:**\n• Node Count: 2\n• Agent Type: No Agent (Cluster)\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1520,7 +1520,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 640,
+   "ms": 561,
    "text": ""
   },
   {
@@ -1532,9 +1532,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 495,
+   "ms": 545,
    "placeholders": [],
-   "text": "📋 **Ruleset: checkgroup_parameters:temperature**\n\nRules (1 total):\n\n🔧 **Rule 1** (ID: 1c6905d2-f583-4e79-9dae-64485a810812)\n   Status: ✅ Active\n   Value: {'levels': (38.0, 45.0)}\n   Folder: /\n   Conditions: Labels: 1 conditions\n   Comment: vmk rule"
+   "text": "📋 **Ruleset: checkgroup_parameters:temperature**\n\nRules (1 total):\n\n🔧 **Rule 1** (ID: bad92780-23da-4c54-8d46-8005fac07197)\n   Status: ✅ Active\n   Value: {'levels': (38.0, 45.0)}\n   Folder: /\n   Conditions: Labels: 1 conditions\n   Comment: vmk rule"
   },
   {
    "phase": "ops",
@@ -1545,7 +1545,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 581,
+   "ms": 518,
    "placeholders": [
     "no description"
    ],
@@ -1555,15 +1555,15 @@
    "phase": "ops",
    "tool": "vibemk_update_rule",
    "args": {
-    "rule_id": "1c6905d2-f583-4e79-9dae-64485a810812",
+    "rule_id": "bad92780-23da-4c54-8d46-8005fac07197",
     "rule_config": "{'levels': (40.0, 45.0)}"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1707,
+   "ms": 1672,
    "placeholders": [],
-   "text": "✅ **Rule Updated Successfully**\n\nRule ID: 1c6905d2-f583-4e79-9dae-64485a810812\nUpdated fields: value_raw\n\n⚠️ **Remember to activate changes!**"
+   "text": "✅ **Rule Updated Successfully**\n\nRule ID: bad92780-23da-4c54-8d46-8005fac07197\nUpdated fields: value_raw\n\n⚠️ **Remember to activate changes!**"
   },
   {
    "phase": "ops",
@@ -1572,22 +1572,22 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1175,
+   "ms": 1159,
    "text": ""
   },
   {
    "phase": "ops",
    "tool": "vibemk_move_rule",
    "args": {
-    "rule_id": "1c6905d2-f583-4e79-9dae-64485a810812",
+    "rule_id": "bad92780-23da-4c54-8d46-8005fac07197",
     "position": "top_of_folder"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1586,
+   "ms": 1601,
    "placeholders": [],
-   "text": "✅ **Rule Moved Successfully**\n\nRule ID: 1c6905d2-f583-4e79-9dae-64485a810812\nNew Position: top_of_folder\n\n⚠️ **Remember to activate changes!**"
+   "text": "✅ **Rule Moved Successfully**\n\nRule ID: bad92780-23da-4c54-8d46-8005fac07197\nNew Position: top_of_folder\n\n⚠️ **Remember to activate changes!**"
   },
   {
    "phase": "ops",
@@ -1601,11 +1601,11 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 660,
+   "ms": 589,
    "placeholders": [
     "none"
    ],
-   "text": "✅ **Host Contact Group Rule Created Successfully**\n\nRuleset: host_contactgroups\nRule ID: c344f14e-ca22-44f9-af48-3f77988b05f1\nContact Groups: ['vmkcg']\nFolder: /\nComment: vmk\n\n📝 **Conditions:** None (applies to all hosts)\n\n⚠️ **Remember to activate changes!**"
+   "text": "✅ **Host Contact Group Rule Created Successfully**\n\nRuleset: host_contactgroups\nRule ID: d4a26c0c-5548-4fc3-8d5c-a481ac9d7cee\nContact Groups: ['vmkcg']\nFolder: /\nComment: vmk\n\n📝 **Conditions:** None (applies to all hosts)\n\n⚠️ **Remember to activate changes!**"
   },
   {
    "phase": "ops",
@@ -1614,7 +1614,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 529,
+   "ms": 557,
    "text": ""
   },
   {
@@ -1629,7 +1629,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1059,
+   "ms": 1124,
    "placeholders": [
     "none"
    ],
@@ -1642,7 +1642,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 634,
+   "ms": 595,
    "text": ""
   },
   {
@@ -1655,7 +1655,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1305,
+   "ms": 1385,
    "placeholders": [],
    "text": "✅ **Host Group Updated Successfully**\n\nName: vmkhg\nUpdated fields: alias\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1666,7 +1666,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 394,
+   "ms": 567,
    "text": ""
   },
   {
@@ -1679,7 +1679,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1217,
+   "ms": 1389,
    "placeholders": [],
    "text": "✅ **Contact Group Updated Successfully**\n\nName: vmkcg\nUpdated fields: alias\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1690,7 +1690,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 597,
+   "ms": 593,
    "text": ""
   },
   {
@@ -1702,7 +1702,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 509,
+   "ms": 554,
    "placeholders": [],
    "text": "📋 **Service Group Details**\n\n**Name:** vmksg\n**Alias:** vmk service group\n**Type:** Service Group Configuration\n\n🔗 **Available Operations:**\n• Update\n• Delete\n\n💡 Use 'update_service_group' or 'delete_service_group' to modify this group"
   },
@@ -1716,7 +1716,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 778,
+   "ms": 801,
    "placeholders": [],
    "text": "✅ **Service Group Updated Successfully**\n\n**Name:** vmksg\n**New Alias:** vmk sg 2\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1727,7 +1727,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 598,
+   "ms": 561,
    "text": ""
   },
   {
@@ -1746,7 +1746,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 536,
+   "ms": 567,
    "placeholders": [],
    "text": "✅ **Bulk Service Groups Updated Successfully**\n\n**Updated:** 1 service groups\n\n📋 **Updated Groups:**\n• vmksg2 → two b\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1757,7 +1757,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 523,
+   "ms": 467,
    "text": ""
   },
   {
@@ -1770,7 +1770,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1459,
+   "ms": 1384,
    "placeholders": [],
    "text": "✅ **User Updated Successfully**\n\nUsername: vmkuser\nUpdated fields: fullname\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1781,7 +1781,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 457,
+   "ms": 576,
    "text": ""
   },
   {
@@ -1794,7 +1794,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1251,
+   "ms": 1507,
    "placeholders": [],
    "text": "✅ **User Added to Contact Group**\n\nUsername: vmkuser\nAdded to group: vmkcg\nTotal groups: all, vmkcg\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1805,7 +1805,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 568,
+   "ms": 410,
    "text": ""
   },
   {
@@ -1818,7 +1818,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1433,
+   "ms": 1287,
    "placeholders": [],
    "text": "✅ **User Removed from Contact Group**\n\nUsername: vmkuser\nRemoved from group: vmkcg\nRemaining groups: all\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1829,7 +1829,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 448,
+   "ms": 636,
    "text": ""
   },
   {
@@ -1842,7 +1842,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 426,
+   "ms": 601,
    "placeholders": [],
    "text": "✅ **User Role Updated Successfully**\n\n**Updated Role**: `vmkrole`\n\n**Changes Applied:**\n• **Alias**: vmk role 2\n\n\n💡 **Use `vibemk_show_user_role` to view the updated role details**"
   },
@@ -1853,7 +1853,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 530,
+   "ms": 648,
    "text": ""
   },
   {
@@ -1866,7 +1866,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1356,
+   "ms": 1457,
    "placeholders": [],
    "text": "✅ **Host Tag Group Updated Successfully**\n\nTag ID: vmktag\nUpdated fields: title\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1877,7 +1877,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 516,
+   "ms": 457,
    "text": ""
   },
   {
@@ -1890,7 +1890,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 564,
+   "ms": 420,
    "placeholders": [],
    "text": "✅ Auxiliary tag 'vmkaux' updated."
   },
@@ -1901,7 +1901,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 542,
+   "ms": 520,
    "text": ""
   },
   {
@@ -1914,7 +1914,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1330,
+   "ms": 1291,
    "placeholders": [],
    "text": "✅ **Time Period Updated Successfully**\n\nName: vmktp\nUpdated fields: alias\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1925,7 +1925,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 600,
+   "ms": 511,
    "text": ""
   },
   {
@@ -1938,7 +1938,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 2720,
+   "ms": 2620,
    "placeholders": [],
    "text": "✅ **Password Updated Successfully**\n\nIdentifier: vmkpw\nUpdated fields: password\n\n🔒 **Security Note:** Changes are securely stored in CheckMK\n\n⚠️ **Remember to activate changes!**"
   },
@@ -1946,14 +1946,14 @@
    "phase": "ops",
    "tool": "vibemk_get_notification_rule",
    "args": {
-    "rule_id": "20b2d467-d8cd-4189-bc95-f24d99d8a5ae"
+    "rule_id": "745fcaed-228f-432a-99fa-ec4b964c25a3"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1205,
+   "ms": 1189,
    "placeholders": [],
-   "text": "📢 **Notification Rule `20b2d467-d8cd-4189-bc95-f24d99d8a5ae`**\n\nDescription: vmk notif\n\nFull rule_config — reuse this structure when creating or updating a rule:\n\n```json\n{\n  \"rule_properties\": {\n    \"description\": \"vmk notif\",\n    \"comment\": \"vmk\",\n    \"documentation_url\": \"\",\n    \"do_not_apply_this_rule\": {\n      \"state\": \"disabled\"\n    },\n    \"allow_users_to_deactivate\": {\n      \"state\": \"enabled\"\n    }\n  },\n  \"notification_method\": {\n    \"notify_plugin\": {\n      \"option\": \"create_notification_with_the_following_parameters\",\n      \"plugin_params\": {\n        \"plugin_name\": \"mail\",\n        \"from_details\": {\n          \"state\": \"disabled\"\n        },\n        \"reply_to\": {\n          \"state\": \"disabled\"\n        },\n        \"subject_for_host_notifications\": {\n          \"state\": \"disabled\"\n        },\n        \"subject_for_service_notifications\": {\n          \"state\": \"disabled\"\n        },\n        \"sort_order_for_bulk_notifications\": {\n          \"state\": \"disabled\"\n        },\n        \"send_separate_notification_to_every_recipient\": {\n          \"state\": \"disabled\"\n        },\n        \"info_to_be_displayed_in_the_email_body\": {\n          \"state\": \"disabled\"\n        },\n        \"insert_html_section_between_body_and_table\": {\n          \"state\": \"disabled\"\n        },\n        \"url_prefix_for_links_to_checkmk\": {\n          \"state\": \"disabled\"\n        },\n        \"enable_sync_smtp\": {\n          \"state\": \"disabled\"\n        },\n        \"display_graphs_among_each_other\": {\n          \"state\": \"disable"
+   "text": "📢 **Notification Rule `745fcaed-228f-432a-99fa-ec4b964c25a3`**\n\nDescription: vmk notif\n\nFull rule_config — reuse this structure when creating or updating a rule:\n\n```json\n{\n  \"rule_properties\": {\n    \"description\": \"vmk notif\",\n    \"comment\": \"vmk\",\n    \"documentation_url\": \"\",\n    \"do_not_apply_this_rule\": {\n      \"state\": \"disabled\"\n    },\n    \"allow_users_to_deactivate\": {\n      \"state\": \"enabled\"\n    }\n  },\n  \"notification_method\": {\n    \"notify_plugin\": {\n      \"option\": \"create_notification_with_the_following_parameters\",\n      \"plugin_params\": {\n        \"plugin_name\": \"mail\",\n        \"from_details\": {\n          \"state\": \"disabled\"\n        },\n        \"reply_to\": {\n          \"state\": \"disabled\"\n        },\n        \"subject_for_host_notifications\": {\n          \"state\": \"disabled\"\n        },\n        \"subject_for_service_notifications\": {\n          \"state\": \"disabled\"\n        },\n        \"sort_order_for_bulk_notifications\": {\n          \"state\": \"disabled\"\n        },\n        \"send_separate_notification_to_every_recipient\": {\n          \"state\": \"disabled\"\n        },\n        \"info_to_be_displayed_in_the_email_body\": {\n          \"state\": \"disabled\"\n        },\n        \"insert_html_section_between_body_and_table\": {\n          \"state\": \"disabled\"\n        },\n        \"url_prefix_for_links_to_checkmk\": {\n          \"state\": \"disabled\"\n        },\n        \"enable_sync_smtp\": {\n          \"state\": \"disabled\"\n        },\n        \"display_graphs_among_each_other\": {\n          \"state\": \"disable"
   },
   {
    "phase": "ops",
@@ -1969,7 +1969,7 @@
    "phase": "ops",
    "tool": "vibemk_update_notification_rule",
    "args": {
-    "rule_id": "20b2d467-d8cd-4189-bc95-f24d99d8a5ae",
+    "rule_id": "745fcaed-228f-432a-99fa-ec4b964c25a3",
     "rule_config": {
      "rule_properties": {
       "description": "vmk notif 2",
@@ -2140,9 +2140,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1557,
+   "ms": 1655,
    "placeholders": [],
-   "text": "✅ **Notification rule '20b2d467-d8cd-4189-bc95-f24d99d8a5ae' updated**\n\n**next step**: activate changes to apply it"
+   "text": "✅ **Notification rule '745fcaed-228f-432a-99fa-ec4b964c25a3' updated**\n\n**next step**: activate changes to apply it"
   },
   {
    "phase": "ops",
@@ -2151,7 +2151,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 568,
+   "ms": 605,
    "text": ""
   },
   {
@@ -2161,9 +2161,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 450,
+   "ms": 523,
    "placeholders": [],
-   "text": "📢 **Notification Rules** (2)\n\n• **Notify all contacts of a host/service via HTML email** — id `8df83ddf-bc43-479a-8aa0-575166c5b711`, enabled, via `create_notification_with_the_following_parameters`\n• **vmk notif 2** — id `20b2d467-d8cd-4189-bc95-f24d99d8a5ae`, enabled, via `create_notification_with_the_following_parameters`"
+   "text": "📢 **Notification Rules** (2)\n\n• **Notify all contacts of a host/service via HTML email** — id `8df83ddf-bc43-479a-8aa0-575166c5b711`, enabled, via `create_notification_with_the_following_parameters`\n• **vmk notif 2** — id `745fcaed-228f-432a-99fa-ec4b964c25a3`, enabled, via `create_notification_with_the_following_parameters`"
   },
   {
    "phase": "ops",
@@ -2185,9 +2185,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 813,
+   "ms": 1006,
    "placeholders": [],
-   "text": "✅ HTTP check 'HTTP' created for 'vmk-h1'.\nURI: /, SSL: False, Port: standard\nRule-ID: c4ad9121-5653-43df-8419-ad48d47c6c89"
+   "text": "✅ HTTP check 'HTTP' created for 'vmk-h1'.\nURI: /, SSL: False, Port: standard\nRule-ID: 3790b07b-ff1b-4cf1-aaa6-2beec4b14534"
   },
   {
    "phase": "ops",
@@ -2199,9 +2199,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1111,
+   "ms": 1165,
    "placeholders": [],
-   "text": "✅ TCP check on port 22 created for 'vmk-h1'.\nService: TCP Port 22, SSL: False\nRule-ID: 29c0a099-e37d-4eae-88ce-302888538594"
+   "text": "✅ TCP check on port 22 created for 'vmk-h1'.\nService: TCP Port 22, SSL: False\nRule-ID: b368a465-f41f-4154-813a-eae6ac3a7eb3"
   },
   {
    "phase": "ops",
@@ -2212,9 +2212,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1133,
+   "ms": 1124,
    "placeholders": [],
-   "text": "✅ ICMP/PING check 'PING' created for 'vmk-h1'.\nPackets: 5, timeout: 20s\nRule-ID: 61aff77e-c73d-4118-8d02-1958b8366cff"
+   "text": "✅ ICMP/PING check 'PING' created for 'vmk-h1'.\nPackets: 5, timeout: 20s\nRule-ID: 60f57993-5225-4b47-ad71-b77cd333e663"
   },
   {
    "phase": "ops",
@@ -2227,9 +2227,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1284,
+   "ms": 1163,
    "placeholders": [],
-   "text": "✅ Custom check 'vmk custom' created for 'vmk-h1'.\nCommand: echo ok\nRule ID: 6840884e-377d-4ea8-949d-5ceadff89ad7"
+   "text": "✅ Custom check 'vmk custom' created for 'vmk-h1'.\nCommand: echo ok\nRule ID: 613433b1-9106-4349-b056-710d5b9b04c1"
   },
   {
    "phase": "ops",
@@ -2240,9 +2240,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1073,
+   "ms": 1122,
    "placeholders": [],
-   "text": "✅ DNS check created for 'vmk-h1'.\nLookup: vmk-h1, DNS server: system default\nRule-ID: 127658a1-fd72-478e-ae54-afdc393394c7"
+   "text": "✅ DNS check created for 'vmk-h1'.\nLookup: vmk-h1, DNS server: system default\nRule-ID: ee8527a4-cc3c-4923-9843-2dd22b1ef9bc"
   },
   {
    "phase": "ops",
@@ -2253,9 +2253,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1222,
+   "ms": 1277,
    "placeholders": [],
-   "text": "✅ SMTP check 'SMTP' created for 'vmk-h1'.\nPort: default, STARTTLS: False\nRule-ID: 6610922a-4a22-4877-bb52-7dbf3d25dd7e"
+   "text": "✅ SMTP check 'SMTP' created for 'vmk-h1'.\nPort: default, STARTTLS: False\nRule-ID: dde03781-3c51-4d71-b13b-5e8aff309f4a"
   },
   {
    "phase": "ops",
@@ -2266,9 +2266,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1099,
+   "ms": 1416,
    "placeholders": [],
-   "text": "✅ FTP check on port 21 created for 'vmk-h1'.\nRule-ID: 06b12e23-e50b-455f-96db-01bf051d3394"
+   "text": "✅ FTP check on port 21 created for 'vmk-h1'.\nRule-ID: 95418966-8bf0-48e5-a22d-7647eb7313df"
   },
   {
    "phase": "ops",
@@ -2280,9 +2280,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1527,
+   "ms": 1486,
    "placeholders": [],
-   "text": "✅ LDAP check 'LDAP' created for 'vmk-h1'.\nBase DN: dc=example,dc=org\nRule-ID: 7a4c5d8b-4e55-4d65-89b7-98602e0e14b5"
+   "text": "✅ LDAP check 'LDAP' created for 'vmk-h1'.\nBase DN: dc=example,dc=org\nRule-ID: 2bcb7539-95cb-4214-bb99-b307562cf3c4"
   },
   {
    "phase": "ops",
@@ -2294,9 +2294,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 885,
+   "ms": 1044,
    "placeholders": [],
-   "text": "✅ SMB check on share 'data' created for 'vmk-h1'.\nWarn: 85.0%, Crit: 95.0%\nRule-ID: c1ec3b89-5798-4537-8757-1f7814c721a6"
+   "text": "✅ SMB check on share 'data' created for 'vmk-h1'.\nWarn: 85.0%, Crit: 95.0%\nRule-ID: e5c68a36-ff41-4adc-a279-b1c73a38192f"
   },
   {
    "phase": "ops",
@@ -2307,9 +2307,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1057,
+   "ms": 1008,
    "placeholders": [],
-   "text": "✅ Event Console check created for 'vmk-h1'.\nRule-ID: 24828474-99e6-452a-8810-faf9599b60f2"
+   "text": "✅ Event Console check created for 'vmk-h1'.\nRule-ID: 60644ad2-f5dd-429a-8ff1-dff4737a5164"
   },
   {
    "phase": "ops",
@@ -2320,9 +2320,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1104,
+   "ms": 1112,
    "placeholders": [],
-   "text": "✅ HW/SW inventory check created for 'vmk-h1'.\nRule-ID: ea39039e-6dc3-477a-b8fc-1cc923281c33"
+   "text": "✅ HW/SW inventory check created for 'vmk-h1'.\nRule-ID: 92243134-7bdc-4f1b-afaa-d23b022cb289"
   },
   {
    "phase": "ops",
@@ -2331,7 +2331,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 5911,
+   "ms": 5960,
    "text": ""
   },
   {
@@ -2341,11 +2341,11 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1592,
+   "ms": 1706,
    "placeholders": [
     "none"
    ],
-   "text": "🔍 **Active Checks**\n\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: c4ad9121-5653-43df-8419-ad48d47c6c89\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:tcp** — vmk-h1\n  ID: 29c0a099-e37d-4eae-88ce-302888538594\n  Value: `{'port': 22}`\n• [🟢 active] **active_checks:icmp** — vmk-h1\n  ID: 61aff77e-c73d-4118-8d02-1958b8366cff\n  Value: `{'description': 'PING', 'packets': 5, 'timeout': 20}`\n• [🟢 active] **active_checks:dns** — vmk-h1\n  ID: 127658a1-fd72-478e-ae54-afdc393394c7\n  Value: `{'hostname': 'vmk-h1', 'server': None, 'response_time': (0.2, 0.3)}`\n• [🟢 active] **active_checks:smtp** — vmk-h1\n  ID: 6610922a-4a22-4877-bb52-7dbf3d25dd7e\n  Value: `{'name': 'SMTP'}`\n• [🟢 active] **active_checks:ftp** — vmk-h1\n  ID: 06b12e23-e50b-455f-96db-01bf051d3394\n  Value: `{'port': 21, 'refuse_state': 'crit'}`\n• [🟢 active] **active_checks:ldap** — vmk-h1\n  ID: 7a4c5d8b-4e55-4d65-89b7-98602e0e14b5\n  Value: `{'name': 'LDAP', 'base_dn': 'dc=example,dc=org', 'response_time': (500.0, 800.0)}`\n• [🟢 active] **active_checks:disk_smb** — vmk-h1\n  ID: c1ec3b89-5798-4537-8757-1f7814c721a6\n  Value: `{'share': 'data', 'host': 'use_parent_host', 'levels': (85.0, 95.0)}`\n• [🟢 active] **active_checks:mkevents** — vmk-h1\n  ID: 24828474-99e6-452a-8810-faf9599b60f2\n  Value: `{'hostspec': ['$HOSTNAME$', '$HOSTADDRESS$', '$HOSTALIAS$'], 'ignore_acknowledged': True, 'remote': None, 'show_last_log...`\n• [🟢 active] **active_checks:cmk_inv** —"
+   "text": "🔍 **Active Checks**\n\n• [🟢 active] **active_checks:http** — vmk-h1\n  ID: 3790b07b-ff1b-4cf1-aaa6-2beec4b14534\n  Value: `{'name': 'HTTP', 'host': {'virthost': 'vmk-h1'}, 'mode': ('url', {'uri': '/'})}`\n• [🟢 active] **active_checks:tcp** — vmk-h1\n  ID: b368a465-f41f-4154-813a-eae6ac3a7eb3\n  Value: `{'port': 22}`\n• [🟢 active] **active_checks:icmp** — vmk-h1\n  ID: 60f57993-5225-4b47-ad71-b77cd333e663\n  Value: `{'description': 'PING', 'packets': 5, 'timeout': 20}`\n• [🟢 active] **active_checks:dns** — vmk-h1\n  ID: ee8527a4-cc3c-4923-9843-2dd22b1ef9bc\n  Value: `{'hostname': 'vmk-h1', 'server': None, 'response_time': (0.2, 0.3)}`\n• [🟢 active] **active_checks:smtp** — vmk-h1\n  ID: dde03781-3c51-4d71-b13b-5e8aff309f4a\n  Value: `{'name': 'SMTP'}`\n• [🟢 active] **active_checks:ftp** — vmk-h1\n  ID: 95418966-8bf0-48e5-a22d-7647eb7313df\n  Value: `{'port': 21, 'refuse_state': 'crit'}`\n• [🟢 active] **active_checks:ldap** — vmk-h1\n  ID: 2bcb7539-95cb-4214-bb99-b307562cf3c4\n  Value: `{'name': 'LDAP', 'base_dn': 'dc=example,dc=org', 'response_time': (500.0, 800.0)}`\n• [🟢 active] **active_checks:disk_smb** — vmk-h1\n  ID: e5c68a36-ff41-4adc-a279-b1c73a38192f\n  Value: `{'share': 'data', 'host': 'use_parent_host', 'levels': (85.0, 95.0)}`\n• [🟢 active] **active_checks:mkevents** — vmk-h1\n  ID: 60644ad2-f5dd-429a-8ff1-dff4737a5164\n  Value: `{'hostspec': ['$HOSTNAME$', '$HOSTADDRESS$', '$HOSTALIAS$'], 'ignore_acknowledged': True, 'remote': None, 'show_last_log...`\n• [🟢 active] **active_checks:cmk_inv** —"
   },
   {
    "phase": "ops",
@@ -2357,9 +2357,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1093,
+   "ms": 1082,
    "placeholders": [],
-   "text": "✅ Active check rule '29c0a099-e37d-4eae-88ce-302888538594' deleted."
+   "text": "✅ Active check rule 'b368a465-f41f-4154-813a-eae6ac3a7eb3' deleted."
   },
   {
    "phase": "ops",
@@ -2368,7 +2368,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 609,
+   "ms": 619,
    "text": ""
   },
   {
@@ -2383,9 +2383,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 3586,
+   "ms": 3590,
    "placeholders": [],
-   "text": "✅ Process thresholds for 'Process sshd' on 'vmk-h1' created.\nMinimum: warn<1, crit<1\nMaximum: warn>=5, crit>=10\nRule-ID: c6d7931e-cd78-4e30-b0c2-f69382d85499\n✅ Activation started (CheckMK runs it in the background).\n⚠️  Service discovery failed: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."
+   "text": "✅ Process thresholds for 'Process sshd' on 'vmk-h1' created.\nMinimum: warn<1, crit<1\nMaximum: warn>=5, crit>=10\nRule-ID: 8935b349-03e3-4069-9846-c793e738af86\n✅ Activation started (CheckMK runs it in the background).\n⚠️  Service discovery failed: Resource not found: Not Found — 404 Not Found: The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again."
   },
   {
    "phase": "ops",
@@ -2394,7 +2394,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 581,
+   "ms": 579,
    "text": ""
   },
   {
@@ -2408,9 +2408,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1039,
+   "ms": 1141,
    "placeholders": [],
-   "text": "✅ Interface parameters set for 'Interface eth0' on 'vmk-h1'.\nExpected speed: 1000 Mbit/s (1,000,000,000 bits/s)\nRule-ID: eca595b6-2c8d-4cb9-ad02-a9de2f8059ed\nℹ️  Activate changes for the rule to take effect."
+   "text": "✅ Interface parameters set for 'Interface eth0' on 'vmk-h1'.\nExpected speed: 1000 Mbit/s (1,000,000,000 bits/s)\nRule-ID: 6ede3158-2abc-4d3d-b6cf-433ee343c158\nℹ️  Activate changes for the rule to take effect."
   },
   {
    "phase": "ops",
@@ -2419,7 +2419,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 620,
+   "ms": 507,
    "text": ""
   },
   {
@@ -2433,9 +2433,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1010,
+   "ms": 1081,
    "placeholders": [],
-   "text": "✅ Memory thresholds set for 'vmk-h1'.\nRAM: warn>=80%, crit>=90%\nRule-ID: 26b6d9c7-3be0-4f1c-bc91-cdb4fb2f08ac\nℹ️  The rule is at the top, so it takes precedence over older rules."
+   "text": "✅ Memory thresholds set for 'vmk-h1'.\nRAM: warn>=80%, crit>=90%\nRule-ID: f3beb481-3e9e-4e5e-a06e-fbaec82f272e\nℹ️  The rule is at the top, so it takes precedence over older rules."
   },
   {
    "phase": "ops",
@@ -2444,7 +2444,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 675,
+   "ms": 613,
    "text": ""
   },
   {
@@ -2454,22 +2454,22 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 606,
+   "ms": 563,
    "placeholders": [],
-   "text": "🔍 **Process monitoring rules (inventory_processes_rules)**\n\n• 🟢 **Process sshd** (match: `sshd`) → vmk-h1\n  ID: `c6d7931e-cd78-4e30-b0c2-f69382d85499`\n  min warn/crit: 1/1, max warn/crit: 5/10"
+   "text": "🔍 **Process monitoring rules (inventory_processes_rules)**\n\n• 🟢 **Process sshd** (match: `sshd`) → vmk-h1\n  ID: `8935b349-03e3-4069-9846-c793e738af86`\n  min warn/crit: 1/1, max warn/crit: 5/10"
   },
   {
    "phase": "ops",
    "tool": "vibemk_delete_service_param_rule",
    "args": {
-    "rule_id": "c6d7931e-cd78-4e30-b0c2-f69382d85499"
+    "rule_id": "8935b349-03e3-4069-9846-c793e738af86"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1131,
+   "ms": 1148,
    "placeholders": [],
-   "text": "✅ Rule `c6d7931e-cd78-4e30-b0c2-f69382d85499` deleted."
+   "text": "✅ Rule `8935b349-03e3-4069-9846-c793e738af86` deleted."
   },
   {
    "phase": "ops",
@@ -2478,7 +2478,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 546,
+   "ms": 625,
    "text": ""
   },
   {
@@ -2488,9 +2488,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 2697,
+   "ms": 2019,
    "placeholders": [],
-   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: 53162069-9041-4675-b2ef-3fed64474075\nSites: cmk\nForce foreign changes: False\nChanges to activate: 3\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
+   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: b9eb0877-ec2d-48e2-9bd4-f3eb9541cd16\nSites: cmk\nForce foreign changes: False\nChanges to activate: 3\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
   },
   {
    "phase": "ops",
@@ -2499,7 +2499,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 13821,
+   "ms": 10718,
    "text": ""
   },
   {
@@ -2512,7 +2512,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 711,
+   "ms": 676,
    "placeholders": [],
    "text": "✅ **Service Discovery Started**\n\nHost: **vmk-h1**\nMode: refresh\n\n🔄 Discovery is running in the background.\nUse 'wait_for_discovery' or 'get_discovery_status' to check progress."
   },
@@ -2525,7 +2525,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 8208,
+   "ms": 5680,
    "placeholders": [],
    "text": "✅ **Discovery Completed**\n\nHost: **vmk-h1**\n\n🔄 Service discovery has finished.\nUse 'get_discovery_status' to see the results."
   },
@@ -2538,7 +2538,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 565,
+   "ms": 527,
    "placeholders": [],
    "text": "📊 **Service Discovery Status**\n\nHost: **vmk-h1**\n\n📋 **Service Summary:**\n  • New services: 0\n  • Unchanged services: 0\n  • Vanished services: 0\n  • Total services: 0\n\n"
   },
@@ -2551,7 +2551,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 438,
+   "ms": 516,
    "placeholders": [],
    "text": "✅ **Discovery Background Job**\n\nHost: **vmk-h1**\nState: FINISHED\nActive: no\n\n• Starting job...\n• Completed.\n\n💡 Use 'get_discovery_status' to see discovery results."
   },
@@ -2576,7 +2576,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 616,
+   "ms": 623,
    "placeholders": [],
    "text": "✅ **Bulk Discovery Started**\n\nJob ID: **bulk_discovery**\nHosts: 1 hosts\n  • vmk-h1\nOptions:\n  • Full scan: True\n  • Bulk size: 10\n  • Ignore errors: True\n  • Monitor undecided: True\n  • Remove vanished: False\n\n🔄 Bulk discovery is running in the background.\nUse 'get_bulk_discovery_status' with Job ID bulk_discovery to check progress."
   },
@@ -2589,7 +2589,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 956,
+   "ms": 986,
    "placeholders": [],
    "text": "🔄 **Bulk Discovery Job Status**\n\nJob ID: **bulk_discovery**\nState: RUNNING\n\n📊 **Progress:**\n  • Bulk discovery started...\n\n💡 Use 'get_discovery_status' on individual hosts for detailed results."
   },
@@ -2604,7 +2604,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 435,
+   "ms": 372,
    "placeholders": [],
    "text": "💬 **Comment Added**\n\nTarget: host 'vmk-h1'\nComment: vmk comment\nPersistent: True"
   },
@@ -2620,7 +2620,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 555,
+   "ms": 562,
    "placeholders": [],
    "text": "💬 **Comment Added**\n\nTarget: service 'vmk-h1/PING'\nComment: vmk svc\nPersistent: True"
   },
@@ -2631,7 +2631,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 889,
+   "ms": 1157,
    "text": ""
   },
   {
@@ -2641,7 +2641,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 565,
+   "ms": 516,
    "text": ""
   },
   {
@@ -2651,22 +2651,22 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 976,
+   "ms": 876,
    "placeholders": [],
-   "text": "💬 **Comments** (2 total):\n\n💬 HOST:113 - vmk-h1 - vmk comment (by cmkadmin)\n💬 SERVICE:114 - vmk-h1/PING - vmk svc (by cmkadmin)"
+   "text": "💬 **Comments** (2 total):\n\n💬 HOST:146 - vmk-h1 - vmk comment (by cmkadmin)\n💬 SERVICE:147 - vmk-h1/PING - vmk svc (by cmkadmin)"
   },
   {
    "phase": "ops",
    "tool": "vibemk_delete_comment",
    "args": {
-    "comment_id": 113
+    "comment_id": 146
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1075,
+   "ms": 1103,
    "placeholders": [],
-   "text": "💬 **Comment Deleted**\n\nTarget: comment #113"
+   "text": "💬 **Comment Deleted**\n\nTarget: comment #146"
   },
   {
    "phase": "ops",
@@ -2675,7 +2675,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 516,
+   "ms": 515,
    "text": ""
   },
   {
@@ -2689,7 +2689,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 504,
+   "ms": 513,
    "placeholders": [],
    "text": "💬 **Comment Deleted**\n\nTarget: vmk-h1/PING"
   },
@@ -2700,7 +2700,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 507,
+   "ms": 601,
    "text": ""
   },
   {
@@ -2709,16 +2709,16 @@
    "args": {
     "downtime_type": "host",
     "host_name": "vmk-h1",
-    "start_time": "2026-11-07T00:29:40Z",
-    "end_time": "2026-11-07T02:28:40Z",
+    "start_time": "2026-11-07T01:27:27Z",
+    "end_time": "2026-11-07T03:26:27Z",
     "comment": "vmk dt"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1460,
+   "ms": 7022,
    "placeholders": [],
-   "text": "✅ **Host Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Start:** 2026-11-07T00:29:00Z\n**End:** 2026-11-07T02:28:00Z\n**Duration:** 60 minutes\n**Comment:** vmk dt\n**Verification:** ✅ Confirmed\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
+   "text": "✅ **Host Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Start:** 2026-11-07T01:27:00Z\n**End:** 2026-11-07T03:26:00Z\n**Duration:** 60 minutes\n**Comment:** vmk dt\n**Verification:** ✅ Confirmed\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
   },
   {
    "phase": "ops",
@@ -2731,9 +2731,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1422,
+   "ms": 1564,
    "placeholders": [],
-   "text": "✅ **Host Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Start:** 2026-11-07T00:28:42Z\n**End:** 2026-11-07T00:58:42Z\n**Duration:** 30 minutes\n**Comment:** vmk dt2\n**Verification:** ✅ Confirmed\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
+   "text": "✅ **Host Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Start:** 2026-11-07T01:26:34Z\n**End:** 2026-11-07T01:56:34Z\n**Duration:** 30 minutes\n**Comment:** vmk dt2\n**Verification:** ✅ Confirmed\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
   },
   {
    "phase": "ops",
@@ -2749,9 +2749,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 23637,
+   "ms": 23769,
    "placeholders": [],
-   "text": "✅ **Service Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Services:** PING\n**Start:** 2026-11-07T00:28:43Z\n**End:** 2026-11-07T00:58:43Z\n**Duration:** 30 minutes\n**Comment:** vmk dt3\n**Verification:** ⚠️ Pending (may take a moment)\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
+   "text": "✅ **Service Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Services:** PING\n**Start:** 2026-11-07T01:26:36Z\n**End:** 2026-11-07T01:56:36Z\n**Duration:** 30 minutes\n**Comment:** vmk dt3\n**Verification:** ⚠️ Pending (may take a moment)\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
   },
   {
    "phase": "ops",
@@ -2760,16 +2760,16 @@
     "downtime_type": "service",
     "host_name": "vmk-h1",
     "service_description": "PING",
-    "start_time": "2026-11-07T00:30:07Z",
-    "end_time": "2026-11-07T02:29:07Z",
+    "start_time": "2026-11-07T01:27:59Z",
+    "end_time": "2026-11-07T03:26:59Z",
     "comment": "vmk dt4"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 23726,
+   "ms": 23405,
    "placeholders": [],
-   "text": "✅ **Service Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Services:** PING\n**Start:** 2026-11-07T00:30:00Z\n**End:** 2026-11-07T02:29:00Z\n**Duration:** 60 minutes\n**Comment:** vmk dt4\n**Verification:** ⚠️ Pending (may take a moment)\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
+   "text": "✅ **Service Downtime Scheduled Successfully**\n\n**Host:** vmk-h1\n**Services:** PING\n**Start:** 2026-11-07T01:27:00Z\n**End:** 2026-11-07T03:26:00Z\n**Duration:** 60 minutes\n**Comment:** vmk dt4\n**Verification:** ⚠️ Pending (may take a moment)\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view all active downtimes"
   },
   {
    "phase": "ops",
@@ -2778,7 +2778,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 2116,
+   "ms": 2055,
    "text": ""
   },
   {
@@ -2788,7 +2788,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 509,
+   "ms": 542,
    "text": ""
   },
   {
@@ -2800,9 +2800,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 916,
+   "ms": 948,
    "placeholders": [],
-   "text": "🔍 **Downtime Status for Host: vmk-h1**\n\n🏠 **Host Object Downtime:** ✅ **YES** - Host is covered by 2 active host-level downtime(s)\n🔧 **Service Downtimes:** ✅ **YES** - 1 service(s) on this host have active downtimes\n\n🎯 **CRITICAL DISTINCTION:** This host HAS host-level downtimes.\n   ✅ Host alerts (host DOWN, UNREACHABLE) are SUPPRESSED\n   ✅ All service alerts on this host are also SUPPRESSED\n   📊 Alert Status: HOST and SERVICE alerts both suppressed\n\n📋 **Active Host Downtimes:**\n   • Downtime #29: vmk dt\n   • Downtime #30: vmk dt2\n\n📋 **Active Service Downtimes:**\n   • Service 'PING' (#31): vmk dt3\n\n💡 **Usage:** This tool helps distinguish between host-level and service-level downtimes\n   for proper alerting analysis and downtime troubleshooting."
+   "text": "🔍 **Downtime Status for Host: vmk-h1**\n\n🏠 **Host Object Downtime:** ✅ **YES** - Host is covered by 2 active host-level downtime(s)\n🔧 **Service Downtimes:** ✅ **YES** - 2 service(s) on this host have active downtimes\n\n🎯 **CRITICAL DISTINCTION:** This host HAS host-level downtimes.\n   ✅ Host alerts (host DOWN, UNREACHABLE) are SUPPRESSED\n   ✅ All service alerts on this host are also SUPPRESSED\n   📊 Alert Status: HOST and SERVICE alerts both suppressed\n\n📋 **Active Host Downtimes:**\n   • Downtime #38: vmk dt\n   • Downtime #39: vmk dt2\n\n📋 **Active Service Downtimes:**\n   • Service 'PING' (#40): vmk dt3\n   • Service 'PING' (#41): vmk dt4\n\n💡 **Usage:** This tool helps distinguish between host-level and service-level downtimes\n   for proper alerting analysis and downtime troubleshooting."
   },
   {
    "phase": "ops",
@@ -2814,21 +2814,21 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 344,
+   "ms": 514,
    "placeholders": [],
-   "text": "📋 **Downtimes List for host 'vmk-h1'**\n\nFound 3 downtimes: **2 Host-Level** + **1 Service-Level**\n\n🏠 **HOST DOWNTIMES** (suppress ALL alerts for these hosts)\n============================================================\n\n**vmk-h1** (2 host downtimes)\n  • Downtime #29: 00:29 - 02:28\n    Comment: \"vmk dt\"\n    **Effect**: Host DOWN/UNREACHABLE + ALL service alerts suppressed\n\n  • Downtime #30: 00:28 - 00:58\n    Comment: \"vmk dt2\"\n    **Effect**: Host DOWN/UNREACHABLE + ALL service alerts suppressed\n\n🔧 **SERVICE DOWNTIMES** (suppress only specific service alerts)\n============================================================\n\n**vmk-h1** (1 service with downtimes)\n  📋 **PING** (1 downtime)\n    • Downtime #31: 00:28 - 00:58\n      Comment: \"vmk dt3\"\n      **Effect**: Only 'PING' alerts suppressed, host alerts STILL FIRE\n\n\n💡 **Key Distinction:**\n   • **Host Downtimes**: Suppress both host alerts (DOWN/UNREACHABLE) AND all service alerts\n   • **Service Downtimes**: Suppress only the specific service alerts, host alerts continue to fire\n💡 **Tip:** Use `vibemk_delete_downtime` with downtime ID to cancel a downtime"
+   "text": "📋 **Downtimes List for host 'vmk-h1'**\n\nFound 4 downtimes: **2 Host-Level** + **2 Service-Level**\n\n🏠 **HOST DOWNTIMES** (suppress ALL alerts for these hosts)\n============================================================\n\n**vmk-h1** (2 host downtimes)\n  • Downtime #38: 01:27 - 03:26\n    Comment: \"vmk dt\"\n    **Effect**: Host DOWN/UNREACHABLE + ALL service alerts suppressed\n\n  • Downtime #39: 01:26 - 01:56\n    Comment: \"vmk dt2\"\n    **Effect**: Host DOWN/UNREACHABLE + ALL service alerts suppressed\n\n🔧 **SERVICE DOWNTIMES** (suppress only specific service alerts)\n============================================================\n\n**vmk-h1** (1 service with downtimes)\n  📋 **PING** (2 downtimes)\n    • Downtime #40: 01:26 - 01:56\n      Comment: \"vmk dt3\"\n      **Effect**: Only 'PING' alerts suppressed, host alerts STILL FIRE\n\n    • Downtime #41: 01:27 - 03:26\n      Comment: \"vmk dt4\"\n      **Effect**: Only 'PING' alerts suppressed, host alerts STILL FIRE\n\n\n💡 **Key Distinction:**\n   • **Host Downtimes**: Suppress both host alerts (DOWN/UNREACHABLE) AND all service alerts\n   • **Service Downtimes**: Suppress only the specific service alerts, host alerts continue to fire\n💡 **Tip:** Use `vibemk_delete_downtime` with downtime ID to cancel a downtime"
   },
   {
    "phase": "ops",
    "tool": "vibemk_modify_downtime",
    "args": {
-    "downtime_id": 29,
-    "end_time": "2026-11-07T04:29:35Z"
+    "downtime_id": 38,
+    "end_time": "2026-11-07T05:27:27Z"
    },
    "expected": "err",
    "got": "err",
    "ok": true,
-   "ms": 7730,
+   "ms": 7727,
    "placeholders": [],
    "text": "❌ **Downtime not modified**\n\nCheckMK accepted the request but the monitoring core did not apply it: the Nagios core of the Raw and Community editions has no MODIFY_*_DOWNTIME command. Delete the downtime and schedule a new one instead."
   },
@@ -2839,21 +2839,21 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 541,
+   "ms": 551,
    "text": ""
   },
   {
    "phase": "ops",
    "tool": "vibemk_delete_downtime",
    "args": {
-    "downtime_id": 29
+    "downtime_id": 38
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1077,
+   "ms": 994,
    "placeholders": [],
-   "text": "✅ **Downtime Deleted**\n\n**Downtime ID:** 29\n**Status:** Removed from monitoring schedule\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view remaining active downtimes"
+   "text": "✅ **Downtime Deleted**\n\n**Downtime ID:** 38\n**Status:** Removed from monitoring schedule\n\n💡 **Tip:** Use `vibemk_list_downtimes` to view remaining active downtimes"
   },
   {
    "phase": "ops",
@@ -2862,7 +2862,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 539,
+   "ms": 453,
    "text": ""
   },
   {
@@ -2872,7 +2872,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 584,
+   "ms": 614,
    "text": ""
   },
   {
@@ -2886,7 +2886,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 534,
+   "ms": 633,
    "placeholders": [],
    "text": "✅ **Problem Acknowledged**\n\nTarget: host 'vmk-h1'\nComment: vmk ack"
   },
@@ -2901,7 +2901,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1096,
+   "ms": 902,
    "placeholders": [],
    "text": "✅ **Service Acknowledgement Created**\n\nHost: **vmk-h1**\nService: **PING**\nComment: vmk ack svc\nSticky: False\nPersistent: False\nNotify: False\n\nCheckMK Version: 2.3\n\nThe service problem has been acknowledged and will not generate further alerts."
   },
@@ -2912,7 +2912,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 3111,
+   "ms": 3086,
    "text": ""
   },
   {
@@ -2922,7 +2922,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 542,
+   "ms": 582,
    "text": ""
   },
   {
@@ -2932,9 +2932,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 567,
+   "ms": 480,
    "placeholders": [],
-   "text": "✅ **Current Acknowledgements**\n\n**1. Acknowledgement #119**\nType: Host\nHost: **vmk-h1**\nComment: vmk ack\nAuthor: cmkadmin\nEntry time: Nov 07 2026 00:29:48\nPersistent: False\n\n**2. Acknowledgement #120**\nType: Service\nHost: **vmk-h1**\nType: Service acknowledgement\nComment: vmk ack svc\nAuthor: cmkadmin\nEntry time: Nov 07 2026 00:29:48\nPersistent: False\n"
+   "text": "✅ **Current Acknowledgements**\n\n**1. Acknowledgement #152**\nType: Host\nHost: **vmk-h1**\nComment: vmk ack\nAuthor: cmkadmin\nEntry time: Nov 07 2026 01:27:40\nPersistent: False\n\n**2. Acknowledgement #153**\nType: Service\nHost: **vmk-h1**\nType: Service acknowledgement\nComment: vmk ack svc\nAuthor: cmkadmin\nEntry time: Nov 07 2026 01:27:40\nPersistent: False\n"
   },
   {
    "phase": "ops",
@@ -2945,7 +2945,7 @@
    "expected": "err",
    "got": "err",
    "ok": true,
-   "ms": 537,
+   "ms": 621,
    "placeholders": [],
    "text": "❌ This CheckMK version has no REST endpoint to remove an acknowledgement\n\nRemove it in the GUI; a non-sticky acknowledgement also clears itself when the state changes."
   },
@@ -2956,7 +2956,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 517,
+   "ms": 452,
    "text": ""
   },
   {
@@ -2969,7 +2969,7 @@
    "expected": "err",
    "got": "err",
    "ok": true,
-   "ms": 560,
+   "ms": 454,
    "placeholders": [],
    "text": "❌ This CheckMK version has no REST endpoint to remove an acknowledgement\n\nRemove it in the GUI; a non-sticky acknowledgement also clears itself when the state changes."
   },
@@ -2980,7 +2980,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 548,
+   "ms": 435,
    "text": ""
   },
   {
@@ -2998,7 +2998,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 518,
+   "ms": 348,
    "placeholders": [],
    "text": "✅ **Problem Acknowledged**\n\nTarget: service 'vmk-h1/PING'\nComment: vmk ack sticky"
   },
@@ -3009,7 +3009,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 583,
+   "ms": 590,
    "text": ""
   },
   {
@@ -3022,7 +3022,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 531,
+   "ms": 524,
    "placeholders": [],
    "text": "✅ **Host Acknowledgement Created**\n\nHost: **vmk-h1**\nComment: vmk ack 2\nSticky: False\nPersistent: False\nNotify: False\n\nCheckMK Version: 2.3\n\nThe host problem has been acknowledged and will not generate further alerts."
   },
@@ -3033,7 +3033,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 469,
+   "ms": 460,
    "text": ""
   },
   {
@@ -3059,7 +3059,7 @@
    "expected": "err",
    "got": "err",
    "ok": true,
-   "ms": 418,
+   "ms": 416,
    "placeholders": [],
    "text": "❌ **CheckMK API Error**\n\nResource not found: Not Found — Could not find event with id 999999."
   },
@@ -3074,7 +3074,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 360,
+   "ms": 557,
    "placeholders": [],
    "text": "✅ 1 event(s) deleted."
   },
@@ -3089,7 +3089,7 @@
    "expected": "err",
    "got": "err",
    "ok": true,
-   "ms": 398,
+   "ms": 527,
    "placeholders": [],
    "text": "❌ **CheckMK API Error**\n\nHTTP 400: Bad Request — Invalid URL 'login.py': No scheme supplied. Perhaps you meant https://login.py?"
   },
@@ -3102,7 +3102,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 544,
+   "ms": 509,
    "placeholders": [],
    "text": "✅ Logged out of site 'cmk'."
   },
@@ -3113,7 +3113,7 @@
    "expected": "err",
    "got": "err",
    "ok": true,
-   "ms": 440,
+   "ms": 397,
    "placeholders": [],
    "text": "❌ **Agent bakery not available**\n\nThis CheckMK edition has no agent bakery -- it is part of the commercial editions only. On Raw/Community, install the vanilla agent from Setup > Agents > Linux / Windows."
   },
@@ -3141,9 +3141,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 476,
+   "ms": 429,
    "placeholders": [],
-   "text": "📋 **Audit Log — 2026-11-07 (18 entries)**\n\n• `00:02:07` **cmkadmin** — edit-host [vmk-h1: Host]\n  Modified host vmk-h1.\n• `00:02:09` **cmkadmin** — edit-host [vmk-h1: Host]\n  Removed explicit attributes of host vmk-h1.\n• `00:04:01` **cmkadmin** — bulk-discovery [vmk-h1: Host]\n  Did service discovery on host vmk-h1: 0 added, 0 removed, 0 kept, 0 total services and 0 host labels added, 0 host labels total\n• `00:06:09` **cmkadmin** — delete-host [vmk-h1: Host]\n  Deleted host vmk-h1\n• `00:07:52` **cmkadmin** — create-host [vmk-h1: Host]\n  Created new host vmk-h1.\n\n…13 more entries (raise limit to see them)."
+   "text": "📋 **Audit Log — 2026-11-07 (28 entries)**\n\n• `00:02:07` **cmkadmin** — edit-host [vmk-h1: Host]\n  Modified host vmk-h1.\n• `00:02:09` **cmkadmin** — edit-host [vmk-h1: Host]\n  Removed explicit attributes of host vmk-h1.\n• `00:04:01` **cmkadmin** — bulk-discovery [vmk-h1: Host]\n  Did service discovery on host vmk-h1: 0 added, 0 removed, 0 kept, 0 total services and 0 host labels added, 0 host labels total\n• `00:06:09` **cmkadmin** — delete-host [vmk-h1: Host]\n  Deleted host vmk-h1\n• `00:07:52` **cmkadmin** — create-host [vmk-h1: Host]\n  Created new host vmk-h1.\n\n…23 more entries (raise limit to see them)."
   },
   {
    "phase": "ops",
@@ -3152,9 +3152,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1537,
+   "ms": 1467,
    "placeholders": [],
-   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: b7bb4d95-9fca-4735-b4eb-5aae20f0260e\nSites: cmk\nForce foreign changes: False\nChanges to activate: 1\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
+   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: 940d0e91-0dc1-4210-a4a3-de300164c332\nSites: cmk\nForce foreign changes: False\nChanges to activate: 1\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
   },
   {
    "phase": "ops",
@@ -3163,7 +3163,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 7482,
+   "ms": 7589,
    "text": ""
   },
   {
@@ -3176,7 +3176,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 633,
+   "ms": 567,
    "placeholders": [],
    "text": "✅ **Host Rename Started**\n\nOld name: vmk-h2b\nNew name: vmk-h2c\n\n⚠️ Remember to activate changes after the job completes."
   },
@@ -3187,7 +3187,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1136,
+   "ms": 1171,
    "text": ""
   },
   {
@@ -3197,7 +3197,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 477,
+   "ms": 638,
    "text": ""
   },
   {
@@ -3207,9 +3207,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 685,
+   "ms": 746,
    "placeholders": [],
-   "text": "📋 **Audit Log — 2026-11-07 (368 entries)**\n\n• `00:00:05` **cmkadmin** — new-rule [c57d5f0d-b7a9-448b-ac98-e9ba3fd594b8: Rule]\n  Created new rule #0 in ruleset \"Temperature\" in folder \"Main\"\n• `00:00:08` **cmkadmin** — snapshot-created\n  Created snapshot wato-snapshot-2026-11-07-00-00-07.tar\n• `00:00:08` **cmkadmin** — activate-changes\n  Starting activation (Sites: cmk)\n• `00:00:08` **cmkadmin** — activate-changes\n  Started activation of site cmk\n• `00:02:07` **cmkadmin** — edit-host [vmk-h1: Host]\n  Modified host vmk-h1.\n• `00:02:09` **cmkadmin** — edit-host [vmk-h1: Host]\n  Removed explicit attributes of host vmk-h1.\n• `00:02:13` **cmkadmin** — create-host [vmk-h2b: Host]\n  Created new host vmk-h2b.\n• `00:02:14` **cmkadmin** — edit-host [vmk-h2b: Host]\n  Modified host vmk-h2b.\n• `00:02:16` **cmkadmin** — create-host [vmk-h2: Host]\n  Created new host vmk-h2.\n• `00:02:17` **cmkadmin** — move-host [vmk-h2: Host]\n  Moved host from \"Main\" (ID: a54ba16bcc1c4277975e6aaa738ebb4e) to \"vmktest\" (ID: ad7957184aba4bb58169ceb9d0c4a354)\n• `00:02:20` **cmkadmin** — edit-folder [vmktest: Folder]\n  Edited properties of folder vibeMK test 2\n• `00:02:21` **cmkadmin** — create-host [vmk-cl: Host]\n  Created new host vmk-cl.\n• `00:02:24` **cmkadmin** — edit-rule [c57d5f0d-b7a9-448b-ac98-e9ba3fd594b8: Rule]\n  Changed properties of rule #0 in ruleset \"Temperature\" in folder \"Main\"\n• `00:02:27` **cmkadmin** — edit-ruleset [checkgroup_parameters:temperature: Ruleset]\n  Moved rule c57d5f0d-b7a9-448b-a"
+   "text": "📋 **Audit Log — 2026-11-07 (706 entries)**\n\n• `00:00:05` **cmkadmin** — new-rule [c57d5f0d-b7a9-448b-ac98-e9ba3fd594b8: Rule]\n  Created new rule #0 in ruleset \"Temperature\" in folder \"Main\"\n• `00:00:08` **cmkadmin** — snapshot-created\n  Created snapshot wato-snapshot-2026-11-07-00-00-07.tar\n• `00:00:08` **cmkadmin** — activate-changes\n  Starting activation (Sites: cmk)\n• `00:00:08` **cmkadmin** — activate-changes\n  Started activation of site cmk\n• `00:02:07` **cmkadmin** — edit-host [vmk-h1: Host]\n  Modified host vmk-h1.\n• `00:02:09` **cmkadmin** — edit-host [vmk-h1: Host]\n  Removed explicit attributes of host vmk-h1.\n• `00:02:13` **cmkadmin** — create-host [vmk-h2b: Host]\n  Created new host vmk-h2b.\n• `00:02:14` **cmkadmin** — edit-host [vmk-h2b: Host]\n  Modified host vmk-h2b.\n• `00:02:16` **cmkadmin** — create-host [vmk-h2: Host]\n  Created new host vmk-h2.\n• `00:02:17` **cmkadmin** — move-host [vmk-h2: Host]\n  Moved host from \"Main\" (ID: a54ba16bcc1c4277975e6aaa738ebb4e) to \"vmktest\" (ID: ad7957184aba4bb58169ceb9d0c4a354)\n• `00:02:20` **cmkadmin** — edit-folder [vmktest: Folder]\n  Edited properties of folder vibeMK test 2\n• `00:02:21` **cmkadmin** — create-host [vmk-cl: Host]\n  Created new host vmk-cl.\n• `00:02:24` **cmkadmin** — edit-rule [c57d5f0d-b7a9-448b-ac98-e9ba3fd594b8: Rule]\n  Changed properties of rule #0 in ruleset \"Temperature\" in folder \"Main\"\n• `00:02:27` **cmkadmin** — edit-ruleset [checkgroup_parameters:temperature: Ruleset]\n  Moved rule c57d5f0d-b7a9-448b-a"
   },
   {
    "phase": "ops",
@@ -3220,7 +3220,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 477,
+   "ms": 470,
    "placeholders": [],
    "text": "📋 **Ruleset Details: checkgroup_parameters:temperature**\n\n**Title:** Temperature\n**Number of Rules:** 1\n\n**Available Operations:**\n• Use `vibemk_get_ruleset` to see actual rules in this ruleset\n• Use `vibemk_create_rule` to add new rules to this ruleset\n• Use `vibemk_search_rulesets` to find related rulesets\n"
   },
@@ -3241,7 +3241,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 550,
+   "ms": 632,
    "placeholders": [
     "no description"
    ],
@@ -3264,7 +3264,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 7609,
+   "ms": 7841,
    "placeholders": [],
    "text": "ℹ️ **No Pending Changes**\n\nThere are no configuration changes to activate."
   },
@@ -3272,53 +3272,53 @@
    "phase": "cleanup",
    "tool": "vibemk_delete_rule",
    "args": {
-    "rule_id": "1c6905d2-f583-4e79-9dae-64485a810812"
+    "rule_id": "bad92780-23da-4c54-8d46-8005fac07197"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1198,
+   "ms": 1192,
    "placeholders": [],
-   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: 1c6905d2-f583-4e79-9dae-64485a810812\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
+   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: bad92780-23da-4c54-8d46-8005fac07197\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
   },
   {
    "phase": "cleanup",
    "tool": "vibemk_delete_notification_rule",
    "args": {
-    "rule_id": "20b2d467-d8cd-4189-bc95-f24d99d8a5ae"
+    "rule_id": "745fcaed-228f-432a-99fa-ec4b964c25a3"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1170,
+   "ms": 1229,
    "placeholders": [],
-   "text": "✅ **Notification rule '20b2d467-d8cd-4189-bc95-f24d99d8a5ae' deleted**\n\n**next step**: activate changes to apply it"
+   "text": "✅ **Notification rule '745fcaed-228f-432a-99fa-ec4b964c25a3' deleted**\n\n**next step**: activate changes to apply it"
   },
   {
    "phase": "cleanup",
    "tool": "vibemk_delete_rule",
    "args": {
-    "rule_id": "c344f14e-ca22-44f9-af48-3f77988b05f1"
+    "rule_id": "d4a26c0c-5548-4fc3-8d5c-a481ac9d7cee"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1172,
+   "ms": 1199,
    "placeholders": [],
-   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: c344f14e-ca22-44f9-af48-3f77988b05f1\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
+   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: d4a26c0c-5548-4fc3-8d5c-a481ac9d7cee\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
   },
   {
    "phase": "cleanup",
    "tool": "vibemk_delete_rule",
    "args": {
-    "rule_id": "698827b2-8d5c-4903-aea7-374a215d33b7"
+    "rule_id": "b5f51af0-58fe-4507-97ca-f9b761c50b98"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1168,
+   "ms": 1213,
    "placeholders": [],
-   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: 698827b2-8d5c-4903-aea7-374a215d33b7\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
+   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: b5f51af0-58fe-4507-97ca-f9b761c50b98\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
   },
   {
    "phase": "cleanup",
@@ -3330,9 +3330,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1496,
+   "ms": 1099,
    "placeholders": [],
-   "text": "✅ Active check rule 'c4ad9121-5653-43df-8419-ad48d47c6c89' deleted."
+   "text": "✅ Active check rule '3790b07b-ff1b-4cf1-aaa6-2beec4b14534' deleted."
   },
   {
    "phase": "cleanup",
@@ -3344,9 +3344,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1235,
+   "ms": 1310,
    "placeholders": [],
-   "text": "✅ Active check rule '61aff77e-c73d-4118-8d02-1958b8366cff' deleted."
+   "text": "✅ Active check rule '60f57993-5225-4b47-ad71-b77cd333e663' deleted."
   },
   {
    "phase": "cleanup",
@@ -3358,9 +3358,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1126,
+   "ms": 1060,
    "placeholders": [],
-   "text": "✅ Active check rule '6840884e-377d-4ea8-949d-5ceadff89ad7' deleted."
+   "text": "✅ Active check rule '613433b1-9106-4349-b056-710d5b9b04c1' deleted."
   },
   {
    "phase": "cleanup",
@@ -3372,9 +3372,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1261,
+   "ms": 1115,
    "placeholders": [],
-   "text": "✅ Active check rule '127658a1-fd72-478e-ae54-afdc393394c7' deleted."
+   "text": "✅ Active check rule 'ee8527a4-cc3c-4923-9843-2dd22b1ef9bc' deleted."
   },
   {
    "phase": "cleanup",
@@ -3386,9 +3386,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1111,
+   "ms": 1291,
    "placeholders": [],
-   "text": "✅ Active check rule '6610922a-4a22-4877-bb52-7dbf3d25dd7e' deleted."
+   "text": "✅ Active check rule 'dde03781-3c51-4d71-b13b-5e8aff309f4a' deleted."
   },
   {
    "phase": "cleanup",
@@ -3400,9 +3400,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1299,
+   "ms": 1252,
    "placeholders": [],
-   "text": "✅ Active check rule '06b12e23-e50b-455f-96db-01bf051d3394' deleted."
+   "text": "✅ Active check rule '95418966-8bf0-48e5-a22d-7647eb7313df' deleted."
   },
   {
    "phase": "cleanup",
@@ -3414,9 +3414,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1088,
+   "ms": 1095,
    "placeholders": [],
-   "text": "✅ Active check rule '7a4c5d8b-4e55-4d65-89b7-98602e0e14b5' deleted."
+   "text": "✅ Active check rule '2bcb7539-95cb-4214-bb99-b307562cf3c4' deleted."
   },
   {
    "phase": "cleanup",
@@ -3428,9 +3428,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1153,
+   "ms": 1097,
    "placeholders": [],
-   "text": "✅ Active check rule 'c1ec3b89-5798-4537-8757-1f7814c721a6' deleted."
+   "text": "✅ Active check rule 'e5c68a36-ff41-4adc-a279-b1c73a38192f' deleted."
   },
   {
    "phase": "cleanup",
@@ -3442,9 +3442,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 987,
+   "ms": 1098,
    "placeholders": [],
-   "text": "✅ Active check rule '24828474-99e6-452a-8810-faf9599b60f2' deleted."
+   "text": "✅ Active check rule '60644ad2-f5dd-429a-8ff1-dff4737a5164' deleted."
   },
   {
    "phase": "cleanup",
@@ -3456,35 +3456,35 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1131,
+   "ms": 1224,
    "placeholders": [],
-   "text": "✅ Active check rule 'ea39039e-6dc3-477a-b8fc-1cc923281c33' deleted."
+   "text": "✅ Active check rule '92243134-7bdc-4f1b-afaa-d23b022cb289' deleted."
   },
   {
    "phase": "cleanup",
    "tool": "vibemk_delete_rule",
    "args": {
-    "rule_id": "eca595b6-2c8d-4cb9-ad02-a9de2f8059ed"
+    "rule_id": "6ede3158-2abc-4d3d-b6cf-433ee343c158"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1181,
+   "ms": 1978,
    "placeholders": [],
-   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: eca595b6-2c8d-4cb9-ad02-a9de2f8059ed\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
+   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: 6ede3158-2abc-4d3d-b6cf-433ee343c158\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
   },
   {
    "phase": "cleanup",
    "tool": "vibemk_delete_rule",
    "args": {
-    "rule_id": "26b6d9c7-3be0-4f1c-bc91-cdb4fb2f08ac"
+    "rule_id": "f3beb481-3e9e-4e5e-a06e-fbaec82f272e"
    },
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1167,
+   "ms": 1501,
    "placeholders": [],
-   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: 26b6d9c7-3be0-4f1c-bc91-cdb4fb2f08ac\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
+   "text": "✅ **Rule Deleted Successfully**\n\nRule ID: f3beb481-3e9e-4e5e-a06e-fbaec82f272e\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The rule is only marked for deletion until you activate changes!"
   },
   {
    "phase": "cleanup",
@@ -3495,7 +3495,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1492,
+   "ms": 1525,
    "placeholders": [],
    "text": "✅ **Host Deleted Successfully**\n\nHost: vmk-cl\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The host is only marked for deletion until you activate changes!"
   },
@@ -3508,7 +3508,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1649,
+   "ms": 1658,
    "placeholders": [],
    "text": "✅ **Host Deleted Successfully**\n\nHost: vmk-h2\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The host is only marked for deletion until you activate changes!"
   },
@@ -3521,7 +3521,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1606,
+   "ms": 1555,
    "placeholders": [],
    "text": "✅ **Host Deleted Successfully**\n\nHost: vmk-h2c\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The host is only marked for deletion until you activate changes!"
   },
@@ -3534,7 +3534,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1533,
+   "ms": 1574,
    "placeholders": [],
    "text": "✅ **Host Deleted Successfully**\n\nHost: vmk-h1\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The host is only marked for deletion until you activate changes!"
   },
@@ -3547,7 +3547,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 623,
+   "ms": 604,
    "placeholders": [],
    "text": "✅ **Folder Deleted Successfully**\n\n📁 **Folder:** /vmktest\n⚙️ **API Path:** ~vmktest\n🗑️ **Delete Mode:** abort_on_nonempty\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The folder is only marked for deletion until you activate changes!"
   },
@@ -3560,7 +3560,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1015,
+   "ms": 992,
    "placeholders": [],
    "text": "✅ **Service Group Deleted Successfully**\n\n**Deleted:** vmksg\n\n⚠️ **Remember to activate changes!**"
   },
@@ -3576,7 +3576,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 521,
+   "ms": 715,
    "placeholders": [],
    "text": "✅ **Bulk Service Groups Deleted Successfully**\n\n**Deleted:** 2 service groups\n\n📋 **Deleted Groups:**\n• vmksg2\n• vmksg3\n\n⚠️ **Remember to activate changes!**"
   },
@@ -3589,7 +3589,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 873,
+   "ms": 1130,
    "placeholders": [],
    "text": "✅ **User Deleted Successfully**\n\nUsername: vmkuser\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The user is only marked for deletion until you activate changes!"
   },
@@ -3602,7 +3602,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 506,
+   "ms": 608,
    "placeholders": [],
    "text": "✅ **User Role Deleted Successfully**\n\n**Deleted Role**: `vmkrole`\n\n⚠️ **Important Notes:**\n• Users with this role will need to be reassigned to other roles\n• Built-in roles (admin, user, guest) cannot be deleted\n• This action cannot be undone\n\n💡 **Use `vibemk_list_user_roles` to view remaining roles**"
   },
@@ -3615,7 +3615,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 852,
+   "ms": 960,
    "placeholders": [],
    "text": "✅ **Contact Group Deleted Successfully**\n\nName: vmkcg\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The contact group is only marked for deletion until you activate changes!"
   },
@@ -3628,7 +3628,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1128,
+   "ms": 1081,
    "placeholders": [],
    "text": "✅ **Host Group Deleted Successfully**\n\nName: vmkhg\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The host group is only marked for deletion until you activate changes!"
   },
@@ -3641,7 +3641,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1055,
+   "ms": 1083,
    "placeholders": [],
    "text": "✅ **Host Tag Group Deleted Successfully**\n\nTag ID: vmktag\nRepair mode: Disabled\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The tag group is only marked for deletion until you activate changes!"
   },
@@ -3654,7 +3654,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 616,
+   "ms": 482,
    "placeholders": [],
    "text": "✅ Auxiliary tag 'vmkaux' deleted."
   },
@@ -3667,7 +3667,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1995,
+   "ms": 2070,
    "placeholders": [],
    "text": "✅ **Time Period Deleted Successfully**\n\nName: vmktp\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The time period is only marked for deletion until you activate changes!"
   },
@@ -3680,7 +3680,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 2817,
+   "ms": 2700,
    "placeholders": [],
    "text": "✅ **Password Deleted Successfully**\n\nIdentifier: vmkpw\n\n🔒 **Security Note:** The password has been securely removed\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The password is only marked for deletion until you activate changes!"
   },
@@ -3695,7 +3695,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 658,
+   "ms": 687,
    "placeholders": [],
    "text": "✅ **Folder Created Successfully**\n\n📁 **Folder:** vmkmove\n📝 **Title:** move me\n📂 **Parent:** /\n🔗 **Full Path:** /vmkmove\n⚙️ **API Path:** ~vmkmove\n\n⚠️ **Remember to activate changes!**"
   },
@@ -3710,7 +3710,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 627,
+   "ms": 529,
    "placeholders": [],
    "text": "✅ **Folder Created Successfully**\n\n📁 **Folder:** vmkdest\n📝 **Title:** dest\n📂 **Parent:** /\n🔗 **Full Path:** /vmkdest\n⚙️ **API Path:** ~vmkdest\n\n⚠️ **Remember to activate changes!**"
   },
@@ -3724,7 +3724,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1071,
+   "ms": 1066,
    "placeholders": [],
    "text": "✅ **Folder Moved Successfully**\n\n📁 **Source:** /vmkmove\n📂 **Destination:** /vmkdest\n⚙️ **API Paths:**\n   • From: ~vmkmove\n   • To: ~vmkdest\n\n⚠️ **Remember to activate changes!**"
   },
@@ -3737,7 +3737,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 577,
+   "ms": 635,
    "placeholders": [],
    "text": "✅ **Folder Deleted Successfully**\n\n📁 **Folder:** /vmkdest/vmkmove\n⚙️ **API Path:** ~vmkdest~vmkmove\n🗑️ **Delete Mode:** abort_on_nonempty\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The folder is only marked for deletion until you activate changes!"
   },
@@ -3750,7 +3750,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 564,
+   "ms": 452,
    "placeholders": [],
    "text": "✅ **Folder Deleted Successfully**\n\n📁 **Folder:** /vmkdest\n⚙️ **API Path:** ~vmkdest\n🗑️ **Delete Mode:** abort_on_nonempty\n\n📝 **Next Steps:**\n1️⃣ Use 'get_pending_changes' to review the deletion\n2️⃣ Use 'activate_changes' to apply the configuration\n\n💡 **Important:** The folder is only marked for deletion until you activate changes!"
   },
@@ -3761,9 +3761,9 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 1850,
+   "ms": 1723,
    "placeholders": [],
-   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: 851ba027-a09d-413f-8999-731672c8f18e\nSites: cmk\nForce foreign changes: False\nChanges to activate: 33\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
+   "text": "✅ **Changes Activation Started Successfully**\n\nActivation ID: b12a9027-c278-43b6-92cb-3850024a1c6f\nSites: cmk\nForce foreign changes: False\nChanges to activate: 33\n\n⏳ Activation is now running...\n💡 Check the CheckMK GUI for progress details."
   },
   {
    "phase": "cleanup",
@@ -3772,7 +3772,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 8890,
+   "ms": 9894,
    "text": ""
   },
   {
@@ -3782,7 +3782,7 @@
    "expected": "ok",
    "got": "ok",
    "ok": true,
-   "ms": 29951,
+   "ms": 30380,
    "text": ""
   }
  ]

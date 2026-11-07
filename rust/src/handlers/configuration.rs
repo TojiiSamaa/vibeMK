@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use serde_json::{json, Value};
 
 use crate::client::{ApiError, CheckMkClient};
-use crate::handlers::base::{py_repr, Base, Handler};
+use crate::handlers::base::{activation_refusal, py_repr, ActivationRefusal, Base, Handler};
 
 const PENDING: &str = "domain-types/activation_run/collections/pending_changes";
 const MAX_LISTED_CHANGES: usize = 15;
@@ -92,6 +92,17 @@ There are no configuration changes to activate."}),
             {
                 Ok(r) => break (r, count),
                 Err(e) if attempt == 0 && e.status_code == Some(412) => attempt += 1,
+                Err(e) if activation_refusal(&e) == Some(ActivationRefusal::NoChanges) => {
+                    return Ok(vec![
+                        json!({"type": "text", "text": "ℹ️ **No Pending Changes**\n\nThere are no configuration changes to activate."}),
+                    ]);
+                }
+                Err(e) if activation_refusal(&e) == Some(ActivationRefusal::ForeignChanges) => {
+                    return Ok(self.base.error_response(
+                        "Activation refused: other users have pending changes",
+                        Some("CheckMK activates every pending change of a site at once. Review them with vibemk_get_pending_changes; to activate them as well, call vibemk_activate_changes again with force_foreign_changes=true."),
+                    ));
+                }
                 Err(e) => {
                     return Ok(self
                         .base

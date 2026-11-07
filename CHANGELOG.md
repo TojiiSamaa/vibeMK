@@ -10,7 +10,24 @@ All notable changes to this project will be documented in this file.
   refuses the others;
   CI in `.github/workflows/ci-rust.yml`
 
+### Changed
+- `activate_changes=true` on a write tool no longer activates other users' pending
+  changes (it sent `force_foreign_changes: true`). When they block the activation,
+  the tool says so; `vibemk_activate_changes` with `force_foreign_changes=true`
+  activates them deliberately (AUDIT S2)
+- Downtime times are shown in local time, the zone typed times are read in;
+  CheckMK sends them in UTC, so a downtime scheduled for 22:00 in Paris was
+  listed at 21:00 (AUDIT E10b)
+
 ### Fixed
+- Activation refusals CheckMK 2.3 and 2.5 really send are read for what they are:
+  401/403 "changes from other users" is no longer reported as a login or
+  permission failure, and 422 "no changes to activate" is an info, not an error
+  (AUDIT E9c)
+- A DELETE retried after a 5xx that then gets 404 is reported as deleted (the first
+  attempt had gone through) (AUDIT E5)
+- The packaging test builds from a copy of the project, so two test runs no
+  longer break each other (AUDIT P4); CI also runs the tests on Windows and macOS (P3)
 - Audit findings, reported in the Rust port and tested there (ids in
   `AUDIT.md`): `Authorization` is not sent on a redirect to another host (S1);
   a non-ASCII bearer token is a 401 (S3); object paths are escaped (S4);

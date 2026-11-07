@@ -87,8 +87,15 @@ class TestTheDurationGrammar:
 class TestReadingTimestampsBackFromCheckmk:
     """CheckMK returns start/end times as either ISO strings or Unix numbers."""
 
-    def test_an_iso_string_with_z_is_understood(self, handler):
-        assert handler._format_timestamp("2026-03-01T22:00:00Z") == "2026-03-01 22:00"
+    def test_an_iso_string_with_z_is_understood(self, handler, away_from_utc):
+        assert handler._format_timestamp("2026-03-01T22:00:00Z") == "2026-03-02 03:30"
+
+    def test_checkmk_utc_times_are_shown_in_the_zone_times_are_typed_in(self, handler, away_from_utc):
+        """E10b: CheckMK sends "+00:00"; a downtime typed for 22:00 at +5:30 showed 16:30."""
+        assert handler._format_timestamp("2030-01-01T16:30:00+00:00") == "2030-01-01 22:00"
+        assert handler._get_time_only("2030-01-01T16:30:00+00:00") == "22:00"
+        stamp = dt.datetime(2030, 1, 1, 22, 0).timestamp()
+        assert handler._format_timestamp(stamp) == "2030-01-01 22:00"
 
     def test_a_unix_number_is_understood(self, handler):
         stamp = dt.datetime(2026, 3, 1, 22, 0).timestamp()

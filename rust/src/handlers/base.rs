@@ -18,7 +18,7 @@ use async_trait::async_trait;
 use futures::stream::{self, StreamExt};
 use serde_json::{json, Value};
 
-use crate::client::{ApiResponse, CheckMkClient, Headers};
+use crate::client::{ApiError, ApiResponse, CheckMkClient, Headers};
 
 /// Block carrying machine-readable data; the dispatcher lifts it into structuredContent.
 pub const STRUCTURED_BLOCK: &str = "_structured";
@@ -31,6 +31,38 @@ pub const ACTIVATION_RUNNING: &str = "domain-types/activation_run/collections/ru
 /// How long an activation waits for a run already in progress, and how often it looks.
 pub const ACTIVATION_RUNNING_WAIT: std::time::Duration = std::time::Duration::from_secs(60);
 pub const ACTIVATION_RUNNING_POLL: std::time::Duration = std::time::Duration::from_millis(500);
+
+/// The two refusals of activate-changes that are not plain failures.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ActivationRefusal {
+    /// Other users have pending changes and `force_foreign_changes` was false.
+    ForeignChanges,
+    /// The site had nothing left to activate.
+    NoChanges,
+}
+
+/// Measured on CheckMK 2.3.0p52 and 2.5.0p18: changes by another user without
+/// force answer 401 (2.3) or 403 (2.5) with "There are changes from other users
+/// and foreign changes are not allowed in this API call."; nothing to activate
+/// answers 422 "Currently there are no changes to activate." The status alone
+/// would read as a login or permission problem.
+pub fn activation_refusal(error: &ApiError) -> Option<ActivationRefusal> {
+    let detail = error
+        .response_data
+        .get("detail")
+        .and_then(Value::as_str)
+        .unwrap_or("")
+        .to_lowercase();
+    match error.status_code {
+        Some(401 | 403) if detail.contains("changes from other users") => {
+            Some(ActivationRefusal::ForeignChanges)
+        }
+        Some(422) if detail.contains("no changes to activate") => {
+            Some(ActivationRefusal::NoChanges)
+        }
+        _ => None,
+    }
+}
 
 #[async_trait]
 pub trait Handler: Send + Sync {
@@ -228,8 +260,8 @@ impl Base {
         if !pending.data.pointer("/value").is_some_and(truthy) {
             return "ℹ️ No pending changes to activate.".to_string();
         }
-        // S2 (AUDIT): force_foreign_changes stays true as in Python until Toji decides.
-        let body = json!({"redirect": false, "sites": [self.client.config.site], "force_foreign_changes": true});
+        // S2 (AUDIT): a write tool never activates another user's changes.
+        let body = json!({"redirect": false, "sites": [self.client.config.site], "force_foreign_changes": false});
         let headers: Headers = vec![("If-Match".to_string(), Self::extract_etag(&pending))];
         match self
             .client
@@ -241,7 +273,11 @@ impl Base {
             .await
         {
             Ok(_) => "✅ Activation started (CheckMK runs it in the background).".to_string(),
-            Err(e) => format!("⚠️ Activation failed: {e}"),
+            Err(e) => match activation_refusal(&e) {
+                Some(ActivationRefusal::ForeignChanges) => "⚠️ Not activated: other users have pending changes, and vibeMK does not activate them on its own. Review them with vibemk_get_pending_changes, then run vibemk_activate_changes with force_foreign_changes=true.".to_string(),
+                Some(ActivationRefusal::NoChanges) => "ℹ️ No pending changes to activate.".to_string(),
+                None => format!("⚠️ Activation failed: {e}"),
+            },
         }
     }
 

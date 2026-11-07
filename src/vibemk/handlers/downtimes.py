@@ -13,6 +13,16 @@ from vibemk.handlers.base import BaseHandler
 MODIFY_READBACK_TRIES = 5
 
 
+def local(moment: dt.datetime) -> dt.datetime:
+    """An aware time in the local zone, the zone typed times are read in (E10b).
+
+    CheckMK 2.3 and 2.5 send downtime times as ISO in UTC ("+00:00"), while
+    "22:00 tomorrow" is read as local time: shown as sent, a downtime
+    scheduled for 22:00 in Paris was listed at 21:00. A naive time stays as is.
+    """
+    return moment.astimezone() if moment.tzinfo is not None else moment
+
+
 def unix_time(timestamp: Any) -> float:
     """A downtime's ISO 8601 time (or a number) as a Unix timestamp; 0.0 when unreadable."""
     try:
@@ -692,7 +702,7 @@ class DowntimeHandler(BaseHandler):
         try:
             # If it's already a string, try to parse as ISO format
             if isinstance(timestamp, str):
-                moment = dt.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                moment = local(dt.datetime.fromisoformat(timestamp.replace("Z", "+00:00")))
                 return moment.strftime("%Y-%m-%d %H:%M")
             # If it's a number, treat as Unix timestamp
             elif isinstance(timestamp, (int, float)):
@@ -711,7 +721,7 @@ class DowntimeHandler(BaseHandler):
         """Extract time-only format (HH:MM) from various timestamp formats"""
         try:
             if isinstance(timestamp, str):
-                moment = dt.datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+                moment = local(dt.datetime.fromisoformat(timestamp.replace("Z", "+00:00")))
                 return moment.strftime("%H:%M")
             elif isinstance(timestamp, (int, float)):
                 moment = dt.datetime.fromtimestamp(timestamp)

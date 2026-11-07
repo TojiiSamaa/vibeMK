@@ -257,6 +257,56 @@ async fn delete_is_retried_on_server_error() {
     assert_eq!(hits(&server).await, 2);
 }
 
+/// E5: the first attempt deleted the object, then a proxy answered 502.
+#[tokio::test]
+async fn a_404_on_a_replayed_delete_is_the_delete_succeeding() {
+    let (server, client) = fake_checkmk_retrying(2).await;
+    Mock::given(method("DELETE"))
+        .respond_with(failing(502))
+        .up_to_n_times(1)
+        .mount(&server)
+        .await;
+    Mock::given(method("DELETE"))
+        .respond_with(status(404))
+        .mount(&server)
+        .await;
+    client
+        .delete("objects/host_config/web01", None, &[])
+        .await
+        .unwrap();
+    assert_eq!(hits(&server).await, 2);
+}
+
+#[tokio::test]
+async fn a_404_on_the_first_delete_or_a_replayed_get_is_still_not_found() {
+    let (server, client) = fake_checkmk_retrying(2).await;
+    Mock::given(method("DELETE"))
+        .respond_with(status(404))
+        .mount(&server)
+        .await;
+    let e = client
+        .delete("objects/host_config/never-there", None, &[])
+        .await
+        .unwrap_err();
+    assert_eq!(e.status_code, Some(404));
+
+    let (server, client) = fake_checkmk_retrying(2).await;
+    Mock::given(method("GET"))
+        .respond_with(failing(502))
+        .up_to_n_times(1)
+        .mount(&server)
+        .await;
+    Mock::given(method("GET"))
+        .respond_with(status(404))
+        .mount(&server)
+        .await;
+    let e = client
+        .get("objects/host_config/web01", None, &[])
+        .await
+        .unwrap_err();
+    assert_eq!(e.status_code, Some(404));
+}
+
 #[tokio::test]
 async fn put_is_retried_on_server_error() {
     let (server, client) = fake_checkmk_retrying(2).await;

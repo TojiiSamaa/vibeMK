@@ -7,7 +7,7 @@ import time
 from typing import Any, Dict, List
 
 from vibemk.api.exceptions import CheckMKError
-from vibemk.handlers.base import ACTIVATION_RUNNING, BaseHandler
+from vibemk.handlers.base import ACTIVATION_RUNNING, FOREIGN_CHANGES, NO_CHANGES, BaseHandler, activation_refusal
 
 RUNNING = ACTIVATION_RUNNING
 
@@ -108,6 +108,21 @@ class ConfigurationHandler(BaseHandler):
             except CheckMKError as error:
                 if attempt == 0 and error.status_code == 412:
                     continue
+                refusal = activation_refusal(error)
+                if refusal == NO_CHANGES:
+                    return [
+                        {
+                            "type": "text",
+                            "text": "ℹ️ **No Pending Changes**\n\nThere are no configuration changes to activate.",
+                        }
+                    ]
+                if refusal == FOREIGN_CHANGES:
+                    return self.error_response(
+                        "Activation refused: other users have pending changes",
+                        "CheckMK activates every pending change of a site at once. Review them with "
+                        "vibemk_get_pending_changes; to activate them as well, call vibemk_activate_changes "
+                        "again with force_foreign_changes=true.",
+                    )
                 return self.error_response("Activation failed", str(error))
 
         if result.get("success"):

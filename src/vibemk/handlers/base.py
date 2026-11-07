@@ -22,6 +22,29 @@ T = TypeVar("T")
 R = TypeVar("R")
 
 ACTIVATION_RUNNING = "domain-types/activation_run/collections/running"
+
+
+FOREIGN_CHANGES = "foreign_changes"
+NO_CHANGES = "no_changes"
+
+
+def activation_refusal(error: CheckMKError) -> Optional[str]:
+    """Name the two refusals of activate-changes that are not plain failures.
+
+    Measured on CheckMK 2.3.0p52 and 2.5.0p18: changes by another user without
+    force_foreign_changes answer 401 (2.3) or 403 (2.5) with "There are changes
+    from other users and foreign changes are not allowed in this API call.";
+    nothing left to activate answers 422 "Currently there are no changes to
+    activate." The status alone would read as a login or permission problem.
+    """
+    detail = str((error.response_data or {}).get("detail") or "").lower()
+    if error.status_code in (401, 403) and "changes from other users" in detail:
+        return FOREIGN_CHANGES
+    if error.status_code == 422 and "no changes to activate" in detail:
+        return NO_CHANGES
+    return None
+
+
 _SECONDS_PER_MINUTE = 60
 _SECONDS_PER_HOUR = 3600
 _SECONDS_PER_DAY = 86400
@@ -195,11 +218,20 @@ class BaseHandler(ABC):
                 data={
                     "redirect": False,
                     "sites": [self.client.config.site],
-                    "force_foreign_changes": True,
+                    "force_foreign_changes": False,
                 },
                 headers={"If-Match": self._extract_etag(pending)},
             )
         except CheckMKError as error:
+            refusal = activation_refusal(error)
+            if refusal == FOREIGN_CHANGES:
+                return (
+                    "⚠️ Not activated: other users have pending changes, and vibeMK does not "
+                    "activate them on its own. Review them with vibemk_get_pending_changes, then "
+                    "run vibemk_activate_changes with force_foreign_changes=true."
+                )
+            if refusal == NO_CHANGES:
+                return "ℹ️ No pending changes to activate."
             return f"⚠️ Activation failed: {error}"
         if not result.get("success"):
             return "⚠️ Activation was not accepted; the changes are still pending."

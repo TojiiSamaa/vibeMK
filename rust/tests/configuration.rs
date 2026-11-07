@@ -473,3 +473,106 @@ async fn write_tools_activation_also_waits_for_the_run_in_progress() {
         "{order:?}"
     );
 }
+
+/// Bodies the live sites answered on 7 Nov 2026 (scripts/live_foreign_changes.py): a
+/// second admin's host left pending, then activate-changes without force.
+const FOREIGN: &str =
+    "There are changes from other users and foreign changes are not allowed in this API call.";
+
+async fn refusing_site(
+    status: u16,
+    body: Value,
+) -> (
+    wiremock::MockServer,
+    std::sync::Arc<vibemk::client::CheckMkClient>,
+) {
+    let (server, client) = common::fake_checkmk().await;
+    Mock::given(method("GET"))
+        .and(path(PENDING))
+        .respond_with(
+            ResponseTemplate::new(200)
+                .insert_header("ETag", "\"etag-f\"")
+                .set_body_json(json!({"value": [{"id": "c1", "user_id": "vmkother"}]})),
+        )
+        .mount(&server)
+        .await;
+    Mock::given(method("POST"))
+        .and(path(ACTIVATE))
+        .respond_with(ResponseTemplate::new(status).set_body_json(body))
+        .expect(1)
+        .mount(&server)
+        .await;
+    (server, client)
+}
+
+fn foreign_body(status: u16) -> Value {
+    json!({"title": "The operation has failed.", "status": status, "detail": FOREIGN})
+}
+
+/// S2: a write tool's own activation used to send force_foreign_changes=true,
+/// publishing whatever another admin had left half done.
+#[tokio::test]
+async fn write_tools_never_activate_other_users_changes() {
+    for status in [401, 403] {
+        let (server, client) = refusing_site(status, foreign_body(status)).await;
+        let line = vibemk::handlers::base::Base::new(client)
+            .run_activation()
+            .await;
+        assert!(line.contains("other users have pending changes"), "{line}");
+        assert!(line.contains("force_foreign_changes=true"), "{line}");
+        let reqs = server.received_requests().await.expect("recording");
+        let post = reqs
+            .iter()
+            .find(|q| q.method.as_str() == "POST")
+            .expect("a POST");
+        let body: Value = serde_json::from_slice(&post.body).expect("json body");
+        assert_eq!(body["force_foreign_changes"], false);
+    }
+}
+
+#[tokio::test]
+async fn activate_changes_explains_a_refusal_for_foreign_changes() {
+    for status in [401, 403] {
+        let (_server, client) = refusing_site(status, foreign_body(status)).await;
+        let r = ConfigurationHandler::new(client)
+            .handle("vibemk_activate_changes", &json!({}))
+            .await;
+        assert!(is_error(&r));
+        assert!(
+            text(&r).contains("other users have pending changes"),
+            "{}",
+            text(&r)
+        );
+        assert!(!text(&r).contains("Authentication failed"), "{}", text(&r));
+    }
+}
+
+/// E9c: the pending list was not empty when read, the site had nothing left when posted.
+#[tokio::test]
+async fn a_422_no_changes_is_nothing_to_activate() {
+    let nothing = json!({"title": "The operation has failed.", "status": 422, "detail": "Currently there are no changes to activate."});
+    let (_server, client) = refusing_site(422, nothing.clone()).await;
+    let r = ConfigurationHandler::new(client)
+        .handle("vibemk_activate_changes", &json!({}))
+        .await;
+    assert!(!is_error(&r));
+    assert!(
+        text(&r).starts_with("ℹ️ **No Pending Changes**"),
+        "{}",
+        text(&r)
+    );
+    let (_server, client) = refusing_site(422, nothing).await;
+    let line = vibemk::handlers::base::Base::new(client)
+        .run_activation()
+        .await;
+    assert_eq!(line, "ℹ️ No pending changes to activate.");
+}
+
+#[tokio::test]
+async fn an_ordinary_401_is_still_a_failure() {
+    let (_server, client) = refusing_site(401, json!({"detail": "Wrong credentials"})).await;
+    let line = vibemk::handlers::base::Base::new(client)
+        .run_activation()
+        .await;
+    assert!(line.starts_with("⚠️ Activation failed"), "{line}");
+}

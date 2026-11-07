@@ -83,6 +83,7 @@ status: format
 	@echo "📊 Git status after formatting:"
 	@git status --short
 # Mirror the CI package job: build, then prove the result installs and runs.
+# POSIX only (/tmp, bin/): on Windows run the steps of the CI package job by hand (P7).
 # Every entry-point defect this project has had was invisible from the
 # checkout and only showed up here.
 package: clean

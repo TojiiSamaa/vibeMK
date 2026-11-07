@@ -468,6 +468,20 @@ impl CheckMkClient {
                 retry_count += 1;
                 continue;
             }
+            // E5: a DELETE is only replayed after a 5xx/429, which does not say whether
+            // the first attempt went through. A 404 on the replay means the object is
+            // gone, which is what was asked: the delete succeeded.
+            if status.as_u16() == 404 && retry_count > 0 && matches!(method, Method::Delete) {
+                tracing::warn!(
+                    "DELETE {endpoint}: 404 on the retry, the first attempt had deleted it"
+                );
+                return Ok(ApiResponse {
+                    status: 204,
+                    data: Value::Object(Default::default()),
+                    raw: String::new(),
+                    headers: reply_headers,
+                });
+            }
             let reason = status.canonical_reason().unwrap_or("");
             let data = serde_json::from_str(&text)
                 .unwrap_or_else(|_| serde_json::json!({ "error": reason }));

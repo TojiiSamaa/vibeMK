@@ -14,7 +14,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from vibemk.api.client import CheckMKClient
-from vibemk.api.exceptions import CheckMKAPIError
+from vibemk.api.exceptions import CheckMKAPIError, CheckMKNotFoundError
 
 
 def _ok() -> MagicMock:
@@ -56,6 +56,30 @@ class TestRetrySafety:
             client.delete("objects/host_config/gone")
 
             assert urlopen.call_count == 2
+
+    def test_a_404_on_a_replayed_delete_is_the_delete_succeeding(self, client):
+        """E5: the first attempt deleted the object, then a proxy answered 502."""
+        with patch("urllib.request.urlopen") as urlopen, patch("time.sleep"):
+            urlopen.side_effect = [_http_error(502), _http_error(404)]
+
+            result = client.delete("objects/host_config/web01")
+
+            assert result["success"] is True
+            assert urlopen.call_count == 2
+
+    def test_a_404_on_the_first_delete_is_still_not_found(self, client):
+        with patch("urllib.request.urlopen") as urlopen, patch("time.sleep"):
+            urlopen.side_effect = [_http_error(404)]
+
+            with pytest.raises(CheckMKNotFoundError):
+                client.delete("objects/host_config/never-there")
+
+    def test_a_404_on_a_replayed_get_is_still_not_found(self, client):
+        with patch("urllib.request.urlopen") as urlopen, patch("time.sleep"):
+            urlopen.side_effect = [_http_error(502), _http_error(404)]
+
+            with pytest.raises(CheckMKNotFoundError):
+                client.get("objects/host_config/web01")
 
     def test_post_is_not_retried_on_server_error(self, client):
         with patch("urllib.request.urlopen") as urlopen, patch("time.sleep"):

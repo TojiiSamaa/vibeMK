@@ -426,7 +426,7 @@ async fn a_successful_write_with_the_flag_is_activated() {
         .and(path(ACTIVATE))
         .and(header("If-Match", "\"abc\""))
         .and(body_json(
-            json!({"redirect": false, "sites": ["cmk"], "force_foreign_changes": true}),
+            json!({"redirect": false, "sites": ["cmk"], "force_foreign_changes": false}),
         ))
         .respond_with(ResponseTemplate::new(200).set_body_json(json!({})))
         .expect(1)

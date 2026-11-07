@@ -202,24 +202,37 @@ pub fn is_downtime_active(downtime: &Value, current: f64) -> bool {
     }
 }
 
-/// `_format_timestamp`: "YYYY-MM-DD HH:MM" in the value's own offset, local for numbers.
+/// `_format_timestamp`: "YYYY-MM-DD HH:MM" in the local zone.
 pub fn format_timestamp(v: &Value) -> String {
-    stamp(v, "%Y-%m-%d %H:%M").unwrap_or_else(|| "Unknown".to_string())
+    format_timestamp_in(&Local, v)
 }
 
-fn stamp(v: &Value, fmt: &str) -> Option<String> {
+/// E10b: CheckMK 2.3 and 2.5 send downtime times as ISO in UTC ("+00:00"),
+/// while "22:00 tomorrow" is read as local time; shown as sent, a downtime
+/// scheduled for 22:00 in Paris was listed at 21:00. Aware times and numbers
+/// are shown in `tz`, a naive time as it is.
+pub fn format_timestamp_in<Tz: TimeZone>(tz: &Tz, v: &Value) -> String
+where
+    Tz::Offset: std::fmt::Display,
+{
+    stamp(tz, v, "%Y-%m-%d %H:%M").unwrap_or_else(|| "Unknown".to_string())
+}
+
+fn stamp<Tz: TimeZone>(tz: &Tz, v: &Value, fmt: &str) -> Option<String>
+where
+    Tz::Offset: std::fmt::Display,
+{
     if !truthy(v) {
         return None;
     }
     match v {
         Value::String(s) => match from_iso(&s.replace('Z', "+00:00"))? {
-            Iso::Aware(d) => Some(d.format(fmt).to_string()),
+            Iso::Aware(d) => Some(d.with_timezone(tz).format(fmt).to_string()),
             Iso::Naive(n) => Some(n.format(fmt).to_string()),
         },
         Value::Number(n) => {
             let t = n.as_f64()?;
-            Local
-                .timestamp_opt(t.floor() as i64, 0)
+            tz.timestamp_opt(t.floor() as i64, 0)
                 .single()
                 .map(|d| d.format(fmt).to_string())
         }
@@ -229,19 +242,27 @@ fn stamp(v: &Value, fmt: &str) -> Option<String> {
 
 /// `_get_time_only`: "HH:MM" (an unreadable value comes back as its first 5 characters).
 fn time_only(v: &Value) -> String {
+    time_only_in(&Local, v)
+}
+
+/// `time_only` with aware times and numbers shown in `tz` (E10b).
+pub fn time_only_in<Tz: TimeZone>(tz: &Tz, v: &Value) -> String
+where
+    Tz::Offset: std::fmt::Display,
+{
     let fallback = |s: String| s.chars().take(5).collect::<String>();
     match v {
         Value::String(s) => match from_iso(&s.replace('Z', "+00:00")) {
-            Some(Iso::Aware(d)) => d.format("%H:%M").to_string(),
+            Some(Iso::Aware(d)) => d.with_timezone(tz).format("%H:%M").to_string(),
             Some(Iso::Naive(n)) => n.format("%H:%M").to_string(),
             None => fallback(s.clone()),
         },
         Value::Number(n) => n
             .as_f64()
-            .and_then(|t| Local.timestamp_opt(t.floor() as i64, 0).single())
+            .and_then(|t| tz.timestamp_opt(t.floor() as i64, 0).single())
             .map_or_else(|| fallback(py_str(v)), |d| d.format("%H:%M").to_string()),
         _ => {
-            let s = format_timestamp(v);
+            let s = format_timestamp_in(tz, v);
             if s.contains(' ') {
                 s.rsplit(' ').next().unwrap_or("").to_string()
             } else {

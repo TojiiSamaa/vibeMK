@@ -9,8 +9,8 @@ use chrono::{DateTime, FixedOffset, Local, TimeZone, Utc};
 use serde_json::{json, Value};
 use vibemk::handlers::base::Handler;
 use vibemk::handlers::downtimes::{
-    format_timestamp, is_downtime_active, parse_downtime_times, parse_natural_time,
-    parse_time_delta, unix_time, DowntimeHandler,
+    format_timestamp, format_timestamp_in, is_downtime_active, parse_downtime_times,
+    parse_natural_time, parse_time_delta, time_only_in, unix_time, DowntimeHandler,
 };
 use wiremock::matchers::{method, path};
 use wiremock::{Mock, MockServer, ResponseTemplate};
@@ -184,8 +184,24 @@ fn an_unparseable_duration_falls_back_to_an_hour() {
 #[test]
 fn an_iso_string_with_z_is_understood() {
     assert_eq!(
-        format_timestamp(&json!("2026-03-01T22:00:00Z")),
-        "2026-03-01 22:00"
+        format_timestamp_in(&kolkata(), &json!("2026-03-01T22:00:00Z")),
+        "2026-03-02 03:30"
+    );
+}
+
+/// E10b: CheckMK sends "+00:00"; a downtime typed for 22:00 at +5:30 showed 16:30.
+#[test]
+fn checkmk_utc_times_are_shown_in_the_zone_times_are_typed_in() {
+    let sent = json!("2030-01-01T16:30:00+00:00");
+    assert_eq!(format_timestamp_in(&kolkata(), &sent), "2030-01-01 22:00");
+    assert_eq!(time_only_in(&kolkata(), &sent), "22:00");
+    let typed = kolkata()
+        .with_ymd_and_hms(2030, 1, 1, 22, 0, 0)
+        .unwrap()
+        .timestamp();
+    assert_eq!(
+        format_timestamp_in(&kolkata(), &json!(typed)),
+        "2030-01-01 22:00"
     );
 }
 

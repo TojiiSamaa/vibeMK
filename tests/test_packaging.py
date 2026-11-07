@@ -13,6 +13,7 @@ artefact, the private `claude.md` notes and the `tmp/` planning files.
 
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
 import zipfile
@@ -118,12 +119,22 @@ def wheel(tmp_path_factory):
         pytest.skip("python-build is needed to inspect the distribution")
 
     outdir = tmp_path_factory.mktemp("dist")
+    # P4: setuptools writes build/ and *.egg-info next to the sources, so two
+    # runs building the checkout at once broke each other. Build a copy.
+    source = tmp_path_factory.mktemp("source") / "vibemk"
+    shutil.copytree(
+        PROJECT_ROOT,
+        source,
+        ignore=shutil.ignore_patterns(
+            ".git", ".venv", "venv", "target", "build", "dist", "*.egg-info", "__pycache__", ".*_cache"
+        ),
+    )
     # sdist first, then the wheel from the unpacked sdist -- the default, and
     # what the CI package job and a release do. `--wheel` alone builds in the
     # checkout and reuses a local build/lib, so a stale one from an older
     # layout ended up in the wheel and failed this check on one machine only.
     completed = subprocess.run(
-        [sys.executable, "-m", "build", "--outdir", str(outdir), str(PROJECT_ROOT)],
+        [sys.executable, "-m", "build", "--outdir", str(outdir), str(source)],
         capture_output=True,
         text=True,
     )
