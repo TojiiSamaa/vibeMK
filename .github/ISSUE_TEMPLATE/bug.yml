@@ -1,0 +1,30 @@
+# géré par profil-github (modeles-issues.mjs) : ne pas modifier à la main
+name: Bug
+description: Quelque chose ne fonctionne pas
+labels: ["bug", "à trier"]
+body:
+  - type: textarea
+    id: attendu
+    attributes:
+      label: "Comportement attendu"
+    validations:
+      required: true
+  - type: textarea
+    id: observe
+    attributes:
+      label: "Comportement observé"
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: "Étapes pour reproduire"
+      description: "Numérotées, la plus courte possible"
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: "Version"
+    validations:
+      required: true
