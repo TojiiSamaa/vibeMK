@@ -1,0 +1,24 @@
+# géré par profil-github (modeles-issues.mjs) : ne pas modifier à la main
+name: Idée / amélioration
+description: Proposer une fonction
+labels: ["amélioration", "à trier"]
+body:
+  - type: textarea
+    id: besoin
+    attributes:
+      label: "Le besoin"
+      description: "Le problème que ça résout, pas la solution"
+    validations:
+      required: true
+  - type: textarea
+    id: idee
+    attributes:
+      label: "La solution imaginée"
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Ce qui existe déjà ou a été essayé"
+    validations:
+      required: false
