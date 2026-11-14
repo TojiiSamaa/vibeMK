@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/discord-apercu.png" alt="vibeMK" width="900"></p>
+
 # vibeMK 🚀
 
 ## Python vs Rust: measured comparison
